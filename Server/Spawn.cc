@@ -155,7 +155,7 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id, Entity const &parent) 
     if (petal_id == PetalID::kMoon)
         BitMath::set(petal.flags, EntityFlags::kIsDetached);
     petal.mass = petal_data.attributes.mass;
-    petal.friction = DEFAULT_FRICTION * 1.5;
+    petal.friction = DEFAULT_FRICTION;
     petal.add_component(kRelations);
     petal.set_parent(parent.id);
     petal.set_team(parent.get_team());

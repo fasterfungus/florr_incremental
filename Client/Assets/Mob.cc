@@ -356,14 +356,16 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             }
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
-            ctx.set_line_width(5);
+            ctx.set_line_width(7);
             ctx.round_line_cap();
             ctx.round_line_join();
             ctx.begin_path();
             ctx.move_to(radius,0);
             for (uint32_t i = 0; i < vertices; ++i) {
                 float base_angle = M_PI * 2 * i / vertices;
-                ctx.qcurve_to(radius*0.9*cosf(base_angle+M_PI/vertices),radius*0.9*sinf(base_angle+M_PI/vertices),radius*cosf(base_angle+2*M_PI/vertices),radius*sinf(base_angle+2*M_PI/vertices));
+                ctx.qcurve_to(
+                    radius*0.8*cosf(base_angle+M_PI/vertices),radius*0.8*sinf(base_angle+M_PI/vertices),
+                    radius*cosf(base_angle+2*M_PI/vertices),radius*sinf(base_angle+2*M_PI/vertices));
             }
             ctx.fill();
             ctx.stroke();
@@ -375,7 +377,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             SeedGenerator gen(std::floor(radius) * 1957264 + 295726);
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
-            ctx.set_line_width(5);
+            ctx.set_line_width(7);
             ctx.round_line_cap();
             ctx.round_line_join();
             ctx.begin_path();
@@ -580,10 +582,10 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.fill();
             ctx.stroke();
             ctx.begin_path();
-            ctx.move_to(-37,-5);
-            ctx.qcurve_to(-36,0,-37,5);
-            ctx.move_to(-27,5);
-            ctx.qcurve_to(-25,0,-27,-5);
+            ctx.move_to(-36,-5);
+            ctx.qcurve_to(-37,0,-36,5);
+            ctx.move_to(-25,5);
+            ctx.qcurve_to(-27,0,-25,-5);
             ctx.stroke();
             ctx.set_fill(0xff333333);
             ctx.set_stroke(0xff222222);
