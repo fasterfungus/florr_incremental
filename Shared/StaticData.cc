@@ -5,9 +5,11 @@
 uint32_t const MAX_LEVEL = 99;
 uint32_t const TPS = 20;
 
-float const PETAL_DISABLE_DELAY = 45.0f; //seconds
+//these two are based on the base game's 20 TPS
 float const PLAYER_ACCELERATION = 5.0f;
 float const DEFAULT_FRICTION = 1.0f/3.0f;
+
+float const PETAL_DISABLE_DELAY = 45.0f; //seconds
 float const SUMMON_RETREAT_RADIUS = 600.0f;
 float const DIGGER_SPAWN_CHANCE = 0.25f;
 

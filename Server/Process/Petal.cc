@@ -29,7 +29,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
         BitMath::at(petal.flags, EntityFlags::kIsDetached)) {
         switch (petal.get_petal_id()) {
             case PetalID::kMissile: {
-                petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(1.5 * PLAYER_ACCELERATION);
+                petal.acceleration.unit_normal(petal.get_angle()).set_magnitude(2.0 * PLAYER_ACCELERATION);
                 break;
             }
             case PetalID::kPoisonPeas:
@@ -77,7 +77,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
     switch (petal.get_petal_id()) {
         case PetalID::kMissile:
             if (BitMath::at(player.input, InputFlags::kAttacking)) {
-                petal.velocity.unit_normal(petal.get_angle()).set_magnitude(20 * PLAYER_ACCELERATION);
+                petal.velocity.unit_normal(petal.get_angle()).set_magnitude(15 * PLAYER_ACCELERATION);
                 petal.friction = DEFAULT_FRICTION;
                 entity_set_despawn_tick(petal, 2.5 * TPS);
             }
@@ -89,7 +89,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 petal.friction = DEFAULT_FRICTION;
                 float angle = delta.angle();
                 if (petal.get_petal_id() == PetalID::kTriweb) angle += frand() - 0.5;
-                petal.acceleration.unit_normal(angle).set_magnitude(30 * PLAYER_ACCELERATION);
+                petal.acceleration.unit_normal(angle).set_magnitude(25 * PLAYER_ACCELERATION);
                 entity_set_despawn_tick(petal, 0.6 * TPS);
             } else if (BitMath::at(player.input, InputFlags::kDefending))
                 entity_set_despawn_tick(petal, 0.6 * TPS);
