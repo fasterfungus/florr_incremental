@@ -7,6 +7,15 @@
 constexpr double M_PI = 3.14159265358979323846;
 #endif
 
+#ifndef EPSILON
+constexpr float EPSILON = 0.000001f;
+#endif
+#ifndef DEG2RAD
+constexpr float DEG2RAD = (float) M_PI / 180.0f;
+#endif
+#ifndef RAD2DEG
+constexpr float RAD2DEG = 180.0f / (float) M_PI;
+#endif
 constexpr uint32_t div_round_up(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
 double frand();
@@ -51,3 +60,12 @@ public:
 std::string format_pct(float);
 std::string format_score(float);
 std::string format_number(float);
+float Max(float, float);
+float Max(float, float, float); 
+float Max(float, float, float, float);
+float Min(float, float);
+float Min(float, float, float);
+float Min(float, float, float, float);
+float Sqrt(float);
+float Clamp(float, float, float);
+bool Equals(float a, float b);

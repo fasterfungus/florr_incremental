@@ -4,7 +4,7 @@
 #include <Shared/Entity.hh>
 
 #include <cmath>
-#include <iostream>
+#include <Helpers/Collision/GJK/GJK.hh>
 
 static bool _should_interact(Entity const &ent1, Entity const &ent2) {
     //if (ent1.has_component(kFlower) || ent2.has_component(kFlower)) return false;
@@ -53,27 +53,25 @@ static void _deal_knockback(Entity &ent, Vector knockback, float mass_ratio) {
 
 static void _cancel_movement(Entity &ent, Vector dir, Vector add) {
     Vector push = dir;
-    push.normalize();
+    push.Normalize();
     float dot = fclamp(push.x * add.x + push.y * add.y, PLAYER_ACCELERATION * 0.5, PLAYER_ACCELERATION * 25);
     ent.velocity += push * (PLAYER_ACCELERATION + dot * 2);
     ent.collision_velocity += push * (0.5 * PLAYER_ACCELERATION);
 }
 
 void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
-    //do a distance dependent check first (it's faster)
     float min_dist = ent1.get_radius() + ent2.get_radius();
     if (fabs(ent1.get_x() - ent2.get_x()) > min_dist || fabs(ent1.get_y() - ent2.get_y()) > min_dist) return;
-    //check if collide (distance independent)
     if (!_should_interact(ent1, ent2)) return;
     //finer distance check
-    Vector separation(ent1.get_x() - ent2.get_x(), ent1.get_y() - ent2.get_y());
-    float dist = min_dist - separation.magnitude();
-    if (dist < 0) return;
+    float dist;
+    Vector separation(0,0);
+    if (!Detect(ent1, ent2, separation, dist)) return;
     if (NO(kDrop) && NO(kWeb)) {
         if (separation.x == 0 && separation.y == 0)
             separation.unit_normal(frand() * 2 * M_PI);
         else
-            separation.normalize();
+            separation.Normalize();
         float ratio = ent2.mass / (ent1.mass + ent2.mass);
         if (!(ent1.get_team() == ent2.get_team())) {
             if (ent1.has_component(kFlower) && !ent2.has_component(kPetal))

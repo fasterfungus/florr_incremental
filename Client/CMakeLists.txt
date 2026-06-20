@@ -2,7 +2,7 @@ set(CMAKE_SYSTEM_NAME Generic)
 
 cmake_minimum_required(VERSION 3.16)
 
-project(gardn-client)
+project(florr_incremental-client)
 include_directories(..)
 
 set(SRCS
@@ -12,11 +12,13 @@ set(SRCS
     Assets/Web.cc
     Render/RenderDrop.cc
     Render/RenderFlower.cc
-    Render/RenderHealth.cc
+        Render/RenderFlowerHealth.cc
+        Render/RenderMobHealth.cc
     Render/RenderMob.cc
     Render/RenderName.cc
     Render/RenderPetal.cc
     Render/RenderWeb.cc
+        Render/RenderCollision.cc
     Render/Renderer.cc
     Debug.cc
     DOM.cc
@@ -86,5 +88,5 @@ endif()
 add_link_options(-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8)
 add_link_options(-sEXPORTED_FUNCTIONS=_main,_key_event,_mouse_event,_touch_event,_wheel_event,_clipboard_event,_loop,_on_message)
 
-add_executable(gardn-client ${SRCS})
+add_executable(florr_incremental-client ${SRCS})
 set(CMAKE_EXECUTABLE_SUFFIX ".js")

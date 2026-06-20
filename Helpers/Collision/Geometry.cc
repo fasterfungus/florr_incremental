@@ -1,0 +1,145 @@
+
+#include <Shared/Entity.hh>
+#include <Helpers/Math.hh>
+#include <cmath>
+#include "Geometry.hh"
+
+float GetDistance2(const Vector& pa, const Vector& pb, const Vector& pt)
+    {
+        float px = pt.x - pa.x, py = pt.y - pa.y;
+        float xx = pb.x - pa.x, yy = pb.y - pa.y;
+        float h = Clamp((px * xx + py * yy) / (xx * xx + yy * yy), 0.0f, 1.0f);
+        float dx = px - xx * h, dy = py - yy * h;
+        return dx * dx + dy * dy;
+    }
+bool Contains(const Entity& ent, const Vector& pt){
+    if (ent.has_component(kPhysics)) {
+        uint8_t raw_shape = ent.get_shape();
+        float radius = ent.get_radius();
+        float width = ent.get_width();
+        float height = ent.get_height();
+        float length = ent.get_length();
+        
+        CollisionShape shape = static_cast<CollisionShape>(raw_shape);
+        switch (shape) {
+            case CollisionShape::kCircle:{
+                return pt.magnitude2() <= radius * radius;
+            }
+            case CollisionShape::kRectangle:{
+                float w = width * 0.5f;
+                float h = height * 0.5f;
+                if (pt.x < -w || pt.x > w) return false;
+                if (pt.y < -h || pt.y > h) return false;
+                return true;
+            }
+            case CollisionShape::kPolygon:{
+                return false;
+            }
+            case CollisionShape::kEllipse:{
+                return false;
+            }
+            case CollisionShape::kPie:{
+                return false;
+            }
+            case CollisionShape::kSegment:{
+                return false;
+            }
+            case CollisionShape::kCapsule:{
+                Vector p1 = Vector(length *  0.5f, 0);
+                Vector p2 = Vector(length * -0.5f, 0);
+                float dist2 = GetDistance2(p1, p2, pt);
+                float radius2 = radius * radius;
+                return dist2 <= radius2;
+            }
+        }
+}
+}
+Vector GetFarthestProjectionPoint(const Entity& ent, const Vector& dir){
+    if (ent.has_component(kPhysics)) {
+        uint8_t raw_shape = ent.get_shape();
+        float radius = ent.get_radius();
+        float width = ent.get_width();
+        float height = ent.get_height();
+        float length = ent.get_length();
+        CollisionShape shape = static_cast<CollisionShape>(raw_shape);
+        float A = width * 0.5f;
+        float B = height * 0.5f;
+        switch (shape) {
+            case CollisionShape::kCircle:{
+                return dir.normalized()*radius;
+            }
+            case CollisionShape::kRectangle:{
+                float w = width * 0.5f;
+                float h = height * 0.5f;
+                Vector vertices[4] = {
+                Vector(-w, -h),
+                Vector( w, -h),
+                Vector( w,  h),
+                Vector(-w,  h)
+                };
+                Vector point = vertices[0];
+                float max = Vector::Dot(point, dir);
+                for (int i = 1; i < 4; i++)
+                {
+                float dot = Vector::Dot(vertices[i], dir);
+                if (dot > max)
+                    {
+                    max = dot;
+                    point = vertices[i];
+                    }
+                }
+                return point;
+                
+            }
+            case CollisionShape::kPolygon:{
+                break;
+            }
+            case CollisionShape::kEllipse:{
+                    float x = 0;
+                    float y = 0;
+
+                    if (Equals(dir.x, 0.0f))
+                    {
+                        float sign = dir.y < 0.0f ? -1 : 1;
+                        y = sign * B;
+                    }
+                    else if (Equals(dir.y, 0.0f))
+                    {
+                        float sign = dir.x < 0.0f ? -1 : 1;
+                        x = sign * A;
+                    }
+                    else
+                    {
+                        float k = dir.y / dir.x;
+
+                        float a2 = std::pow(A,2);
+                        float b2 = std::pow(B,2);
+                        float k2 = std::pow(k,2);
+
+                        float t = std::sqrt((a2 + b2 * k2) / k2);
+                        Vector v = Vector(0.0f, t);
+                        if (Vector::Dot(v, dir) < 0)
+                        {
+                            t *= -1;
+                        }
+
+                        x = k * t - (b2 * k2 * k * t) / (a2 + b2 * k2);
+                        y = (b2 * k2 * t) / (a2 + b2 * k2);
+                    }
+                    return Vector(x, y);
+            }
+            case CollisionShape::kPie:{
+                break;
+            }
+            case CollisionShape::kSegment:{
+                break;
+            }
+            case CollisionShape::kCapsule:{
+                Vector p = dir.normalized()*length;
+                float x = dir.x >= 0 ? length * 0.5f : -length * 0.5f;
+                p.x += x;
+                return p;
+            }
+        }
+}
+}

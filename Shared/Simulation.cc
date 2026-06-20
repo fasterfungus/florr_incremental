@@ -1,5 +1,4 @@
 #include <Shared/Simulation.hh>
-
 #ifdef DEBUG
 #include <iostream>
 

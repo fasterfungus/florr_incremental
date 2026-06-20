@@ -125,6 +125,10 @@ void Game::render_game() {
         renderer.rotate(ent.get_angle());
         renderer.scale(ent.animation);
         render_web(renderer, ent);
+        if (Game::show_collision)
+        {
+            render_collision(renderer, ent);
+        }
     });
     simulation.for_each<kDrop>([](Simulation *sim, Entity const &ent){
         RenderContext context(&renderer);
@@ -132,11 +136,22 @@ void Game::render_game() {
         renderer.rotate(ent.get_angle() + (ent.animation - 1) * 3 * M_PI);
         renderer.scale(ent.animation);
         render_drop(renderer, ent);
+        if (Game::show_collision)
+        {
+            render_collision(renderer, ent);
+        }
     });
     simulation.for_each<kHealth>([](Simulation *sim, Entity const &ent){
         RenderContext context(&renderer);
         renderer.translate(ent.get_x(), ent.get_y());
-        render_health(renderer, ent);
+        if (ent.has_component(kFlower))
+        {
+            render_flower_health(renderer, ent);
+        }
+        if (ent.has_component(kMob))
+        {
+            render_mob_health(renderer, ent);
+        }
     });
     simulation.for_each<kPetal>([](Simulation *sim, Entity const &ent){
         RenderContext context(&renderer);
@@ -144,6 +159,10 @@ void Game::render_game() {
         renderer.rotate(ent.get_angle());
         _apply_damage_filter(renderer, ent);
         render_petal(renderer, ent);
+        if (Game::show_collision)
+        {
+            render_collision(renderer, ent);
+        }
     });
     simulation.for_each<kMob>([](Simulation *sim, Entity const &ent){
         if (ent.get_mob_id() != MobID::kAntHole) return;
@@ -153,6 +172,7 @@ void Game::render_game() {
             renderer.rotate(ent.get_angle());
         _apply_damage_filter(renderer, ent);
         render_mob(renderer, ent);
+
     });
     simulation.for_each<kMob>([](Simulation *sim, Entity const &ent){
         if (ent.get_mob_id() == MobID::kAntHole) return;
@@ -162,12 +182,20 @@ void Game::render_game() {
             renderer.rotate(ent.get_angle());
         _apply_damage_filter(renderer, ent);
         render_mob(renderer, ent);
+        if (Game::show_collision)
+        {
+            render_collision(renderer, ent);
+        }
     });
     simulation.for_each<kFlower>([](Simulation *sim, Entity const &ent){
         RenderContext context(&renderer);
         renderer.translate(ent.get_x(), ent.get_y());
         _apply_damage_filter(renderer, ent);
         render_flower(renderer, ent);
+        if (Game::show_collision)
+        {
+            render_collision(renderer, ent);
+        }
     });
     simulation.for_each<kName>([](Simulation *sim, Entity const &ent){
         RenderContext context(&renderer);

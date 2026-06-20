@@ -23,7 +23,7 @@ namespace Game {
     extern std::string disconnect_message;
     extern std::array<uint8_t, PetalID::kNumPetals> seen_petals;
     extern std::array<uint8_t, MobID::kNumMobs> seen_mobs;
-    
+    extern bool show_collision;
     extern double timestamp;
     
     extern double score;

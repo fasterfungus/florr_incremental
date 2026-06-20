@@ -2,7 +2,7 @@
 
 #include <Shared/Binary.hh>
 #include <Shared/StaticData.hh>
-
+#include <Helpers/Collision/BoundingBox/BoundingBoxHelper.hh>
 #include <Shared/Binary.hh>
 
 Entity::Entity() {
@@ -25,7 +25,6 @@ void Entity::init() {
     #undef MULTIPLE
     reset_protocol();
 }
-
 void Entity::reset_protocol() {
     for (uint32_t n = 0; n < div_round_up(kFieldCount, 8); ++n) state[n] = 0;
     #define SINGLE(component, name, type);

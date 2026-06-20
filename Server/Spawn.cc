@@ -7,7 +7,7 @@
 #include <Shared/Map.hh>
 #include <Shared/Simulation.hh>
 #include <Shared/StaticData.hh>
-
+#include <Helpers/Collision/BoundingBox/BoundingBoxHelper.hh>
 #include <cmath>
 
 Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
@@ -16,6 +16,10 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
     Entity &drop = sim->alloc_ent();
     drop.add_component(kPhysics);
     drop.set_radius(25);
+    drop.set_width(50);
+    drop.set_height(50);
+    drop.set_shape(4);
+    Set(drop);
     drop.set_angle(frand() * 0.2 - 0.1);
     drop.friction = 0.25;
 
@@ -30,7 +34,7 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
 }
 
 static Entity &__alloc_mob(
-    Simulation *sim, MobID::T mob_id, float x, float y, 
+    Simulation *sim, MobID::T mob_id, float x, float y,
     EntityID const team, std::function<void(Entity &)> on_spawn
 ) {
     DEBUG_ONLY(assert(mob_id < MobID::kNumMobs);)
@@ -40,14 +44,19 @@ static Entity &__alloc_mob(
 
     mob.add_component(kPhysics);
     mob.set_radius(data.radius.get_single(seed));
+    mob.set_width(data.width);
+    mob.set_height(data.height);
+    mob.set_length(data.length);
+    mob.set_shape(data.shape);
     mob.set_angle(frand() * 2 * M_PI);
     mob.set_x(x);
     mob.set_y(y);
+    Set(mob);
     mob.friction = DEFAULT_FRICTION;
     mob.mass = (1 + mob.get_radius() / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 10000 : 1);
     if (mob_id == MobID::kAntHole)
         BitMath::set(mob.flags, EntityFlags::kNoFriendlyCollision);
-        
+
     mob.add_component(kRelations);
     mob.set_team(team);
 
@@ -72,21 +81,21 @@ static Entity &__alloc_mob(
         mob.set_angle(0);
         mob.set_color(ColorID::kGray);
     }
-    if (on_spawn) 
+    if (on_spawn)
         on_spawn(mob);
     return mob;
 }
 
 Entity &alloc_mob(
-    Simulation *sim, MobID::T mob_id, float x, float y, 
+    Simulation *sim, MobID::T mob_id, float x, float y,
     EntityID const team, std::function<void(Entity &)> on_spawn
 ) {
     struct MobData const &data = MOB_DATA[mob_id];
     if (data.attributes.segments <= 1) {
         Entity &ent = __alloc_mob(sim, mob_id, x, y, team, on_spawn);
         if (mob_id == MobID::kAntHole) {
-            std::vector<MobID::T> const spawns = { 
-                MobID::kBabyAnt, MobID::kBabyAnt, MobID::kBabyAnt, 
+            std::vector<MobID::T> const spawns = {
+                MobID::kBabyAnt, MobID::kBabyAnt, MobID::kBabyAnt,
                 MobID::kWorkerAnt, MobID::kWorkerAnt, MobID::kSoldierAnt
             };
             for (MobID::T mob_id : spawns) {
@@ -119,6 +128,8 @@ Entity &alloc_player(Simulation *sim, EntityID const team) {
 
     player.add_component(kPhysics);
     player.set_radius(BASE_FLOWER_RADIUS);
+    player.set_shape(1);
+    Set(player);
     player.friction = DEFAULT_FRICTION;
     player.mass = 1;
 
@@ -150,6 +161,8 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id, Entity const &parent) 
     petal.set_x(parent.get_x());
     petal.set_y(parent.get_y());
     petal.set_radius(petal_data.radius);
+    petal.set_shape(1);
+    Set(petal);
     if (petal_data.attributes.rotation_style == PetalAttributes::kPassiveRot)
         petal.set_angle(frand() * 2 * M_PI);
     if (petal_id == PetalID::kMoon)
@@ -183,6 +196,8 @@ Entity &alloc_web(Simulation *sim, float radius, Entity const &parent) {
     web.set_y(parent.get_y());
     web.set_angle(frand() * 2 * M_PI);
     web.set_radius(radius);
+    web.set_shape(1);
+    Set(web);
     web.mass = 1.0;
     web.friction = 1.0;
     web.add_component(kRelations);
@@ -203,17 +218,17 @@ Entity &alloc_cpu_camera(Simulation *sim, EntityID const team) {
     ent.set_respawn_level(frand() * 30);
     ent.set_team(team);
     ent.set_color(ColorID::kGray);
-    
+
     //need to auto add to petaltracker
     std::vector<PetalID::T> const inventory = {
-        PetalID::kRose, PetalID::kBasic, PetalID::kBasic, 
+        PetalID::kRose, PetalID::kBasic, PetalID::kBasic,
         PetalID::kRose, PetalID::kBasic, PetalID::kBasic,
         PetalID::kRose, PetalID::kBasic, PetalID::kBasic
     };
 
     for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
         ent.set_inventory(i, inventory[i]);
-    
+
     if (frand() < 0.001 && PetalTracker::get_count(sim, PetalID::kUniqueBasic) == 0)
         ent.set_inventory(0, PetalID::kUniqueBasic);
     for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)

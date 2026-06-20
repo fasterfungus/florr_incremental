@@ -6,6 +6,7 @@
 
 typedef uint16_t game_tick_t;
 
+
 #define PERCOMPONENT \
     COMPONENT(Physics) \
     COMPONENT(Camera) \
@@ -37,7 +38,19 @@ FIELDS_Name
 SINGLE(Physics, x, Float) \
 SINGLE(Physics, y, Float) \
 SINGLE(Physics, radius, Float) \
-SINGLE(Physics, angle, Float)
+SINGLE(Physics, angle, Float) \
+SINGLE(Physics, width, Float) \
+SINGLE(Physics, length, Float) \
+SINGLE(Physics, height, Float) \
+SINGLE(Physics, sweep, Float) \
+SINGLE(Physics, vertics_count, uint8_t) \
+MULTIPLE(Physics, vertics_x, Float, MAX_POLY_VERTICES) \
+MULTIPLE(Physics, vertics_y, Float, MAX_POLY_VERTICES) \
+SINGLE(Physics, maxx, Float) \
+SINGLE(Physics, maxy, Float) \
+SINGLE(Physics, minx, Float) \
+SINGLE(Physics, miny, Float) \
+SINGLE(Physics, shape, uint8_t) 
 
 #define FIELDS_Camera \
 SINGLE(Camera, player, EntityID) \

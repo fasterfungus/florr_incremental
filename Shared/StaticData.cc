@@ -721,6 +721,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {10.0},
         .damage = 10.0,
         .radius = {14.0},
+        .shape = 1,
         .xp = 1,
         .drops = {
             PetalID::kLight, PetalID::kLeaf, PetalID::kTwin, PetalID::kRice, PetalID::kTriplet
@@ -734,6 +735,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {25.0},
         .damage = 10.0,
         .radius = {14.0},
+        .shape = 1,
         .xp = 3,
         .drops = {
             PetalID::kLight, PetalID::kLeaf, PetalID::kTwin, PetalID::kCorn, PetalID::kBone
@@ -747,6 +749,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {40.0},
         .damage = 10.0,
         .radius = {14.0},
+        .shape = 1,
         .xp = 5,
         .drops = {
             PetalID::kTwin, PetalID::kIris, PetalID::kWing, PetalID::kFaster, PetalID::kTriplet
@@ -759,7 +762,10 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .rarity = RarityID::kCommon,
         .health = {15.0},
         .damage = 50.0,
-        .radius = {20.0},
+        .radius = {200.0},
+        .width = 600.0,
+        .height = 400.0,
+        .shape = 2,
         .xp = 4,
         .drops = {
             PetalID::kLight, PetalID::kStinger, PetalID::kTwin, PetalID::kWing
@@ -773,6 +779,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {25.0},
         .damage = 10.0,
         .radius = {30.0},
+        .shape = 1,
         .xp = 3,
         .drops = {
             PetalID::kLight, PetalID::kRose, PetalID::kTwin, PetalID::kBubble
@@ -786,6 +793,8 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {40.0},
         .damage = 35.0,
         .radius = {35.0},
+        .length = 25.0,
+        .shape = 0,
         .xp = 10,
         .drops = {
             PetalID::kIris, PetalID::kSalt, PetalID::kWing, PetalID::kTriplet
@@ -799,6 +808,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {1000.0},
         .damage = 10.0,
         .radius = {90.0},
+        .shape = 1,
         .xp = 400,
         .drops = {
             PetalID::kRose, PetalID::kDahlia, PetalID::kBubble, PetalID::kAzalea, PetalID::kObserver
@@ -812,6 +822,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {600.0},
         .damage = 35.0,
         .radius = {75.0},
+        .shape = 1,
         .xp = 50,
         .drops = {
             PetalID::kIris, PetalID::kWing, PetalID::kBlueIris, PetalID::kTriplet, PetalID::kBeetleEgg, PetalID::kThirdEye
@@ -827,6 +838,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {35.0},
         .damage = 10.0,
         .radius = {30.0},
+        .shape = 1,
         .xp = 5,
         .drops = {
             PetalID::kDahlia, PetalID::kWing, PetalID::kYinYang, PetalID::kAzalea
@@ -840,6 +852,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {40.0},
         .damage = 40.0,
         .radius = {40.0},
+        .shape = 1,
         .xp = 12,
         .drops = {
             PetalID::kDandelion, PetalID::kMissile, PetalID::kWing, PetalID::kBubble, PetalID::kAntennae
@@ -855,6 +868,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {25.0, 50.0},
         .damage = 30.0,
         .radius = {30.0, 60.0},
+        .shape = 1,
         .xp = 2,
         .drops = {
             PetalID::kStinger, PetalID::kYucca, PetalID::kCactus, PetalID::kPoisonCactus, PetalID::kTricac
@@ -870,6 +884,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {5.0, 15.0},
         .damage = 10.0,
         .radius = {10.0, 25.0},
+        .shape = 1,
         .xp = 1,
         .drops = {
             PetalID::kHeavy, PetalID::kLight, PetalID::kRock
@@ -885,6 +900,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {40.0, 60.0},
         .damage = 10.0,
         .radius = {50.0, 75.0},
+        .shape = 1,
         .xp = 10,
         .drops = {
             PetalID::kHeavy, PetalID::kRock, PetalID::kHeaviest, PetalID::kMoon
@@ -900,6 +916,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {50.0},
         .damage = 10.0,
         .radius = {35.0},
+        .shape = 1,
         .xp = 2,
         .drops = {
             PetalID::kLight, PetalID::kTwin, PetalID::kLeaf, PetalID::kPeas, PetalID::kTriplet, PetalID::kGoldenLeaf
@@ -915,6 +932,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {50.0},
         .damage = 10.0,
         .radius = {35.0},
+        .shape = 1,
         .xp = 3,
         .drops = {
             PetalID::kIris, PetalID::kPoisonPeas, PetalID::kBlueIris
@@ -934,6 +952,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health= {50.0},
         .damage = 10.0,
         .radius = {35.0},
+        .shape = 1,
         .xp = 4,
         .drops = {
             PetalID::kSand, PetalID::kFaster, PetalID::kSalt, PetalID::kStick
@@ -949,6 +968,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {30.0, 45.0},
         .damage = 40.0,
         .radius = {32.0, 48.0},
+        .shape = 1,
         .xp = 5,
         .drops = {
             PetalID::kSand, PetalID::kFaster, PetalID::kStick
@@ -962,6 +982,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {35.0},
         .damage = 10.0,
         .radius = {35.0},
+        .shape = 1,
         .xp = 10,
         .drops = {
             PetalID::kIris, PetalID::kPincer, PetalID::kTriplet, PetalID::kLotus
@@ -980,6 +1001,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {35.0},
         .damage = 10.0,
         .radius = {15.0},
+        .shape = 1,
         .xp = 8,
         .drops = {
             PetalID::kStinger, PetalID::kWeb, PetalID::kFaster, PetalID::kTriweb
@@ -998,6 +1020,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {500.0},
         .damage = 10.0,
         .radius = {45.0},
+        .shape = 1,
         .xp = 25,
         .drops = {
             PetalID::kIris, PetalID::kWing, PetalID::kAntEgg, PetalID::kTriplet
@@ -1013,6 +1036,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {350.0},
         .damage = 10.0,
         .radius = {25.0},
+        .shape = 1,
         .xp = 15,
         .drops = {
             PetalID::kTwin, PetalID::kIris, PetalID::kWing, PetalID::kAntEgg, PetalID::kTringer
@@ -1028,6 +1052,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {25.0},
         .damage = 10.0,
         .radius = {30.0},
+        .shape = 1,
         .xp = 30,
         .drops = {
             PetalID::kDahlia, PetalID::kWing, PetalID::kBubble, PetalID::kYggdrasil
@@ -1041,6 +1066,9 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {20.0},
         .damage = 10.0,
         .radius = {40.0},
+        .width = 60,
+        .height = 60,
+        .shape = 5,
         .xp = 1,
         .drops = {
             PetalID::kSquare
@@ -1056,6 +1084,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = {250.0},
         .damage = 25.0,
         .radius = {40.0},
+        .shape = 1,
         .xp = 0,
         .drops = {
             PetalID::kCutter

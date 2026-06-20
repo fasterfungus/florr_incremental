@@ -1,8 +1,9 @@
 set(CMAKE_SYSTEM_NAME Generic)
 
 cmake_minimum_required(VERSION 3.16)
-project(gardn-server)
-
+project(florr_incremental-server)
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 include_directories(..)
 
 set(SOURCES
@@ -33,6 +34,8 @@ set(SOURCES
     ../Helpers/Math.cc
     ../Helpers/UTF8.cc
     ../Helpers/Vector.cc
+        ../Helpers/Collision/GeometryHelper.cc
+        ../Helpers/Matrix.cc
     ../Shared/Arena.cc
     ../Shared/Binary.cc
     ../Shared/Config.cc
@@ -41,6 +44,13 @@ set(SOURCES
     ../Shared/Map.cc
     ../Shared/Simulation.cc
     ../Shared/StaticData.cc
+        ../Helpers/Collision/Geometry.cc
+        ../Helpers/Collision/GJK/GJK.cc
+        ../Helpers/Collision/GJK/EPA.cc
+        ../Helpers/Collision/GJK/ExpandingSimplex.cc
+        ../Helpers/Collision/GJK/Simplex.cc
+        ../Helpers/Collision/BoundingBox/BoundingBoxHelper.cc
+
 )
 
 if(WASM_SERVER)
@@ -53,7 +63,7 @@ if(GENERAL_SPATIAL_HASH)
 else()
     set(SOURCES ${SOURCES} SpatialHashUniform.cc)
 endif()
-set(CMAKE_CXX_FLAGS "-std=c++20 -DSERVERSIDE=1")
+set(CMAKE_CXX_FLAGS "-std=c++20 -DSERVERSIDE=1 ")
 
 if (TDM)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGAMEMODE_TDM=1")
@@ -69,22 +79,22 @@ endif()
 
 if(WASM_SERVER)
     set(CMAKE_CXX_COMPILER "em++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWASM_SERVER=1")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWASM_SERVER=1 ")
     add_link_options(-sEXIT_RUNTIME=0 -sEXPORTED_FUNCTIONS=_main,_on_connect,_on_disconnect,_tick,_on_message)
     if (NOT DEBUG) 
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --closure=1")
     endif()
-    add_executable(gardn-server ${SOURCES})
+    add_executable(florr_incremental-server ${SOURCES})
     set(CMAKE_EXECUTABLE_SUFFIX ".js")
 else()
     set(CMAKE_CXX_COMPILER "g++")
-    add_executable(gardn-server ${SOURCES})
-    target_include_directories(gardn-server PRIVATE ${CMAKE_SOURCE_DIR}/uWebSockets/src)
-    target_include_directories(gardn-server PRIVATE ${CMAKE_SOURCE_DIR}/uWebSockets/uSockets/src)
-    target_link_directories(gardn-server PRIVATE ${CMAKE_SOURCE_DIR}/uWebSockets/uSockets)
-    target_link_libraries(gardn-server uv z)
-    target_link_libraries(gardn-server -l:uSockets.a)
+    add_executable(florr_incremental-server ${SOURCES})
+    target_include_directories(florr_incremental-server PRIVATE ${CMAKE_SOURCE_DIR}/uWebSockets/src)
+    target_include_directories(florr_incremental-server PRIVATE ${CMAKE_SOURCE_DIR}/uWebSockets/uSockets/src)
+    target_link_directories(florr_incremental-server PRIVATE ${CMAKE_SOURCE_DIR}/uWebSockets/uSockets)
+    target_link_libraries(florr_incremental-server uv z)
+    target_link_libraries(florr_incremental-server -l:uSockets.a)
     if(CMAKE_HOST_WIN32)
-        target_link_libraries(gardn-server ws2_32)
+        target_link_libraries(florr_incremental-server ws2_32)
     endif()
 endif()

@@ -102,6 +102,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kBee:
+            ctx.scale(radius / 30);
             SET_BASE_COLOR(0xffffe763)
             ctx.set_fill(0xff333333);
             ctx.set_stroke(0xff292929);

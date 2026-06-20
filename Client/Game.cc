@@ -15,7 +15,6 @@ float const MAX_TRANSITION_CIRCLE = 2500;
 
 static int _c = setup_canvas();
 static int _i = setup_inputs();
-
 namespace Game {
     Simulation simulation;
     Renderer renderer;
@@ -31,7 +30,7 @@ namespace Game {
     std::array<uint8_t, PetalID::kNumPetals> seen_petals;
     std::array<uint8_t, MobID::kNumMobs> seen_mobs;
     std::array<PetalID::T, 2 * MAX_SLOT_COUNT> cached_loadout = {PetalID::kNone};
-
+    bool show_collision = false;
     double timestamp = 0;
 
     double score = 0;
@@ -326,7 +325,13 @@ void Game::tick(double time) {
         uint8_t defend = Input::keys_held.contains('\x10') || BitMath::at(Input::mouse_buttons_state, Input::RightMouse);
         Input::game_inputs.flags = (attack << InputFlags::kAttacking) | (defend << InputFlags::kDefending);
     }
-
+    if (!Input::is_mobile)
+    {
+        if (Input::keys_held_this_tick.contains('P'))
+        {
+            show_collision = !show_collision;
+        }
+    }
     if (socket.ready && alive()) send_inputs();
 
     if (Input::keys_held_this_tick.contains(';'))

@@ -51,6 +51,7 @@ class Entity {
 public:
     Entity();
     void init();
+    void update_bounding_box();
     void reset_protocol();
     Entity(Entity const &) = delete;
     Entity &operator=(Entity const &) = delete;

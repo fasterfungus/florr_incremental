@@ -9,6 +9,7 @@ inline uint32_t const ARENA_WIDTH = 40000;
 inline uint32_t const ARENA_HEIGHT = 4000;
 
 inline uint32_t const MAX_SLOT_COUNT = 8;
+inline uint32_t const MAX_POLY_VERTICES = 8;
 inline uint32_t const LEVELS_PER_EXTRA_SLOT = 15;
 inline uint32_t const LEADERBOARD_SIZE = 10;
 inline uint32_t const MAX_PETALS_IN_CLUMP = 4;
@@ -22,7 +23,15 @@ namespace DamageType {
         kReflect
     };
 }
-
+enum class CollisionShape : uint8_t {
+    kCapsule,
+    kCircle,
+    kEllipse,
+    kPie,
+    kPolygon,
+    kRectangle,
+    kSegment
+};
 namespace PetalID {
     typedef uint8_t T;
     enum : T {
@@ -249,6 +258,11 @@ struct MobData {
     RangeValue health;
     float damage;
     RangeValue radius;
+    float width;
+    float height;
+    float length;
+    uint8_t shape;
+
     uint32_t xp;
     StaticArray<PetalID::T, MAX_DROPS_PER_MOB> drops;
     struct MobAttributes attributes;

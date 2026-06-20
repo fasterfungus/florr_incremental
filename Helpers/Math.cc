@@ -128,3 +128,39 @@ std::string format_number(float num) {
     if (num < 10 && num != std::floorf(num)) return std::format("{:.1f}", num);
     return format_score(num);
 }
+float Max(float a, float b)
+    {
+        return std::max(a, b);
+    }
+float Max(float a, float b, float c)
+    {
+        return Max(Max(a, b), c);
+    }
+float Max(float a, float b, float c, float d)
+    {
+        return Max(Max(a, b, c), d);
+    }
+float Min(float a, float b)
+    {
+        return std::min(a, b);
+    }
+float Min(float a, float b, float c)
+    {
+        return Min(Min(a, b), c);
+    }
+float Min(float a, float b, float c, float d)
+    {
+        return Min(Min(a, b, c), d);
+    }
+float Sqrt(float v)
+    {
+        return (float)std::sqrt(v);
+    }
+float Clamp(float num, float min, float max)    // 将num限制在[min, max]范围内
+    {
+        return Min(max, Max(num, min));
+    }
+bool Equals(float a, float b)
+{
+    return std::abs(a - b) < EPSILON;
+}
