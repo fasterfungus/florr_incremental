@@ -23,6 +23,7 @@ set(SOURCES
     Process/Petal.cc
     Process/Score.cc
     Process/Segment.cc
+        SpatialHashCanonical.cc
     Client.cc
     Game.cc
     Main.cc
@@ -57,11 +58,6 @@ if(WASM_SERVER)
     set(SOURCES ${SOURCES} Wasm.cc)
 else()
     set(SOURCES ${SOURCES} Native.cc)
-endif()
-if(GENERAL_SPATIAL_HASH)
-    set(SOURCES ${SOURCES} SpatialHashCanonical.cc)
-else()
-    set(SOURCES ${SOURCES} SpatialHashUniform.cc)
 endif()
 set(CMAKE_CXX_FLAGS "-std=c++20 -DSERVERSIDE=1 ")
 

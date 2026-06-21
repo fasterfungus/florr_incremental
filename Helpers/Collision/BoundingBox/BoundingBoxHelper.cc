@@ -9,10 +9,10 @@ void Set(Entity &e)
     Vector p2 = GetFarthestProjectionPoint(e, right);
     Vector p3 = GetFarthestProjectionPoint(e,down);
     Vector p4 = GetFarthestProjectionPoint(e, left);
-    e.set_maxx(Max(p1.x, p2.x, p3.x, p4.x));
-    e.set_maxy(Max(p1.y, p2.y, p3.y, p4.y));
-    e.set_minx(Min(p1.x, p2.x, p3.x, p4.x));
-    e.set_miny(Min(p1.y, p2.y, p3.y, p4.y));
+    e.set_maxx(Max(p1.x, p2.x, p3.x, p4.x)*e.get_scale());
+    e.set_maxy(Max(p1.y, p2.y, p3.y, p4.y)*e.get_scale());
+    e.set_minx(Min(p1.x, p2.x, p3.x, p4.x)*e.get_scale());
+    e.set_miny(Min(p1.y, p2.y, p3.y, p4.y)*e.get_scale());
 }
 bool BoundingBoxContains(const Entity &e, const Vector &pt)
 {

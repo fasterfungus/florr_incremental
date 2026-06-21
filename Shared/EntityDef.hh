@@ -39,6 +39,7 @@ SINGLE(Physics, x, Float) \
 SINGLE(Physics, y, Float) \
 SINGLE(Physics, radius, Float) \
 SINGLE(Physics, angle, Float) \
+SINGLE(Physics, scale, Float) \
 SINGLE(Physics, width, Float) \
 SINGLE(Physics, length, Float) \
 SINGLE(Physics, height, Float) \

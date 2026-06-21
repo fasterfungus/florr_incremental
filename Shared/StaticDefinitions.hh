@@ -257,6 +257,7 @@ struct MobData {
     uint8_t rarity;
     RangeValue health;
     float damage;
+    float scale;
     RangeValue radius;
     float width;
     float height;

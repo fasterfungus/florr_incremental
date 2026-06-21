@@ -58,13 +58,13 @@ WebSocketServer::WebSocketServer() {
             switch (req.url) {
                 case "/":
                     break;
-                case "/gardn-client.js":
+                case "/florr_incremental-client.js":
                     encodeType = "application/javascript";
-                    file = "gardn-client.js";
+                    file = "florr_incremental-client.js";
                     break;
-                case "/gardn-client.wasm":
+                case "/florr_incremental-client.wasm":
                     encodeType = "application/wasm";
-                    file = "gardn-client.wasm";
+                    file = "florr_incremental-client.wasm";
                     break;
                 default:
                     file = "";

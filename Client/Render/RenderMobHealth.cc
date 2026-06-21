@@ -9,7 +9,7 @@
 #include <Shared/StaticData.hh>
 void render_mob_health(Renderer &ctx, Entity const &ent) {
     if (!ent.has_component(kMob) && ent.healthbar_opacity < 0.01) return;
-    float w = ent.get_radius() * 1.33;
+    float w = ent.get_radius() *ent.get_scale()* 1.33;
     ctx.set_global_alpha((1 - ent.deletion_animation) * (ent.has_component(kMob) && !ent.has_component(kSegmented) ? 1 : ent.healthbar_opacity));
     ctx.scale(1 + 0.5 * ent.deletion_animation);
     ctx.translate(-w, w + 15);

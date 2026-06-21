@@ -7,6 +7,7 @@
 
 struct FlowerRenderAttributes {
     float radius = 25;
+    float scale = 1;
     float eye_x = 3;
     float eye_y = 0;
     float mouth = 15;
@@ -19,6 +20,7 @@ struct FlowerRenderAttributes {
 struct MobRenderAttributes {
     float animation;
     float radius;
+    float scale;
     uint32_t seed;
     uint32_t flags;
     uint8_t color;

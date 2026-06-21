@@ -15,6 +15,7 @@ void render_flower(Renderer &ctx, Entity const &ent) {
     if (ent.deletion_animation > 0) BitMath::set(face_flags, FaceFlags::kDeadEyes);
     draw_static_flower(ctx, {
         .radius = ent.get_radius(),
+        .scale = ent.get_scale(),
         .eye_x = ent.eye_x,
         .eye_y = ent.eye_y,
         .mouth = ent.mouth,

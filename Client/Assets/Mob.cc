@@ -11,12 +11,14 @@
 
 void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
     float radius = attr.radius;
+    float scale = attr.scale;
     uint32_t flags = attr.flags;
     float animation_value = sinf(attr.animation);
     uint32_t seed = attr.seed;
     uint32_t base_color = 0xffffe763;
     switch(mob_id) {
         case MobID::kBabyAnt:
+            ctx.scale(scale);
             SET_BASE_COLOR(0xff555555)
             ctx.set_stroke(0xff292929);
             ctx.set_line_width(7);
@@ -35,6 +37,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kWorkerAnt:
+            ctx.scale(scale);
             SET_BASE_COLOR(0xff555555)
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
@@ -59,6 +62,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kSoldierAnt:
+            ctx.scale(scale);
             SET_BASE_COLOR(0xff555555)
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
@@ -102,7 +106,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kBee:
-            ctx.scale(radius / 30);
+            ctx.scale(scale);
             SET_BASE_COLOR(0xffffe763)
             ctx.set_fill(0xff333333);
             ctx.set_stroke(0xff292929);
@@ -157,7 +161,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         case MobID::kMassiveLadybug:
         case MobID::kDarkLadybug:
         case MobID::kShinyLadybug:
-            ctx.scale(radius / 30);
+            ctx.scale(scale);
             if (mob_id == MobID::kDarkLadybug) SET_BASE_COLOR(0xff962921)
             else if (mob_id == MobID::kShinyLadybug) SET_BASE_COLOR(0xffebeb34)
             else SET_BASE_COLOR(0xffeb4034)
@@ -224,7 +228,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             break;
         case MobID::kBeetle:
         case MobID::kMassiveBeetle:
-            ctx.scale(radius / 35);
+            ctx.scale(scale);
             SET_BASE_COLOR(0xff905db0)
             ctx.begin_path();
             ctx.set_fill(0xff333333);
@@ -298,6 +302,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.fill();
             break;
         case MobID::kHornet:
+            ctx.scale(scale);
             SET_BASE_COLOR(0xffffe763)
             ctx.set_fill(0xff333333);
             ctx.set_stroke(0xff292929);
@@ -340,6 +345,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kCactus: {
+                ctx.scale(scale);
             SET_BASE_COLOR(0xff32a852)
             uint32_t vertices = radius / 10 + 5;
             {
@@ -374,6 +380,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         }
         case MobID::kRock:
         case MobID::kBoulder: {
+                ctx.scale(scale);
             SET_BASE_COLOR(0xff777777)
             SeedGenerator gen(std::floor(radius) * 1957264 + 295726);
             ctx.set_fill(base_color);
@@ -397,6 +404,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         case MobID::kCentipede:
         case MobID::kEvilCentipede:
         case MobID::kDesertCentipede:
+        ctx.scale(scale);
             if (mob_id == MobID::kCentipede) SET_BASE_COLOR(0xff8ac255)
             else if (mob_id == MobID::kEvilCentipede) SET_BASE_COLOR(0xff905db0)
             else SET_BASE_COLOR(0xffd4c66e)
@@ -435,6 +443,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             }
             break;
         case MobID::kSpider:
+        ctx.scale(scale);
             SET_BASE_COLOR(0xff4f412e);
             ctx.set_fill(base_color);
             ctx.set_stroke(0xff333333);
@@ -466,6 +475,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kSandstorm:
+        ctx.scale(scale);
             SET_BASE_COLOR(0xffd5c7a6)
             ctx.set_line_width(radius / 5);
             ctx.round_line_cap();
@@ -505,7 +515,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kScorpion:
-            ctx.scale(radius / 35);
+        ctx.scale(scale);
             ctx.set_fill(0xff333333);
             ctx.set_stroke(0xff333333);
             ctx.set_line_width(7);
@@ -599,6 +609,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kAntHole:
+        ctx.scale(scale);
             SET_BASE_COLOR(0xffb58500);
             ctx.begin_path();
             ctx.arc(0,0,radius);
@@ -614,6 +625,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.fill();
             break;
         case MobID::kQueenAnt:
+        ctx.scale(scale);
             ctx.begin_path();
             ctx.arc(-25,0,33.5);
             ctx.set_fill(0xff454545);
@@ -663,6 +675,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.fill();
             break;
         case MobID::kSquare:
+        ctx.scale(scale);
             ctx.set_fill(0xffffe869);
             ctx.set_stroke(0xffcfbc55);
             ctx.set_line_width(0.15*radius);
@@ -674,6 +687,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.stroke();
             break;
         case MobID::kDigger: {
+                ctx.scale(scale);
             attr.flower_attrs.radius = attr.radius;
             BitMath::set(attr.flower_attrs.equip_flags, EquipmentFlags::kCutter);
             BitMath::set(attr.flower_attrs.face_flags, FaceFlags::kSquareEyes);

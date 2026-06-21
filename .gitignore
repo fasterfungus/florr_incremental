@@ -3,5 +3,5 @@ wasm_build/
 node_modules/
 .vs/
 .vscode/
-gardn-client.js
-gardn-client.wasm
+florr_incremental-client.js
+florr_incremental-client.wasm

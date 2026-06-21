@@ -15,6 +15,7 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
     PetalTracker::add_petal(sim, drop_id);
     Entity &drop = sim->alloc_ent();
     drop.add_component(kPhysics);
+    drop.set_scale(1.0);
     drop.set_radius(25);
     drop.set_width(50);
     drop.set_height(50);
@@ -43,6 +44,7 @@ static Entity &__alloc_mob(
     Entity &mob = sim->alloc_ent();
 
     mob.add_component(kPhysics);
+    mob.set_scale(data.scale);
     mob.set_radius(data.radius.get_single(seed));
     mob.set_width(data.width);
     mob.set_height(data.height);
@@ -127,7 +129,9 @@ Entity &alloc_player(Simulation *sim, EntityID const team) {
     Entity &player = sim->alloc_ent();
 
     player.add_component(kPhysics);
+    player.set_scale(1.0);
     player.set_radius(BASE_FLOWER_RADIUS);
+
     player.set_shape(1);
     Set(player);
     player.friction = DEFAULT_FRICTION;
@@ -160,6 +164,7 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id, Entity const &parent) 
     petal.add_component(kPhysics);
     petal.set_x(parent.get_x());
     petal.set_y(parent.get_y());
+    petal.set_scale(1.0);
     petal.set_radius(petal_data.radius);
     petal.set_shape(1);
     Set(petal);
@@ -195,6 +200,7 @@ Entity &alloc_web(Simulation *sim, float radius, Entity const &parent) {
     web.set_x(parent.get_x());
     web.set_y(parent.get_y());
     web.set_angle(frand() * 2 * M_PI);
+    web.set_scale(1.0);
     web.set_radius(radius);
     web.set_shape(1);
     Set(web);

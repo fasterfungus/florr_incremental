@@ -57,13 +57,14 @@ bool Contains(const Entity& ent, const Vector& pt){
 Vector GetFarthestProjectionPoint(const Entity& ent, const Vector& dir){
     if (ent.has_component(kPhysics)) {
         uint8_t raw_shape = ent.get_shape();
-        float radius = ent.get_radius();
-        float width = ent.get_width();
-        float height = ent.get_height();
-        float length = ent.get_length();
+        float scale = ent.get_scale();
+        float radius = ent.get_radius()*scale;
+        float width = ent.get_width()*scale;
+        float height = ent.get_height()*scale;
+        float length = ent.get_length()*scale;
+        float A = width * 0.5f * scale;
+        float B = height * 0.5f * scale;
         CollisionShape shape = static_cast<CollisionShape>(raw_shape);
-        float A = width * 0.5f;
-        float B = height * 0.5f;
         switch (shape) {
             case CollisionShape::kCircle:{
                 return dir.normalized()*radius;
