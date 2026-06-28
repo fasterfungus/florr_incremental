@@ -32,7 +32,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
             ctx.begin_path();
-            ctx.arc(0,0,radius);
+            ctx.arc(0,0,14.0);
             ctx.fill();
             ctx.stroke();
             break;
@@ -57,7 +57,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
             ctx.begin_path();
-            ctx.arc(4,0,radius);
+            ctx.arc(4,0,14.0);
             ctx.fill();
             ctx.stroke();
             break;
@@ -101,7 +101,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.set_fill(base_color);
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
             ctx.begin_path();
-            ctx.arc(4,0,radius);
+            ctx.arc(4,0,14.0);
             ctx.fill();
             ctx.stroke();
             break;
@@ -347,16 +347,16 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         case MobID::kCactus: {
                 ctx.scale(scale);
             SET_BASE_COLOR(0xff32a852)
-            uint32_t vertices = radius / 10 + 5;
+            uint32_t vertices = 3*scale + 5;
             {
                 RenderContext context(&ctx);
                 ctx.set_fill(0xff222222);
                 ctx.begin_path();
                 for (uint32_t i = 0; i < vertices; ++i) {
-                    ctx.move_to(10+radius,0);
-                    ctx.line_to(0.5+radius,3);
-                    ctx.line_to(0.5+radius,-3);
-                    ctx.line_to(10+radius,0);
+                    ctx.move_to(40,0);
+                    ctx.line_to(30.5,3);
+                    ctx.line_to(30.5,-3);
+                    ctx.line_to(40,0);
                     ctx.rotate(M_PI * 2 / vertices);
                 }
                 ctx.fill();
@@ -367,12 +367,12 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.round_line_cap();
             ctx.round_line_join();
             ctx.begin_path();
-            ctx.move_to(radius,0);
+            ctx.move_to(30,0);
             for (uint32_t i = 0; i < vertices; ++i) {
                 float base_angle = M_PI * 2 * i / vertices;
                 ctx.qcurve_to(
-                    radius*0.8*cosf(base_angle+M_PI/vertices),radius*0.8*sinf(base_angle+M_PI/vertices),
-                    radius*cosf(base_angle+2*M_PI/vertices),radius*sinf(base_angle+2*M_PI/vertices));
+                    30*0.8*cosf(base_angle+M_PI/vertices),30*0.8*sinf(base_angle+M_PI/vertices),
+                    30*cosf(base_angle+2*M_PI/vertices),30*sinf(base_angle+2*M_PI/vertices));
             }
             ctx.fill();
             ctx.stroke();

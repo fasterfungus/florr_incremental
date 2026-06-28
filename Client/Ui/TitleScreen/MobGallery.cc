@@ -26,7 +26,7 @@ void GalleryMob::on_render(Renderer &ctx) {
         ctx.rotate(-3*M_PI/4);
     if (id == MobID::kBeetle || id == MobID::kMassiveBeetle)
         ctx.translate(-5,0);
-    float radius = (data.radius.upper + data.radius.lower) / 2;
+    float radius = (data.radius + data.radius) / 2;
     if (radius > width * 0.5) ctx.scale(0.5 * width / radius);
     ctx.scale(0.5);
     draw_static_mob(id, ctx, { .radius = radius, .flower_attrs = { .color = ColorID::kGray } });
@@ -64,7 +64,7 @@ static Element *make_mob_stat_container(MobID::T id) {
     struct MobAttributes const &attrs = mob_data.attributes;
     stats.push_back(new Ui::HContainer({
         new Ui::StaticText(12, "Health:", { .fill = 0xff77ff77 }),
-        new Ui::StaticText(12, mob_data.health.to_string())
+        new Ui::StaticText(12, std::to_string(mob_data.health))
     }, 0, 5, { .h_justify = Style::Left }));
     stats.push_back(new Ui::HContainer({
         new Ui::StaticText(12, "Damage:", { .fill = 0xffff7777 }),

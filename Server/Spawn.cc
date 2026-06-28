@@ -45,7 +45,7 @@ static Entity &__alloc_mob(
 
     mob.add_component(kPhysics);
     mob.set_scale(data.scale);
-    mob.set_radius(data.radius.get_single(seed));
+    mob.set_radius(data.radius);
     mob.set_width(data.width);
     mob.set_height(data.height);
     mob.set_length(data.length);
@@ -66,7 +66,7 @@ static Entity &__alloc_mob(
     mob.set_mob_id(mob_id);
 
     mob.add_component(kHealth);
-    mob.health = mob.max_health = data.health.get_single(seed);
+    mob.health = mob.max_health = data.health;
     mob.damage = data.damage;
     mob.poison_damage = data.attributes.poison_damage;
     mob.set_health_ratio(1);

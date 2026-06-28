@@ -255,10 +255,10 @@ struct MobData {
     char const *name;
     char const *description;
     uint8_t rarity;
-    RangeValue health;
+    float health;
     float damage;
     float scale;
-    RangeValue radius;
+    float radius;
     float width;
     float height;
     float length;
