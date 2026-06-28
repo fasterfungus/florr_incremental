@@ -828,9 +828,10 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .rarity = RarityID::kRare,
         .health = 600.0,
         .damage = 35.0,
-        .scale = 1.0,
-        .radius = 75.0,
-        .shape = 1,
+        .scale = 3.0,
+        .radius = 30.0,
+        .length = 25.0,
+        .shape = 0,
         .xp = 50,
         .drops = {
             PetalID::kIris, PetalID::kWing, PetalID::kBlueIris, PetalID::kTriplet, PetalID::kBeetleEgg, PetalID::kThirdEye
@@ -861,8 +862,10 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {{
         .health = 40.0,
         .damage = 40.0,
         .scale = 1.0,
-        .radius = 40.0,
-        .shape = 1,
+        .radius = 20.0,
+        .width = 60.0,
+        .height = 40.0,
+        .shape = 2,
         .xp = 12,
         .drops = {
             PetalID::kDandelion, PetalID::kMissile, PetalID::kWing, PetalID::kBubble, PetalID::kAntennae

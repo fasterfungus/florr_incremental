@@ -40,7 +40,8 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
             { MobID::kCentipede, 10000 },
             { MobID::kBoulder, 10000 },
             { MobID::kMassiveLadybug, 200 },
-            { MobID::kSquare, 1 }
+            { MobID::kSquare, 1 },
+        { MobID::kMassiveBeetle, 200000 },
         },
         .difficulty = 0,
         .color = 0xff1ea761,

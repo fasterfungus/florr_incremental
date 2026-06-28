@@ -468,7 +468,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             #undef draw_leg
             ctx.stroke();
             ctx.begin_path();
-            ctx.arc(0,0,radius);
+            ctx.arc(0,0,15);
             ctx.fill();
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
             ctx.set_line_width(5);
@@ -477,17 +477,17 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         case MobID::kSandstorm:
         ctx.scale(scale);
             SET_BASE_COLOR(0xffd5c7a6)
-            ctx.set_line_width(radius / 5);
+            ctx.set_line_width(32 / 5);
             ctx.round_line_cap();
             ctx.round_line_join();
             ctx.set_fill(base_color);
             ctx.set_stroke(base_color);
             ctx.rotate(attr.animation / 3);
             ctx.begin_path();
-            ctx.move_to(radius, 0);
+            ctx.move_to(32, 0);
             for (uint32_t i = 1; i <= 6; ++i) {
                 float angle = 2 * M_PI * i / 6;
-                ctx.line_to(cosf(angle) * radius, sinf(angle) * radius);
+                ctx.line_to(cosf(angle) * 32, sinf(angle) * 32);
             }
             ctx.fill();
             ctx.stroke();
@@ -495,10 +495,10 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.set_stroke(Renderer::HSV(base_color, 0.9));
             ctx.rotate(attr.animation / 3);
             ctx.begin_path();
-            ctx.move_to(radius*2/3, 0);
+            ctx.move_to(32*2/3, 0);
             for (uint32_t i = 1; i <= 6; ++i) {
                 float angle = 2 * M_PI * i / 6;
-                ctx.line_to(cosf(angle) * radius*2/3, sinf(angle) * radius*2/3);
+                ctx.line_to(cosf(angle) * 32*2/3, sinf(angle) * 32*2/3);
             }
             ctx.fill();
             ctx.stroke();
@@ -506,10 +506,10 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.set_stroke(Renderer::HSV(base_color, 0.8));
             ctx.rotate(attr.animation / 3);
             ctx.begin_path();
-            ctx.move_to(radius/3, 0);
+            ctx.move_to(32/3, 0);
             for (uint32_t i = 1; i <= 6; ++i) {
                 float angle = 2 * M_PI * i / 6;
-                ctx.line_to(cosf(angle) * radius/3, sinf(angle) * radius/3);
+                ctx.line_to(cosf(angle) * 32/3, sinf(angle) * 32/3);
             }
             ctx.fill();
             ctx.stroke();
@@ -612,15 +612,15 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         ctx.scale(scale);
             SET_BASE_COLOR(0xffb58500);
             ctx.begin_path();
-            ctx.arc(0,0,radius);
+            ctx.arc(0,0,45);
             ctx.set_fill(base_color);
             ctx.fill();
             ctx.begin_path();
-            ctx.arc(0,0,radius*2/3);
+            ctx.arc(0,0,45*2/3);
             ctx.set_fill(Renderer::HSV(base_color, 0.8));
             ctx.fill();
             ctx.begin_path();
-            ctx.arc(0,0,radius/3);
+            ctx.arc(0,0,45/3);
             ctx.set_fill(Renderer::HSV(base_color, 0.6));
             ctx.fill();
             break;
@@ -678,17 +678,17 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
         ctx.scale(scale);
             ctx.set_fill(0xffffe869);
             ctx.set_stroke(0xffcfbc55);
-            ctx.set_line_width(0.15*radius);
+            ctx.set_line_width(0.15*40);
             ctx.round_line_cap();
             ctx.round_line_join();
             ctx.begin_path();
-            ctx.rect(-radius * 0.707, -radius * 0.707, radius * 1.414, radius * 1.414);
+            ctx.rect(-40 * 0.707, -40 * 0.707, 40 * 1.414, 40 * 1.414);
             ctx.fill();
             ctx.stroke();
             break;
         case MobID::kDigger: {
                 ctx.scale(scale);
-            attr.flower_attrs.radius = attr.radius;
+            attr.flower_attrs.radius = 40;
             BitMath::set(attr.flower_attrs.equip_flags, EquipmentFlags::kCutter);
             BitMath::set(attr.flower_attrs.face_flags, FaceFlags::kSquareEyes);
             draw_static_flower(ctx, attr.flower_attrs);
