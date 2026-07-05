@@ -53,14 +53,13 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
             }
         }
     }
-    /* yggdrasil revive clause
     if (defender.health == 0 && defender.has_component(kFlower)) {
         if (_yggdrasil_revival_clause(sim, defender)) {
             defender.health = defender.max_health * 0.25;
             defender.immunity_ticks = 1.0 * TPS;
         }
     }
-    */
+
     if (!sim->ent_exists(atk_id)) return;
     Entity &attacker = sim->get_ent(atk_id);
 

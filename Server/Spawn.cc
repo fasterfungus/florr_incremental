@@ -164,7 +164,7 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id, Entity const &parent) 
     petal.add_component(kPhysics);
     petal.set_x(parent.get_x());
     petal.set_y(parent.get_y());
-    petal.set_scale(1.0);
+    petal.set_scale(petal_data.scale);
     petal.set_radius(petal_data.radius);
     petal.set_shape(1);
     Set(petal);

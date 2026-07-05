@@ -648,7 +648,7 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
                 ctx.set_fill(0x7feeeeee);
                 ctx.fill();
             }
-            {          
+            {
                 RenderContext context(&ctx);
                 ctx.rotate(-animation_value * 0.1);
                 ctx.begin_path();
@@ -686,6 +686,19 @@ void draw_static_mob(MobID::T mob_id, Renderer &ctx, MobRenderAttributes attr) {
             ctx.fill();
             ctx.stroke();
             break;
+    case MobID::kEllipse:
+        ctx.scale(scale);
+        ctx.set_fill(0xffffe869);
+        ctx.set_stroke(0xffcfbc55);
+        ctx.set_line_width(0.15*40);
+        ctx.round_line_cap();
+        ctx.round_line_join();
+        ctx.begin_path();
+        ctx.ellipse(0, 0, 30, 20); // 例如 x半径40，y半径20
+        ctx.fill();
+        ctx.stroke();
+        break;
+
         case MobID::kDigger: {
                 ctx.scale(scale);
             attr.flower_attrs.radius = 40;

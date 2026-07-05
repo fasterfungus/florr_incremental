@@ -256,7 +256,7 @@ Element *Ui::make_github_link_button() {
                 ctx.fill();
             }, 40, 40),
             [](Element *elt, uint8_t e){
-                if (e == Ui::kClick) DOM::open_page("https://github.com/trigonal-bacon/gardn/");
+                if (e == Ui::kClick) DOM::open_page("https://github.com/fasterfungus/florr_incremental");
             },
             nullptr,
             { .fill = 0xff333333, .line_width = 4, .round_radius = 4 }

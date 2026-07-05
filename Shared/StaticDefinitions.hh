@@ -75,6 +75,7 @@ namespace PetalID {
         kSalt,
         kUniqueBasic,
         kSquare,
+        kEllipse,
         kMoon,
         kLotus,
         kCutter,
@@ -115,6 +116,8 @@ namespace MobID {
         kQueenAnt,
         kShinyLadybug,
         kSquare,
+        //kCapsule,
+        kEllipse,
         kDigger,
         kNumMobs
     };
@@ -237,6 +240,7 @@ struct PetalData {
     char const *description;
     float health;
     float damage;
+    float scale;
     float radius;
     float reload;
     uint8_t count;

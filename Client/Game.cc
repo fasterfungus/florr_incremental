@@ -118,7 +118,7 @@ void Game::init() {
     );
     game_ui_window.add_child(
         new Ui::HContainer({
-            new Ui::StaticText(20, "the gardn project")
+            new Ui::StaticText(20, "Florr Incremental")
         }, 20, 0, { .h_justify = Ui::Style::Left, .v_justify = Ui::Style::Top })
     );
     Ui::make_petal_tooltips();

@@ -51,7 +51,7 @@ SINGLE(Physics, maxx, Float) \
 SINGLE(Physics, maxy, Float) \
 SINGLE(Physics, minx, Float) \
 SINGLE(Physics, miny, Float) \
-SINGLE(Physics, shape, uint8_t) 
+SINGLE(Physics, shape, uint8_t)
 
 #define FIELDS_Camera \
 SINGLE(Camera, player, EntityID) \
@@ -60,7 +60,7 @@ MULTIPLE(Camera, inventory, PetalID::T, 2 * MAX_SLOT_COUNT) \
 SINGLE(Camera, killed_by, std::string) \
 SINGLE(Camera, camera_x, Float) \
 SINGLE(Camera, camera_y, Float) \
-SINGLE(Camera, fov, Float) 
+SINGLE(Camera, fov, Float)
 
 #define FIELDS_Relations \
 SINGLE(Relations, team, EntityID) \
@@ -158,7 +158,8 @@ SINGLE(Name, nametag_visible, uint8_t)
     SINGLE(damage_flash, float, =0)
 #endif
 
-class EntityID {
+class EntityID
+{
 public:
     typedef uint8_t hash_type;
     typedef uint16_t id_type;
@@ -171,11 +172,14 @@ public:
     bool null() const;
 };
 
-namespace std {
-    template<>
-    struct hash<EntityID> {
-        size_t operator()(EntityID const &id) {
-            return (size_t) EntityID::make_hash(id);
+namespace std
+{
+    template <>
+    struct hash<EntityID>
+    {
+        size_t operator()(EntityID const& id)
+        {
+            return (size_t)EntityID::make_hash(id);
         }
     };
 }
@@ -188,19 +192,22 @@ inline const EntityID NULL_ENTITY;
 #ifdef SERVER_ONLY
 class Simulation;
 
-struct LoadoutPetal {
+struct LoadoutPetal
+{
     EntityID ent_id;
     game_tick_t reload;
 };
 
-class LoadoutSlot {
+class LoadoutSlot
+{
     PetalID::T id;
+
 public:
     uint8_t already_spawned;
-    LoadoutPetal petals[MAX_PETALS_IN_CLUMP];    
+    LoadoutPetal petals[MAX_PETALS_IN_CLUMP];
     LoadoutSlot();
     void reset();
-    void update_id(Simulation *, PetalID::T);
+    void update_id(Simulation*, PetalID::T);
     void force_reload();
     PetalID::T get_petal_id() const;
     uint32_t size() const;
