@@ -8,6 +8,6 @@ class Simplex
 {
 public:
     std::vector<Vector> vertics;
-    void Add(const Vector& pt);
-    bool Check(Vector& dir);
+    void Add(const Vector&);
+    bool Check(Vector&);
 };

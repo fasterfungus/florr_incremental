@@ -99,18 +99,18 @@ Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
                 Vector(w, h),
                 Vector(-w, h)
             };
-            Vector point = vertices[0];
-            float max = Vector::Dot(point, dir);
+            Vector pt = vertices[0];
+            float max = Vector::Dot(pt, dir);
             for (int i = 1; i < 4; i++)
             {
                 float dot = Vector::Dot(vertices[i], dir);
                 if (dot > max)
                 {
                     max = dot;
-                    point = vertices[i];
+                    pt = vertices[i];
                 }
             }
-            return point;
+            return pt;
             break;
         }
     case CollisionShape::kPolygon:
