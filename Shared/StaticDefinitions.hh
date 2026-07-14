@@ -4,6 +4,7 @@
 #include <Helpers/Math.hh>
 
 #include <cstdint>
+#include <vector>
 
 inline uint32_t const ARENA_WIDTH = 40000;
 inline uint32_t const ARENA_HEIGHT = 4000;
@@ -268,7 +269,8 @@ struct MobData {
     float width;
     float height;
     float length;
-    uint8_t shape;
+    std::vector<std::vector<float>> vertics;
+    CollisionShape shape;
 
     uint32_t xp;
     StaticArray<PetalID::T, MAX_DROPS_PER_MOB> drops;

@@ -37,7 +37,8 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
 static Entity &__alloc_mob(
     Simulation *sim, MobID::T mob_id, float x, float y,
     EntityID const team, std::function<void(Entity &)> on_spawn
-) {
+)
+{
     DEBUG_ONLY(assert(mob_id < MobID::kNumMobs);)
     struct MobData const &data = MOB_DATA[mob_id];
     float seed = frand();
@@ -49,6 +50,12 @@ static Entity &__alloc_mob(
     mob.set_width(data.width);
     mob.set_height(data.height);
     mob.set_length(data.length);
+    for (u_int8_t i=0;i<data.vertics.size();i++)
+    {
+        mob.set_vertics_x(data.vertics[i][0],i);
+        mob.set_vertics_y(data.vertics[i][1],i);
+    }
+    mob.set_vertics_size(data.vertics.size());
     mob.set_shape(data.shape);
     mob.set_angle(frand() * 2 * M_PI);
     mob.set_x(x);
