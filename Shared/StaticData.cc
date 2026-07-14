@@ -1140,7 +1140,8 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {
             .damage = 10.0,
             .scale = 1.0,
             .radius = 25.0,
-            .shape = CollisionShape::kCircle,
+            .vertics = {{-60,0},{-55,14.5},{-37.5,29},{37.5,23},{50,0},{37.5,-23},{-37.5,-29},{-55,-14.5}},
+            .shape = CollisionShape::kPolygon,
             .xp = 15,
             .drops = {
                 PetalID::kTwin, PetalID::kIris, PetalID::kWing, PetalID::kAntEgg, PetalID::kTringer

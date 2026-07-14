@@ -52,11 +52,11 @@ static Entity &__alloc_mob(
     mob.set_length(data.length);
     for (u_int8_t i=0;i<data.vertics.size();i++)
     {
-        mob.set_vertics_x(data.vertics[i][0],i);
-        mob.set_vertics_y(data.vertics[i][1],i);
+        mob.set_vertics_x(i,data.vertics[i][0]);
+        mob.set_vertics_y(i,data.vertics[i][1]);
     }
     mob.set_vertics_size(data.vertics.size());
-    mob.set_shape(data.shape);
+    mob.set_shape(static_cast<int>(data.shape));
     mob.set_angle(frand() * 2 * M_PI);
     mob.set_x(x);
     mob.set_y(y);

@@ -32,6 +32,18 @@ void render_collision(Renderer &ctx, Entity const & ent)
         ctx.ellipse(0,0,ent.get_width()/2,ent.get_height()/2);
         ctx.stroke();
     }
+    if (shape == CollisionShape::kPolygon)
+    {
+        ctx.set_stroke(0x80ff0000);
+        ctx.set_line_width(1);
+        ctx.begin_path();
+        for (uint8_t i = 0;i<ent.get_vertics_size();i++)
+        {
+            ctx.line_to(ent.get_vertics_x(i),ent.get_vertics_y(i));
+        }
+        ctx.line_to(ent.get_vertics_x(0),ent.get_vertics_y(0));
+        ctx.stroke();
+    }
     if (shape == CollisionShape::kRectangle)
     {
         ctx.set_stroke(0x80ff0000);
