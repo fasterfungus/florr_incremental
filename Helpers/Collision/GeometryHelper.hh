@@ -1,4 +1,5 @@
 #pragma once
 #include <Shared/Entity.hh>
-Vector GetFarthestProjectionPointAfterTransform(const Entity &e, Vector dir);
-Vector Support(const Entity &e1, const Entity &e2, Vector dir);
+#include <Helpers/Collision/Geometry.hh>
+Vector GetFarthestProjectionPointAfterTransform(const Geometry &, Vector);
+Vector Support(const Geometry&,const Geometry&,Vector);

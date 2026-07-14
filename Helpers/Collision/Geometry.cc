@@ -4,6 +4,25 @@
 #include <cmath>
 #include "Geometry.hh"
 
+#include <vector>
+
+Geometry::Geometry(const Entity& ent)
+{
+    shape = static_cast<CollisionShape>(ent.get_shape());
+    scale = ent.get_scale();
+    radius = ent.get_radius()*scale;
+    width = ent.get_width()*scale;
+    height = ent.get_height()*scale;
+    length = ent.get_length()*scale;
+    x = ent.get_x();
+    y = ent.get_y();
+    angle = ent.get_angle();
+    for(uint8_t i=0;i < ent.get_vertics_size();i++)
+    {
+        vertics.push_back(Vector(ent.get_vertics_x(i),ent.get_vertics_y(i)));
+    }
+}
+
 float GetDistance2(const Vector& pa, const Vector& pb, const Vector& pt)
     {
         float px = pt.x - pa.x, py = pt.y - pa.y;
@@ -57,26 +76,18 @@ bool Contains(const Entity& ent, const Vector& pt){
 }
 */
 
-Vector GetFarthestProjectionPoint(const Entity& ent, const Vector &dir){
-    if (ent.has_component(kPhysics)) {
-        uint8_t raw_shape = ent.get_shape();
-        float scale = ent.get_scale();
-        float radius = ent.get_radius()*scale;
-        float width = ent.get_width()*scale;
-        float height = ent.get_height()*scale;
-        float length = ent.get_length()*scale;
-        Vector point = Vector(ent.get_vertics_x(0),ent.get_vertics_y(0));
-        float A = width * 0.5f;
-        float B = height * 0.5f ;
-        CollisionShape shape = static_cast<CollisionShape>(raw_shape);
-        switch (shape) {
+Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector &dir){
+        float A = geometry.width * 0.5f;
+        float B = geometry.height * 0.5f ;
+        Vector point (0,0);
+        switch (geometry.shape) {
             case CollisionShape::kCircle:{
-                return dir.normalized()*radius;
+                return dir.normalized()*geometry.radius;
                     break;
             }
             case CollisionShape::kRectangle:{
-                float w = width * 0.5f;
-                float h = height * 0.5f;
+                float w = geometry.width * 0.5f;
+                float h = geometry.height * 0.5f;
                 Vector vertices[4] = {
                 Vector(-w, -h),
                 Vector( w, -h),
@@ -100,10 +111,11 @@ Vector GetFarthestProjectionPoint(const Entity& ent, const Vector &dir){
             }
             case CollisionShape::kPolygon:
                 {
+                    point = geometry.vertics[0];
                     float max = Vector::Dot(point, dir);
-                    for (int i =1 ; i < ent.get_vertics_size();i++)
+                    for (int i =1 ; i < geometry.vertics.size() ;i++)
                     {
-                        Vector vertic = Vector(ent.get_vertics_x(i),ent.get_vertics_y(i));
+                        Vector vertic = geometry.vertics[i];
                         float dot = Vector::Dot(vertic, dir);
                         if (dot > max)
                         {
@@ -151,20 +163,19 @@ Vector GetFarthestProjectionPoint(const Entity& ent, const Vector &dir){
             }
             case CollisionShape::kPie:{
 
-
+                return Vector(0,0);
                 break;
             }
             case CollisionShape::kSegment:{
-                    return (dir.x >= 0) ? Vector(length * 0.5f, 0) :Vector(length * -0.5f,0);
+                    return (dir.x >= 0) ? Vector(geometry.length * 0.5f, 0) :Vector(geometry.length * -0.5f,0);
                 break;
             }
             case CollisionShape::kCapsule:{
-                Vector p = dir.normalized()*length;
-                float x = dir.x >= 0 ? length * 0.5f : -length * 0.5f;
+                Vector p = dir.normalized()*geometry.length;
+                float x = dir.x >= 0 ? geometry.length * 0.5f : -geometry.length * 0.5f;
                 p.x += x;
                 return p;
                     break;
             }
         }
-}
 }

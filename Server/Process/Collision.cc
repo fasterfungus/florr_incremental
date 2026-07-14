@@ -64,7 +64,9 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
     //finer distance check
     float dist;
     Vector separation(0,0);
-    if (!Detect(ent1, ent2, separation, dist))return;
+    Geometry g1(ent1);
+    Geometry g2(ent2);
+    if (!Detect(g1, g2, separation, dist))return;
     if (NO(kDrop) && NO(kWeb)) {
         if (separation.x == 0 && separation.y == 0)
             separation.unit_normal(frand() * 2 * M_PI);

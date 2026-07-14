@@ -932,10 +932,10 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
         ctx.round_line_cap();
         ctx.round_line_join();
         ctx.begin_path();
-        ctx.move_to(7.0,0);
-        ctx.line_to(-7.0*0.5,7.0*0.866);
-        ctx.line_to(-7.0*0.5,-7.0*0.866);
-        ctx.line_to(7.0,0);
+        ctx.move_to(10.0,0);
+        ctx.line_to(-10.0*0.5,10.0*0.866);
+        ctx.line_to(-10.0*0.5,-10.0*0.866);
+        ctx.line_to(10.0,0);
         ctx.fill();
         ctx.stroke();
         break;

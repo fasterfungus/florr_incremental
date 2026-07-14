@@ -3,7 +3,7 @@
 #include <Helpers/Collision/GeometryHelper.hh>
 #include <Shared/Entity.hh>
 #include "EPA.hh"
-void CheckPenetration(const Simplex &simplex, const Entity &e1, const Entity &e2, Vector &normal ,float &depth)
+void CheckPenetration(const Simplex &simplex, const Geometry &g1, const Geometry &g2, Vector &normal ,float &depth)
         {
             ExpandingSimplex expandingSimplex(simplex);
             Edge edge = expandingSimplex.GetClosestEdge();
@@ -12,7 +12,7 @@ void CheckPenetration(const Simplex &simplex, const Entity &e1, const Entity &e2
             for (uint8_t i = 0; i < 50; i++)
             {
                 edge = expandingSimplex.GetClosestEdge();
-                point = Support(e1,e2,edge.normal);
+                point = Support(g1,g2,edge.normal);
                 float projection = Vector::Dot(point, edge.normal);
                 if (projection - edge.distance < EPSILON)
                 {

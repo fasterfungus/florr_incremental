@@ -3,7 +3,10 @@
 #include <Helpers/Collision/GJK/EPA.hh>
 #include <Helpers/Collision/GeometryHelper.hh>
 #include "GJK.hh"
-bool Detect(Simplex &simplex, const Entity &e1, const Entity &e2, const Vector &dir)
+
+#include "Helpers/Collision/Geometry.hh"
+
+bool Detect(Simplex &simplex, const Geometry &g1, const Geometry &g2, const Vector &dir)
         {
             Vector d(dir.x,dir.y);
             if (d.magnitude2() < EPSILON)
@@ -11,7 +14,7 @@ bool Detect(Simplex &simplex, const Entity &e1, const Entity &e2, const Vector &
                 d = Vector(1, 0);
             }
 
-            Vector pt = Support(e1,e2,d);
+            Vector pt = Support(g1,g2,d);
             simplex.Add(pt);
 
             if (pt.Dot(d) <= 0.0f)
@@ -23,7 +26,7 @@ bool Detect(Simplex &simplex, const Entity &e1, const Entity &e2, const Vector &
 
             for (int i = 0; i < 100; i++) //最多执行100次，实际使用中不会达到这个次数
             {
-                pt = Support(e1,e2,d);
+                pt = Support(g1,g2,d);
 
                 simplex.Add(pt);
 
@@ -40,14 +43,14 @@ bool Detect(Simplex &simplex, const Entity &e1, const Entity &e2, const Vector &
 
             return false;
         }
-bool Detect(const Entity &e1, const Entity &e2,Vector &normal, float &depth)
+bool Detect(const Geometry &g1, const Geometry &g2,Vector &normal, float &depth)
         {
             Simplex simplex;
-            Vector dir = Vector(e1.get_x() - e2.get_x(), e1.get_y() - e2.get_y());
+            Vector dir = Vector(g1.x - g2.x, g1.y - g2.y);
 
-            if (Detect(simplex, e1, e2, dir))
+            if (Detect(simplex, g1, g2, dir))
             {
-                CheckPenetration(simplex, e1, e2, normal, depth);
+                CheckPenetration(simplex, g1, g2, normal, depth);
                 normal.negative();
                 return true;
             }
