@@ -3,18 +3,20 @@
 #include <Helpers/Collision/Geometry.hh>
 #include <Helpers/Vector.hh>
 #include <Shared/Entity.hh>
-void Set(Entity &e)
+
+void Set(Entity& e)
 {
     Vector p1 = GetFarthestProjectionPoint(e, up);
     Vector p2 = GetFarthestProjectionPoint(e, right);
-    Vector p3 = GetFarthestProjectionPoint(e,down);
+    Vector p3 = GetFarthestProjectionPoint(e, down);
     Vector p4 = GetFarthestProjectionPoint(e, left);
-    e.set_maxx(Max(p1.x, p2.x, p3.x, p4.x)*e.get_scale());
-    e.set_maxy(Max(p1.y, p2.y, p3.y, p4.y)*e.get_scale());
-    e.set_minx(Min(p1.x, p2.x, p3.x, p4.x)*e.get_scale());
-    e.set_miny(Min(p1.y, p2.y, p3.y, p4.y)*e.get_scale());
+    e.set_maxx(Max(p1.x, p2.x, p3.x, p4.x) * e.get_scale());
+    e.set_maxy(Max(p1.y, p2.y, p3.y, p4.y) * e.get_scale());
+    e.set_minx(Min(p1.x, p2.x, p3.x, p4.x) * e.get_scale());
+    e.set_miny(Min(p1.y, p2.y, p3.y, p4.y) * e.get_scale());
 }
-bool BoundingBoxContains(const Entity &e, const Vector &pt)
+
+bool BoundingBoxContains(const Entity& e, const Vector& pt)
 {
     float minx = e.get_minx() + e.get_x();
     float miny = e.get_miny() + e.get_y();
@@ -22,9 +24,10 @@ bool BoundingBoxContains(const Entity &e, const Vector &pt)
     float maxy = e.get_maxy() + e.get_y();
 
     return minx <= pt.x && maxx >= pt.x &&
-           miny <= pt.y && maxy >= pt.y;
+        miny <= pt.y && maxy >= pt.y;
 }
-bool Overlaps(const Entity &e1,const Entity &e2)
+
+bool Overlaps(const Entity& e1, const Entity& e2)
 {
     float minx1 = e1.get_minx() + e1.get_x();
     float miny1 = e1.get_miny() + e1.get_y();

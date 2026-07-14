@@ -6,14 +6,17 @@
 #include "ExpandingSimplex.hh"
 
 #include <cmath>
+
 bool Edge::operator<(const Edge& e)
 {
     return this->distance < e.distance;
 }
+
 bool Edge::operator>(const Edge& e)
 {
     return this->distance > e.distance;
 }
+
 Edge::Edge(const Vector& p1, const Vector& p2, WindingType winding)
 {
     this->p1 = p1;

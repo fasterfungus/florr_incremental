@@ -6,7 +6,7 @@
 
 class Simplex
 {
-    public:
+public:
     std::vector<Vector> vertics;
     void Add(const Vector& pt);
     bool Check(Vector& dir);
