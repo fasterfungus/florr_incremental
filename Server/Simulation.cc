@@ -40,6 +40,11 @@ void Simulation::on_tick() {
         }
     }
     for_each_entity([](Simulation *sim, Entity &ent) {
+    ent.set_last_x(ent.get_x());
+    ent.set_last_y(ent.get_y());
+
+});
+    for_each_entity([](Simulation *sim, Entity &ent) {
         if (ent.has_component(kPhysics))
             sim->spatial_hash.insert(ent);
         if (BitMath::at(ent.flags, EntityFlags::kHasCulling))

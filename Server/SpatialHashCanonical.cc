@@ -23,10 +23,10 @@ void SpatialHash::refresh(uint32_t _width, uint32_t _height) {
 
 void SpatialHash::insert(Entity const &ent) {
     DEBUG_ONLY(assert(ent.has_component(kPhysics));)
-    uint32_t sx = fclamp(ent.get_x() - ent.get_radius(), 0, ARENA_WIDTH - 1) / GRID_SIZE;
-    uint32_t sy = fclamp(ent.get_y() - ent.get_radius(), 0, ARENA_HEIGHT - 1) / GRID_SIZE;
-    uint32_t ex = fclamp(ent.get_x() + ent.get_radius(), 0, ARENA_WIDTH - 1) / GRID_SIZE;
-    uint32_t ey = fclamp(ent.get_y() + ent.get_radius(), 0, ARENA_HEIGHT - 1) / GRID_SIZE;
+    uint32_t sx = fclamp(ent.get_x() - ent.get_radius()*ent.get_scale(), 0, ARENA_WIDTH - 1) / GRID_SIZE;
+    uint32_t sy = fclamp(ent.get_y() - ent.get_radius()*ent.get_scale(), 0, ARENA_HEIGHT - 1) / GRID_SIZE;
+    uint32_t ex = fclamp(ent.get_x() + ent.get_radius()*ent.get_scale(), 0, ARENA_WIDTH - 1) / GRID_SIZE;
+    uint32_t ey = fclamp(ent.get_y() + ent.get_radius()*ent.get_scale(), 0, ARENA_HEIGHT - 1) / GRID_SIZE;
     for (uint32_t x = sx; x <= ex; ++x)
         for (uint32_t y = sy; y <= ey; ++y)
             cells[x][y].push_back(ent.id);
@@ -60,10 +60,10 @@ void SpatialHash::query(float x, float y, float w, float h, std::function<void(S
             std::vector<EntityID> const &cell = cells[_x][_y];
             for (uint32_t i = 0; i < cell.size(); ++i) {
                 Entity &ent = simulation->get_ent(cell[i]);
-                if (ent.get_x() + ent.get_radius() < x - w) continue;
-                if (ent.get_x() - ent.get_radius() > x + w) continue;
-                if (ent.get_y() + ent.get_radius() < y - h) continue;
-                if (ent.get_y() - ent.get_radius() > y + h) continue;
+                if (ent.get_x() + ent.get_radius()*ent.get_scale() < x - w) continue;
+                if (ent.get_x() - ent.get_radius()*ent.get_scale() > x + w) continue;
+                if (ent.get_y() + ent.get_radius()*ent.get_scale() < y - h) continue;
+                if (ent.get_y() - ent.get_radius()*ent.get_scale() > y + h) continue;
                 if (seen_entities.contains(cell[i].id)) continue;
                 cb(simulation, ent);
                 seen_entities.insert(cell[i].id);

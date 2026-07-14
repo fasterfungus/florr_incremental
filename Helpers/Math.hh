@@ -69,3 +69,4 @@ float Min(float, float, float, float);
 float Sqrt(float);
 float Clamp(float, float, float);
 bool Equals(float a, float b);
+bool Sign(float value);

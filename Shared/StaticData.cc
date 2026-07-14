@@ -38,8 +38,8 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {
             .description = "A nice petal, not too strong but not too weak",
             .health = 10.0,
             .damage = 10.0,
-            .scale = 10.0,
-            .radius = 1.0,
+            .scale = 1.0,
+            .radius = 10.0,
             .reload = 2.5,
             .count = 1,
             .rarity = RarityID::kCommon,
@@ -628,7 +628,7 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {
             .count = 1,
             .rarity = RarityID::kUnique,
             .attributes = {
-            .icon_angle = M_PI / 4 + 1
+                .icon_angle = M_PI / 4 + 1
             }
         },
         {
@@ -776,6 +776,18 @@ std::array<struct PetalData, PetalID::kNumPetals> const PETAL_DATA = {
                 .icon_angle = -1
             }
         },
+        {
+            .name = "Stinger",
+            .description = "TOO OP",
+            .health = 1.0,
+            .damage = 35.0,
+            .scale = 1.0,
+            .radius = 7.0,
+            .reload = 0.1,
+            .count = 1,
+            .rarity = RarityID::kMythic,
+            .attributes = {}
+        },
     }
 };
 
@@ -792,7 +804,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {
             .shape = 1,
             .xp = 1,
             .drops = {
-                PetalID::kLight, PetalID::kLeaf, PetalID::kTwin, PetalID::kRice, PetalID::kTriplet
+                PetalID::kLeaf, PetalID::kTwin, PetalID::kRice, PetalID::kTriplet, PetalID::kRiceStinger
             },
             .attributes = {}
         },
@@ -832,7 +844,7 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {
             .rarity = RarityID::kCommon,
             .health = 15.0,
             .damage = 50.0,
-            .scale = 1.3,
+            .scale = 1.0,
             .radius = 20.0,
             .width = 60.0,
             .height = 40.0,
@@ -880,8 +892,8 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {
             .rarity = RarityID::kEpic,
             .health = 1000.0,
             .damage = 10.0,
-            .scale = 1.0,
-            .radius = 90.0,
+            .scale = 3.0,
+            .radius = 30.0,
             .shape = 1,
             .xp = 400,
             .drops = {
@@ -1189,6 +1201,23 @@ std::array<struct MobData, MobID::kNumMobs> const MOB_DATA = {
             .attributes = {
                 .stationary = 1
             }
+        },
+        {
+            .name = "Segment",
+            .description = "???",
+            .rarity = RarityID::kUnique,
+            .health = 20000.0,
+            .damage = 0.0,
+            .scale = 1.0,
+            .radius = 40.0,
+            .length = 80,
+            .shape = 6,
+            .xp = 1,
+            .drops = {
+            },
+            .attributes = {
+                .stationary = 1
+            },
         },
         {
             .name = "Digger",

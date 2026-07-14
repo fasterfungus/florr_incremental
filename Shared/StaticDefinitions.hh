@@ -86,6 +86,7 @@ namespace PetalID {
         kYucca,
         kCorn,
         kGoldenLeaf,
+        kRiceStinger,
         kNumPetals
     };
 };
@@ -118,6 +119,7 @@ namespace MobID {
         kSquare,
         //kCapsule,
         kEllipse,
+        kSegment,
         kDigger,
         kNumMobs
     };

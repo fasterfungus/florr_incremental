@@ -3,6 +3,8 @@
 #include <cmath>
 #include <format>
 
+#include "Vector.hh"
+
 float fclamp(float v, float s, float e) {
     if (!(v >= s)) return s;
     if (!(v <= e)) return e;
@@ -163,4 +165,8 @@ float Clamp(float num, float min, float max)    // 将num限制在[min, max]范�
 bool Equals(float a, float b)
 {
     return std::abs(a - b) < EPSILON;
+}
+bool Sign(float value)
+{
+    return (value >= 0) ? 1 : -1;
 }

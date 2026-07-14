@@ -43,4 +43,12 @@ void render_collision(Renderer &ctx, Entity const & ent)
         ctx.line_to(-ent.get_width()/2,ent.get_height()/2);
         ctx.stroke();
     }
+    if (ent.get_shape() == 6) {
+        ctx.set_stroke(0x80ff0000);
+        ctx.set_line_width(1);
+        ctx.begin_path();
+        ctx.move_to(-ent.get_length() * 0.5f, 0.0f);
+        ctx.line_to( ent.get_length() * 0.5f, 0.0f);
+        ctx.stroke();
+    }
 }

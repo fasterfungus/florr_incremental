@@ -925,6 +925,20 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.fill();
             ctx.stroke();
             break;
+    case PetalID::kRiceStinger:
+        ctx.set_fill(0xffffffff);
+        ctx.set_stroke(0xffcfcfcf);
+        ctx.set_line_width(3);
+        ctx.round_line_cap();
+        ctx.round_line_join();
+        ctx.begin_path();
+        ctx.move_to(7.0,0);
+        ctx.line_to(-7.0*0.5,7.0*0.866);
+        ctx.line_to(-7.0*0.5,-7.0*0.866);
+        ctx.line_to(7.0,0);
+        ctx.fill();
+        ctx.stroke();
+        break;
         default:
             assert(id < PetalID::kNumPetals);
             assert(!"didn't cover petal render");

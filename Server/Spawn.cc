@@ -19,7 +19,7 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
     drop.set_radius(25);
     drop.set_width(50);
     drop.set_height(50);
-    drop.set_shape(4);
+    drop.set_shape(5);
     Set(drop);
     drop.set_angle(frand() * 0.2 - 0.1);
     drop.friction = 0.25;

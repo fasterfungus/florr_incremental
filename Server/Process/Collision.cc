@@ -60,13 +60,11 @@ static void _cancel_movement(Entity &ent, Vector dir, Vector add) {
 }
 
 void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
-    float min_dist = ent1.get_radius() + ent2.get_radius();
-    if (fabs(ent1.get_x() - ent2.get_x()) > min_dist || fabs(ent1.get_y() - ent2.get_y()) > min_dist) return;
     if (!_should_interact(ent1, ent2)) return;
     //finer distance check
     float dist;
     Vector separation(0,0);
-    if (!Detect(ent1, ent2, separation, dist)) return;
+    if (!Detect(ent1, ent2, separation, dist))return;
     if (NO(kDrop) && NO(kWeb)) {
         if (separation.x == 0 && separation.y == 0)
             separation.unit_normal(frand() * 2 * M_PI);
