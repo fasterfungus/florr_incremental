@@ -43,7 +43,6 @@ inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
             { MobID::kSquare, 100000 },
             {MobID::kEllipse,100000},
             {MobID::kSegment,100000},
-            {MobID::kQueenAnt,100000}
         },
         .difficulty = 0,
         .color = 0xff1ea761,

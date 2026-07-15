@@ -11,14 +11,20 @@ public:
     float width;
     float height;
     float length;
+    float angle;
     std::vector<Vector> vertics;
     CollisionShape shape;
     float x;
     float y;
-    float angle;
+    float last_x;
+    float last_y;
+    float rotation;
+
     Geometry(const Entity&);
+    Geometry(float,float,float,float,CollisionShape);
 };
 
 float GetDistance2(const Vector&, const Vector&, const Vector&);
-bool Contains(const Entity&, const Vector&);
+float GetDistance2(const Vector&, const Vector&);
+bool Contains(const Geometry&, const Vector&);
 Vector GetFarthestProjectionPoint(const Geometry&, const Vector&);

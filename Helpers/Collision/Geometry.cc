@@ -16,13 +16,29 @@ Geometry::Geometry(const Entity& ent)
     length = ent.get_length() * scale;
     x = ent.get_x();
     y = ent.get_y();
-    angle = ent.get_angle();
+    last_x = ent.get_last_x();
+    last_y = ent.get_last_y();
+    rotation = ent.get_angle();
     for (uint8_t i = 0; i < ent.get_vertics_size(); i++)
     {
         vertics.push_back(Vector(ent.get_vertics_x(i), ent.get_vertics_y(i)));
     }
 }
+Geometry::Geometry(float length,float radius,float x,float y,CollisionShape shape)
+{
+    this->length = length;
+    this->radius = radius;
+    this->x = x;
+    this->y = y;
+    this->shape = shape;
+}
+float GetDistance2(Vector a, Vector b)
+{
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
 
+    return dx * dx + dy * dy;
+}
 float GetDistance2(const Vector& pa, const Vector& pb, const Vector& pt)
 {
     float px = pt.x - pa.x, py = pt.y - pa.y;
@@ -32,23 +48,15 @@ float GetDistance2(const Vector& pa, const Vector& pb, const Vector& pt)
     return dx * dx + dy * dy;
 }
 
-/*
-bool Contains(const Entity& ent, const Vector& pt){
-    if (ent.has_component(kPhysics)) {
-        uint8_t raw_shape = ent.get_shape();
-        float radius = ent.get_radius();
-        float width = ent.get_width();
-        float height = ent.get_height();
-        float length = ent.get_length();
 
-        CollisionShape shape = static_cast<CollisionShape>(raw_shape);
-        switch (shape) {
+bool Contains(const Geometry& geometry, const Vector& pt){
+        switch (geometry.shape) {
             case CollisionShape::kCircle:{
-                return pt.magnitude2() <= radius * radius;
+                return pt.magnitude2() <= geometry.radius * geometry.radius;
             }
             case CollisionShape::kRectangle:{
-                float w = width * 0.5f;
-                float h = height * 0.5f;
+                float w = geometry.width * 0.5f;
+                float h = geometry.height * 0.5f;
                 if (pt.x < -w || pt.x > w) return false;
                 if (pt.y < -h || pt.y > h) return false;
                 return true;
@@ -66,16 +74,16 @@ bool Contains(const Entity& ent, const Vector& pt){
                 return false;
             }
             case CollisionShape::kCapsule:{
-                Vector p1 = Vector(length *  0.5f, 0);
-                Vector p2 = Vector(length * -0.5f, 0);
+                Vector p1 = Vector(geometry.length *  0.5f, 0);
+                Vector p2 = Vector(geometry.length * -0.5f, 0);
                 float dist2 = GetDistance2(p1, p2, pt);
-                float radius2 = radius * radius;
+                float radius2 = geometry.radius * geometry.radius;
                 return dist2 <= radius2;
             }
         }
+
 }
-}
-*/
+
 
 Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
 {
