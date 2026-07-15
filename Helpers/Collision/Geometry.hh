@@ -21,7 +21,7 @@ public:
     float rotation;
 
     Geometry(const Entity&);
-    Geometry(float,float,float,float,CollisionShape);
+    Geometry(float,float,float,float,float,CollisionShape);
 };
 
 float GetDistance2(const Vector&, const Vector&, const Vector&);

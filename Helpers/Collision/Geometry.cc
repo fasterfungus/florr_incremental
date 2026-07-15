@@ -24,13 +24,14 @@ Geometry::Geometry(const Entity& ent)
         vertics.push_back(Vector(ent.get_vertics_x(i), ent.get_vertics_y(i)));
     }
 }
-Geometry::Geometry(float length,float radius,float x,float y,CollisionShape shape)
+Geometry::Geometry(float length,float radius,float x,float y,float rotation ,CollisionShape shape)
 {
     this->length = length;
     this->radius = radius;
     this->x = x;
     this->y = y;
     this->shape = shape;
+    this->rotation = rotation;
 }
 float GetDistance2(Vector a, Vector b)
 {

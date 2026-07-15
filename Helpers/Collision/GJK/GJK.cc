@@ -51,7 +51,10 @@ bool SweepDetect(const Geometry& c1, const Geometry& s2, Vector& normal, float& 
         if (l < EPSILON) return false;
         float x = (c1.x + c1.last_x)/2;
         float y = (c1.y + c1.last_y)/2;
-        Geometry g = Geometry(c1.radius,l,x,y,CollisionShape::kCapsule);
+        float angle = std::atan2(c1.y - c1.last_y, c1.x - c1.last_x);
+        if (angle < 0) angle += 2.0f * M_PI;   // 保证在 [0, 2π)
+        float halfLength = l * 0.5f;
+        Geometry g = Geometry(c1.radius,l,x,y,angle,CollisionShape::kCapsule);
         if (Detect(s1, g, s2,dir))
         {
             CheckPenetration(s1, g, s2, normal, depth);
@@ -81,14 +84,6 @@ bool Detect(const Geometry& g1, const Geometry& g2, Vector& normal, float& depth
         return true;
     }
 
-    if (g1.shape == CollisionShape::kCircle && g2.shape == CollisionShape::kSegment)
-    {
-        if (SweepDetect(g1, g2, normal, depth))return true;
-    }
-    if (g2.shape == CollisionShape::kCircle && g1.shape == CollisionShape::kSegment)
-    {
-        if (SweepDetect(g2, g1, normal, depth))return true;
-    }
 
     return false;
 };
