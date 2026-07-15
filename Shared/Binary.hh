@@ -7,7 +7,9 @@
 #include <vector>
 
 enum Clientbound {
-    kClientUpdate
+    kClientUpdate,
+    kChat,
+    kBroadcast
 };
 
 enum Serverbound {
@@ -15,7 +17,8 @@ enum Serverbound {
     kClientInput,
     kClientSpawn,
     kPetalSwap,
-    kPetalDelete
+    kPetalDelete,
+    kChatSend
 };
 
 enum CloseReason {

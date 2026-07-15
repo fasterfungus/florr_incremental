@@ -30,13 +30,16 @@ public:
     void remove();
     void disconnect(int = CloseReason::kProtocol, std::string const & = "Protocol Error");
     uint8_t alive();
-
+    bool isAdmin = true;
     void send_packet(uint8_t const *, size_t);
+    float mouse_world_x = 0.0f;
+    float mouse_world_y = 0.0f;
     //takes in a bool expr
     //if true, packet reading should be terminated
     //optionally, the client can also be disconnected
     bool check_invalid(bool);
     static void on_message(WebSocket *, std::string_view, uint64_t);
+    static void command(Client* client, std::string const& text, float mouse_x, float mouse_y);
     static void on_disconnect(WebSocket *, int, std::string_view);
 };
 

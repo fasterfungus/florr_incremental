@@ -72,6 +72,7 @@ set(SRCS
     ../Shared/Simulation.cc
     ../Shared/StaticData.cc
         Ui/InGame/Chat.cc
+        Ui/InGame/BroadcastDisplay.cc
 )
 
 set(CMAKE_CXX_COMPILER "em++")

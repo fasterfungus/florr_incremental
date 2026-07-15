@@ -92,3 +92,11 @@ void DOM::open_page(char const *url) {
         } catch(e) {}
     }, url);
 }
+
+void DOM::element_focus(char const* name) {
+    EM_ASM({
+        const name = UTF8ToString($0);
+        const elem = document.getElementById(name);
+        elem.focus();
+        }, name);
+}

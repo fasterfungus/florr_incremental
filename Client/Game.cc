@@ -45,6 +45,13 @@ namespace Game {
     uint8_t simulation_ready = 0;
     uint8_t on_game_screen = 0;
     uint8_t show_debug = 0;
+
+    std::vector<ChatMsg> chats;     // 接收到的聊天消息
+    std::string chat_text;          // 本地输入框绑定的文本
+    bool show_chat = false;         // 当前是否显示聊天输入框
+
+    std::vector<BroadcastMessage> broadcasts;
+    std::string password;
 }
 
 using namespace Game;
@@ -109,6 +116,12 @@ void Game::init() {
     for (uint8_t i = 0; i < MAX_SLOT_COUNT * 2; ++i) game_ui_window.add_child(new Ui::UiLoadoutPetal(i));
     game_ui_window.add_child(
         Ui::make_leaderboard()
+    );
+    game_ui_window.add_child(
+        Ui::make_chat()
+);
+    game_ui_window.add_child(
+        Ui::make_broadcast_display()
     );
     game_ui_window.add_child(
         Ui::make_overlevel_indicator()
@@ -269,23 +282,25 @@ void Game::tick(double time) {
         renderer.set_global_alpha(0.85);
         renderer.translate(renderer.width/2,renderer.height/2);
         renderer.draw_image(game_ui_renderer);
-        //process keybind petal switches
-        if (Input::keys_held_this_tick.contains('X'))
-            Game::swap_all_petals();
-        else if (Input::keys_held_this_tick.contains('E')) 
-            Ui::forward_secondary_select();
-        else if (Input::keys_held_this_tick.contains('Q')) 
-            Ui::backward_secondary_select();
-        else if (Ui::UiLoadout::selected_with_keys == MAX_SLOT_COUNT) {
-            for (uint8_t i = 0; i < Game::loadout_count; ++i) {
-                if (Input::keys_held_this_tick.contains(SLOT_KEYBINDS[i])) {
-                    Ui::forward_secondary_select();
-                    break;
+        if (!show_chat) {
+            //process keybind petal switches
+            if (Input::keys_held_this_tick.contains('X'))
+                Game::swap_all_petals();
+            else if (Input::keys_held_this_tick.contains('E'))
+                Ui::forward_secondary_select();
+            else if (Input::keys_held_this_tick.contains('Q'))
+                Ui::backward_secondary_select();
+            else if (Ui::UiLoadout::selected_with_keys == MAX_SLOT_COUNT) {
+                for (uint8_t i = 0; i < Game::loadout_count; ++i) {
+                    if (Input::keys_held_this_tick.contains(SLOT_KEYBINDS[i])) {
+                        Ui::forward_secondary_select();
+                        break;
+                    }
                 }
             }
         } else if (Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] == PetalID::kNone)
             Ui::UiLoadout::selected_with_keys = MAX_SLOT_COUNT;
-        if (Ui::UiLoadout::selected_with_keys < MAX_SLOT_COUNT 
+        if (!show_chat && Ui::UiLoadout::selected_with_keys < MAX_SLOT_COUNT
             && Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] != PetalID::kNone) {
             if (Input::keys_held_this_tick.contains('T')) {
                 Ui::ui_delete_petal(Ui::UiLoadout::selected_with_keys + Game::loadout_count);

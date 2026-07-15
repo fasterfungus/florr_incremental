@@ -39,7 +39,19 @@ namespace Game {
     extern uint8_t simulation_ready;
     extern uint8_t on_game_screen;
     extern uint8_t show_debug;
-    
+    struct ChatMsg {
+        EntityID sender;
+        std::string text;
+    };
+
+    extern std::vector<ChatMsg> chats;
+    extern std::string chat_text;
+    extern bool show_chat;
+
+    struct BroadcastMessage {
+        std::string text;
+    };
+    extern std::vector<BroadcastMessage> broadcasts;
     void init();
     void reset();
     uint8_t alive();
@@ -56,4 +68,5 @@ namespace Game {
     void swap_all_petals();
     void on_message(uint8_t *, uint32_t);
     void poll_ui_event(Ui::ScreenEvent const &);
+    void send_chat(std::string const&);
 };

@@ -6,13 +6,14 @@
 #include <Server/Spawn.hh>
 
 #include <Helpers/UTF8.hh>
-
+#include <sstream>
 #include <Shared/Binary.hh>
 #include <Shared/Config.hh>
+#include <cmath>
 
 #include <array>
 #include <iostream>
-
+#define VALIDATE(expr) if (!expr) { client->disconnect(); return; }
 constexpr std::array<uint32_t, RarityID::kNumRarities> RARITY_TO_XP = { 2, 10, 50, 200, 1000, 5000, 0 };
 
 Client::Client() : game(nullptr) {}
@@ -147,8 +148,181 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             player.set_loadout_ids(pos2, tmp);
             break;
         }
+        case Serverbound::kChatSend: {
+            if (!client->alive()) break;
+            Simulation* simulation = &client->game->simulation;
+            Entity& camera = simulation->get_ent(client->camera);
+            Entity& player = simulation->get_ent(camera.get_player());
+            std::string text;
+            VALIDATE(validator.validate_string(MAX_CHAT_LENGTH));
+            reader.read<std::string>(text);
+            VALIDATE(UTF8Parser::is_valid_utf8(text));
+            text = UTF8Parser::trunc_string(text, MAX_CHAT_LENGTH);
+            if (text.empty()) break;
+
+            // ������� '/' ��ͷ�Ĳ�����ת��
+            if (!text.empty() && text[0] == '/') {
+                command(client, text.substr(1), client->mouse_world_x, client->mouse_world_y);
+                break; // ������㲥
+            }
+
+            // ֱ�ӹ㲥������ά������
+            client->game->chat(player.id, text);
+            break;
+        }
+
     }
 }
+
+void Client::command(Client* client, std::string const& text, float mouse_x, float mouse_y) {
+    Simulation* simulation = &client->game->simulation;
+    Entity& camera = simulation->get_ent(client->camera);
+    Entity& player = simulation->get_ent(camera.get_player());
+    float x = mouse_x;
+    float y = mouse_y;
+
+    std::istringstream iss(text);
+    std::string command, arg;
+    iss >> command;
+    std::transform(command.begin(), command.end(), command.begin(), ::tolower);
+
+    if (command == "kill") {
+        simulation->get_ent(player.get_parent()).set_killed_by(player.get_name());
+        simulation->request_delete(player.id);
+    }
+    else if (command == "bbht") {
+        std::vector<PetalID::T> fixed_loadout = {
+           PetalID::kDahlia,
+           PetalID::kSalt,
+           PetalID::kDahlia,
+           PetalID::kBubble,
+           PetalID::kStinger,
+           PetalID::kIris,
+           PetalID::kStinger,
+           PetalID::kDandelion,
+        };
+
+        for (uint32_t i = 0; i < fixed_loadout.size(); ++i) {
+            PetalID::T pid = fixed_loadout[i];
+            player.set_inventory(i, pid);
+            LoadoutSlot& slot = player.loadout[i];
+            player.set_loadout_ids(i, pid);
+            slot.update_id(simulation, pid);
+            slot.force_reload();
+        }
+        for (uint32_t i = 0; i < loadout_slots_at_level(30); ++i)
+            PetalTracker::add_petal(simulation, player.get_inventory(i));
+    }
+    if (!client->isAdmin) return;
+
+    if (command == "drop" || command == "give") {
+        PetalID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument&) { continue; }
+            catch (const std::out_of_range&) { continue; }
+            if (id >= PetalID::kNumPetals) continue;
+            Entity& drop = alloc_drop(simulation, id);
+            drop.set_x(player.get_x()), drop.set_y(player.get_y());
+        }
+    }
+    else if (command == "dropto") {
+        PetalID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument&) { continue; }
+            catch (const std::out_of_range&) { continue; }
+            if (id >= PetalID::kNumPetals) continue;
+            Entity& drop = alloc_drop(simulation, id);
+            drop.set_x(x), drop.set_y(y);
+        }
+    }
+    else if (command == "tp") {
+        try { iss >> arg, x = std::stof(arg), iss >> arg, y = std::stof(arg); }
+        catch (const std::invalid_argument&) { return; }
+        catch (const std::out_of_range&) { return; }
+        player.set_x(x), player.set_y(y);
+    }
+    else if (command == "tpto") {
+        player.set_x(x), player.set_y(y);
+    }
+    else if (command == "xp") {
+        uint32_t xp;
+        try { iss >> arg, xp = uint32_t(std::stoul(arg)); }
+        catch (const std::invalid_argument&) { return; }
+        catch (const std::out_of_range&) { return; }
+        player.set_score(player.get_score() + xp);
+    }
+    else if (command == "spawn") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument&) { continue; }
+            catch (const std::out_of_range&) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, player.get_x(), player.get_y(), NULL_ENTITY);
+        }
+    }
+    else if (command == "spawnto") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument&) { continue; }
+            catch (const std::out_of_range&) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, x, y, NULL_ENTITY);
+        }
+    }
+    else if (command == "spawnally") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument&) { continue; }
+            catch (const std::out_of_range&) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, player.get_x(), player.get_y(), player.get_team());
+        }
+    }
+    else if (command == "spawnallyto") {
+        MobID::T id;
+        while (iss >> arg) {
+            try { id = std::stoi(arg); }
+            catch (const std::invalid_argument&) { continue; }
+            catch (const std::out_of_range&) { continue; }
+            if (id >= MobID::kNumMobs) continue;
+            alloc_mob(simulation, id, x, y, player.get_team());
+        }
+    }
+    else if (command == "killallmobs") {
+        for (uint16_t i = 0; i < ENTITY_CAP; ++i) {
+            EntityID id(i, 0);
+           // if (!simulation->ent_alive(id)) continue;
+            Entity& ent = simulation->get_ent(id);
+            if (ent.has_component(kMob)) {
+                ent.health = 0;
+            }
+        }
+    }
+    else  if (command == "broadcast") {
+        std::string text;
+        std::getline(iss, text);
+        if (!text.empty()) {
+            Server::game.broadcast_message(text);
+        }
+    }
+    else if (command == "god") {
+        if (!player.immunity_ticks) {
+            player.immunity_ticks = 99999 * TPS;
+        }
+        else {
+            player.immunity_ticks = 0;
+        }
+    }
+    else if (command == "heal") {
+        player.health = player.max_health;
+    }
+        }
+
 
 void Client::on_disconnect(WebSocket *ws, int code, std::string_view message) {
     std::printf("disconnect: [%d]\n", code);

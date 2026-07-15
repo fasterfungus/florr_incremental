@@ -122,3 +122,41 @@ void GameInstance::remove_client(Client *client) {
     }
     client->game = nullptr;
 }
+
+void GameInstance::chat(EntityID sender, std::string const& text) {
+    for (Client* client : clients) {
+        // �ж�ͬ�Ӻ��Ӿ�
+        Simulation* sim = &simulation;
+        if (!sim->ent_exists(sender)) continue;
+
+        Entity& sender_ent = sim->get_ent(sender);
+        Entity& camera = sim->get_ent(client->camera);
+
+        bool send = false;
+        if (sender_ent.get_team() == camera.get_team()) {
+            send = true; // ͬ����Զ�ɼ�
+        }
+        else if (client->in_view.contains(sender_ent.id)) {
+            send = true;
+        }
+
+        if (send) {
+            Writer writer(Server::OUTGOING_PACKET);
+            writer.write<uint8_t>(Clientbound::kChat);
+            writer.write<EntityID>(sender);   // ����ʵ�� ID
+            writer.write<std::string>(text);
+            client->send_packet(writer.packet, writer.at - writer.packet);
+        }
+    }
+}
+
+void GameInstance::broadcast_message(std::string const& msg) {
+    for (Client* client : clients) {
+
+        Writer writer(Server::OUTGOING_PACKET);
+        writer.write<uint8_t>(Clientbound::kBroadcast); // ������ö������
+        writer.write<std::string>(msg);
+
+        client->send_packet(writer.packet, writer.at - writer.packet);
+    }
+}

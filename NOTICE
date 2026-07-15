@@ -1,0 +1,13 @@
+Copyright notice:
+
+- Base project :
+Copyright (C) 2025 trigonal-bacon
+Source: https://github.com/trigonal-bacon/gardn
+License: GNU Affero General Public License v3.0 (AGPLv3)
+Modifications made by Faster_Fungus (2026):
+- Improved the collision detection algorithm
+
+- Forked modifications from "gardn" by eggstar111 :
+Copyright (C) 2025 eggstar111
+Source: https://github.com/eggstar111/gardn
+License: GNU Affero General Public License v3.0 (AGPLv3)
