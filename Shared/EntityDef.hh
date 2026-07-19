@@ -37,8 +37,6 @@ FIELDS_Name
 #define FIELDS_Physics \
 SINGLE(Physics, x, Float) \
 SINGLE(Physics, y, Float) \
-SINGLE(Physics, last_x, Float) \
-SINGLE(Physics, last_y, Float) \
 SINGLE(Physics, radius, Float) \
 SINGLE(Physics, angle, Float) \
 SINGLE(Physics, scale, Float) \

@@ -46,10 +46,10 @@ void SpatialHash::query(float x, float y, float w, float h, std::function<void(S
     tree.query(region, [&](EntityID id) {
         Entity &ent = simulation->get_ent(id);
         float r = ent.get_radius() * ent.get_scale();
-        float world_minx = std::min(ent.get_x() + ent.get_minx(), ent.get_x() - r);
-        float world_maxx = std::max(ent.get_x() + ent.get_maxx(), ent.get_x() + r);
-        float world_miny = std::min(ent.get_y() + ent.get_miny(), ent.get_y() - r);
-        float world_maxy = std::max(ent.get_y() + ent.get_maxy(), ent.get_y() + r);
+        float world_minx = ent.get_x() + ent.get_minx();
+        float world_maxx = ent.get_x() + ent.get_maxx();
+        float world_miny = ent.get_y() + ent.get_miny();
+        float world_maxy = ent.get_y() + ent.get_maxy();
         if (world_maxx < x - w || world_minx > x + w) return;
         if (world_maxy < y - h || world_miny > y + h) return;
         cb(simulation, ent);

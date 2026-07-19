@@ -16,8 +16,6 @@ Geometry::Geometry(const Entity& ent)
     length = ent.get_length() * scale;
     x = ent.get_x();
     y = ent.get_y();
-    last_x = ent.get_last_x();
-    last_y = ent.get_last_y();
     rotation = ent.get_angle();
     angle = ent.get_angle();
     for (uint8_t i = 0; i < ent.get_vertics_size(); i++)

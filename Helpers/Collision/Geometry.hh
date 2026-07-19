@@ -16,8 +16,6 @@ public:
     CollisionShape shape;
     float x;
     float y;
-    float last_x;
-    float last_y;
     float rotation;
 
     Geometry(const Entity&);
