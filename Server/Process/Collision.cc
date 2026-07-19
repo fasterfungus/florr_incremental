@@ -67,38 +67,7 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
     Vector separation(0,0);
     Geometry g1 = Geometry(ent1);
     Geometry g2 = Geometry(ent2);
-    if (!Detect(g1, g2, separation, dist)){
-        if (g1.shape == CollisionShape::kCircle && g2.shape == CollisionShape::kSegment)
-        {
-            if (SweepDetect(g1, g2, separation, dist))
-            {
-                Vector v = Vector(std::cos(ent1.get_angle()),std::sin(ent1.get_angle()));
-                if (separation.Dot(v) > 0)
-                {
-                    separation.negative();
-                }
-                std::cout<<"aaa";
-                return;
-            }
-            return;
-        }
-        if (g2.shape == CollisionShape::kCircle && g1.shape == CollisionShape::kSegment)
-        {
-            if (SweepDetect(g2, g1, separation, dist))
-            {
-                Vector v = Vector(std::cos(ent2.get_angle()),std::sin(ent2.get_angle()));
-                if (separation.Dot(v) > 0)
-                {
-                    std::cout<<"aaa";
-                    separation.negative();
-
-                }
-                return;
-            }
-            return;
-        }
-        return;
-    };
+    if (!Detect(g1, g2, separation, dist)){};
     if (NO(kDrop) && NO(kWeb)) {
         if (separation.x == 0 && separation.y == 0)
             separation.unit_normal(frand() * 2 * M_PI);

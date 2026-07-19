@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "Helpers/Collision/BoundingBox/BoundingBoxHelper.hh"
+
 static void calculate_leaderboard(Simulation *sim) {
     std::vector<Entity const *> players;
     sim->for_each<kCamera>([&](Simulation *sim, Entity &ent) { 
@@ -42,6 +44,7 @@ void Simulation::on_tick() {
     for_each_entity([](Simulation *sim, Entity &ent) {
     ent.set_last_x(ent.get_x());
     ent.set_last_y(ent.get_y());
+        Set(ent);
 
 });
     for_each_entity([](Simulation *sim, Entity &ent) {

@@ -3,20 +3,21 @@
 #include <Shared/Entity.hh>
 #include <Shared/StaticData.hh>
 
+#include <Server/BVH.hh>
+
 #include <cstdint>
 #include <functional>
-#include <vector>
 
 class Simulation;
 class Entity;
 
-static const uint32_t GRID_SIZE = 100 * 2;
-static const uint32_t MAX_GRID_X = div_round_up(ARENA_WIDTH, GRID_SIZE);
-static const uint32_t MAX_GRID_Y = div_round_up(ARENA_HEIGHT, GRID_SIZE);
-
+// Broad-phase spatial index over active physics entities. Backed by a dynamic
+// AABB BVH (see BVH.hh). The public interface is unchanged from the previous
+// grid-based implementation, so callers (Simulation, Detection, Culling, Game)
+// need no modification.
 class SpatialHash {
     Simulation *simulation;
-    std::vector<EntityID> cells[MAX_GRID_X][MAX_GRID_Y];
+    BVH tree;
     uint32_t width;
     uint32_t height;
 public:

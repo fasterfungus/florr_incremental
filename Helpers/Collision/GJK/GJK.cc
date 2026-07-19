@@ -43,6 +43,7 @@ bool Detect(Simplex& simplex, const Geometry& g1, const Geometry& g2, const Vect
 
     return false;
 }
+/*
 bool SweepDetect(const Geometry& c1, const Geometry& s2, Vector& normal, float& depth)
 {
         Vector dir = Vector(c1.x - s2.x, c1.y - s2.y);
@@ -63,6 +64,7 @@ bool SweepDetect(const Geometry& c1, const Geometry& s2, Vector& normal, float& 
         }
         return false;
 }
+*/
 bool Detect(const Geometry& g1, const Geometry& g2, Vector& normal, float& depth)
 {
     Simplex simplex;

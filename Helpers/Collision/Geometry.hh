@@ -11,7 +11,6 @@ public:
     float width;
     float height;
     float length;
-    float angle;
     std::vector<Vector> vertics;
     CollisionShape shape;
     float x;
