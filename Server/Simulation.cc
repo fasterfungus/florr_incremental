@@ -49,7 +49,7 @@ void Simulation::on_tick() {
 });
     for_each_entity([](Simulation *sim, Entity &ent) {
         if (ent.has_component(kPhysics))
-            sim->spatial_hash.insert(ent);
+            sim->spatial_hash.sync(ent);
         if (BitMath::at(ent.flags, EntityFlags::kHasCulling))
             BitMath::set(ent.flags, EntityFlags::kIsCulled);
     });

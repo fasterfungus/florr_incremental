@@ -23,7 +23,9 @@ class SpatialHash {
 public:
     SpatialHash(Simulation *);
     void refresh(uint32_t, uint32_t);
-    void insert(Entity const &);
+    void reset();
+    void sync(Entity &);
+    void remove(Entity &);
     void collide(std::function<void(Simulation *, Entity &, Entity &)>);
     void query(float, float, float, float, std::function<void(Simulation *, Entity &)>);
 };

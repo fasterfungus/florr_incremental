@@ -17,12 +17,12 @@ bool Contain(const Geometry& g,const Vector& pt)
 }
 Vector GetFarthestProjectionPointAfterTransform(const Geometry& g, Vector dir)
 {
-    float rotation = g.rotation;
-    Matrix m1 = Matrix::CreateRotationMatrix(-rotation);
+    float angle = g.angle;
+    Matrix m1 = Matrix::CreateRotationMatrix(-angle);
     dir = Matrix::Transform(dir, m1);
 
     Vector pt = GetFarthestProjectionPoint(g, dir);
-    Matrix m2 = Matrix::CreateRotationMatrix(rotation);
+    Matrix m2 = Matrix::CreateRotationMatrix(angle);
     Vector p = Vector(g.x, g.y);
     Matrix m3 = Matrix::CreateTranslationMatrix(p);
     return Matrix::Transform(pt, m2 * m3); // 经检验无问题
@@ -53,9 +53,9 @@ bool IsCircleOverlapsWithCircle(const Geometry& c1, const Geometry& c2,
 }
 Vector GetFarthestProjectionPointAfterRotation(const Geometry& g, Vector dir)
 {
-    Matrix m1 = Matrix::CreateRotationMatrix(-g.rotation);
+    Matrix m1 = Matrix::CreateRotationMatrix(-g.angle);
     dir = Matrix::Transform(dir, m1);
     Vector pt = GetFarthestProjectionPoint(g,dir);
-    Matrix m2 = Matrix::CreateRotationMatrix(g.rotation);
+    Matrix m2 = Matrix::CreateRotationMatrix(g.angle);
     return Matrix::Transform(pt, m2);
 }

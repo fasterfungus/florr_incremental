@@ -21,6 +21,7 @@ void Simulation::reset() {
 
     arena_info.init();
     #ifdef SERVERSIDE
+    spatial_hash.reset();
     spatial_hash.refresh(ARENA_WIDTH, ARENA_HEIGHT);
     petal_count_tracker = {0};
     zone_mob_counts = {0};
@@ -72,6 +73,10 @@ void Simulation::request_delete(EntityID const &id) {
 void Simulation::_delete_ent(EntityID const &id) {
     DEBUG_ONLY(std::cout << "ent_delete " << id << "\n";)
     DEBUG_ONLY(assert(ent_exists(id)));
+    #ifdef SERVERSIDE
+    if (entities[id.id].bvh_proxy >= 0)
+        spatial_hash.remove(entities[id.id]);
+    #endif
     BitMath::unset_arr(entity_tracker.data(), id.id);
     hash_tracker[id.id]++;
 }

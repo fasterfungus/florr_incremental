@@ -146,7 +146,8 @@ SINGLE(Name, nametag_visible, uint8_t)
     \
     SINGLE(zone, uint8_t, =0) \
     SINGLE(deletion_tick, uint8_t, =0) \
-    SINGLE(deleted_petals, circ_arr_t, ={})
+    SINGLE(deleted_petals, circ_arr_t, ={}) \
+    SINGLE(bvh_proxy, int32_t, =-1)
 #else
 #define PER_EXTRA_FIELD \
     SINGLE(last_damaged_time, double, =0) \

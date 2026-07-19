@@ -19,10 +19,21 @@ Geometry::Geometry(const Entity& ent)
     last_x = ent.get_last_x();
     last_y = ent.get_last_y();
     rotation = ent.get_angle();
+    angle = ent.get_angle();
     for (uint8_t i = 0; i < ent.get_vertics_size(); i++)
     {
         vertics.push_back(Vector(ent.get_vertics_x(i), ent.get_vertics_y(i)));
     }
+}
+Geometry::Geometry(float length,float radius,float x,float y,float rotation ,CollisionShape shape)
+{
+    this->length = length;
+    this->radius = radius;
+    this->x = x;
+    this->y = y;
+    this->shape = shape;
+    this->rotation = rotation;
+    this->angle = rotation;
 }
 float GetDistance2(Vector a, Vector b)
 {

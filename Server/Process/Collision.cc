@@ -67,7 +67,9 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
     Vector separation(0,0);
     Geometry g1 = Geometry(ent1);
     Geometry g2 = Geometry(ent2);
-    if (!Detect(g1, g2, separation, dist))return;
+    if (!Detect(g1, g2, separation, dist)){
+        return;
+    };
     if (NO(kDrop) && NO(kWeb)) {
         if (separation.x == 0 && separation.y == 0)
             separation.unit_normal(frand() * 2 * M_PI);
