@@ -60,7 +60,6 @@ void tick_entity_motion(Simulation *sim, Entity &ent) {
 // the now-touching pair and applies damage/knockback as usual.
 static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
     if (ent.pending_delete || !ent.has_component(kPhysics)) return;
-
     Vector end(ent.get_x(), ent.get_y());
     Vector dir = end - start;
 

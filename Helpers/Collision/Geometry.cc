@@ -187,7 +187,7 @@ Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
         }
     case CollisionShape::kCapsule:
         {
-            Vector p = dir.normalized() * geometry.length;
+            Vector p = dir.normalized() * geometry.radius;
             float x = dir.x >= 0 ? geometry.length * 0.5f : -geometry.length * 0.5f;
             p.x += x;
             return p;
