@@ -5,7 +5,7 @@
 #include <Server/EntityFunctions.hh>
 #include <Server/Server.hh>
 #include <Server/Spawn.hh>
-#include <Server/SpatialHash.hh>
+#include <Server/BVHCollisionManager.hh>
 
 #include <Shared/Map.hh>
 

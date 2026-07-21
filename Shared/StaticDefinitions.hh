@@ -294,3 +294,11 @@ struct ZoneDefinition {
     uint32_t color;
     char const *name;
 };
+namespace Map {
+    enum : uint8_t {
+        kGarden,
+        kDesert,
+        kAntRoom,
+        kNumGamemodes
+    };
+}

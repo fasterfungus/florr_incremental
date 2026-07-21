@@ -1,6 +1,6 @@
 #pragma once
 #include <Shared/Entity.hh>
-#include <Helpers/Math.hh>
+#include <Server/Wall.hh>
 #include <vector>
 
 class Geometry
@@ -19,7 +19,7 @@ public:
     float rotation;
 
     Geometry(const Entity&);
-    Geometry(float,float,float,float,float,CollisionShape);
+    Geometry(const Wall&);
 };
 
 float GetDistance2(const Vector&, const Vector&, const Vector&);

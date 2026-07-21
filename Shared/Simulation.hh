@@ -4,7 +4,7 @@
 #include <Shared/Entity.hh>
 
 #ifdef SERVERSIDE
-#include <Server/SpatialHash.hh>
+#include <Server/BVHCollisionManager.hh>
 #endif
 
 #include <functional>
@@ -20,7 +20,7 @@ class Simulation {
 public:
     SERVER_ONLY(std::array<uint32_t, PetalID::kNumPetals> petal_count_tracker;)
     SERVER_ONLY(std::array<uint32_t, MAP_DATA.size()> zone_mob_counts;)
-    SERVER_ONLY(SpatialHash spatial_hash;)
+    SERVER_ONLY(BVHCollisionManager spatial_hash;)
     Arena arena_info;
     Simulation();
     void reset();

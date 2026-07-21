@@ -15,7 +15,6 @@ struct AABB {
         : min_x(_min_x), min_y(_min_y), max_x(_max_x), max_y(_max_y) {}
 
     static AABB from_entity(Entity const &e) {
-        float r = e.get_radius() * e.get_scale();
         float min_x = e.get_x() + e.get_minx();
         float min_y = e.get_y() + e.get_miny();
         float max_x = e.get_x() + e.get_maxx();

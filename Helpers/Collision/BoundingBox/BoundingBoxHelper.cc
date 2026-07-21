@@ -8,10 +8,11 @@
 
 void Set(Entity& e)
 {
-    Vector p1 = GetFarthestProjectionPointAfterRotation(e, up);
-    Vector p2 = GetFarthestProjectionPointAfterRotation(e, right);
-    Vector p3 = GetFarthestProjectionPointAfterRotation(e, down);
-    Vector p4 = GetFarthestProjectionPointAfterRotation(e, left);
+    Geometry g = Geometry(e);
+    Vector p1 = GetFarthestProjectionPointAfterRotation(g, up);
+    Vector p2 = GetFarthestProjectionPointAfterRotation(g, right);
+    Vector p3 = GetFarthestProjectionPointAfterRotation(g, down);
+    Vector p4 = GetFarthestProjectionPointAfterRotation(g, left);
     e.set_maxx(Max(p1.x, p2.x, p3.x, p4.x));
     e.set_maxy(Max(p1.y, p2.y, p3.y, p4.y));
     e.set_minx(Min(p1.x, p2.x, p3.x, p4.x));

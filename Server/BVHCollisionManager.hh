@@ -15,13 +15,13 @@ class Entity;
 // AABB BVH (see BVH.hh). The public interface is unchanged from the previous
 // grid-based implementation, so callers (Simulation, Detection, Culling, Game)
 // need no modification.
-class SpatialHash {
+class BVHCollisionManager {
     Simulation *simulation;
-    BVH tree;
+    BVH dynamic_tree;
     uint32_t width;
     uint32_t height;
 public:
-    SpatialHash(Simulation *);
+    BVHCollisionManager(Simulation *);
     void refresh(uint32_t, uint32_t);
     void reset();
     void sync(Entity &);

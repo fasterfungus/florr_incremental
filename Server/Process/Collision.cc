@@ -75,7 +75,7 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
             separation.unit_normal(frand() * 2 * M_PI);
         else
             separation.Normalize();
-        float ratio = ent2.mass / (ent1.mass + ent2.mass);
+        float ratio = ent2.mass*ent2.get_scale() / (ent1.mass*ent2.get_scale() + ent2.mass*ent2.get_scale());
         if (!(ent1.get_team() == ent2.get_team())) {
             if (ent1.has_component(kFlower) && !ent2.has_component(kPetal))
                 _cancel_movement(ent1, separation, ent2.velocity - ent1.velocity);

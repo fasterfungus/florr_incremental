@@ -17,22 +17,21 @@ Geometry::Geometry(const Entity& ent)
     x = ent.get_x();
     y = ent.get_y();
     rotation = ent.get_angle();
-    angle = ent.get_angle();
     for (uint8_t i = 0; i < ent.get_vertics_size(); i++)
     {
         vertics.push_back(Vector(ent.get_vertics_x(i), ent.get_vertics_y(i)));
     }
 }
-Geometry::Geometry(float length,float radius,float x,float y,float rotation ,CollisionShape shape)
+
+Geometry::Geometry(const Wall& wall)
 {
-    this->length = length;
-    this->radius = radius;
-    this->x = x;
-    this->y = y;
-    this->shape = shape;
-    this->rotation = rotation;
-    this->angle = rotation;
+    length = wall.length;
+    x = wall.x;
+    y = wall.y;
+    rotation = wall.angle;
+    shape = CollisionShape::kSegment;
 }
+
 float GetDistance2(Vector a, Vector b)
 {
     float dx = a.x - b.x;

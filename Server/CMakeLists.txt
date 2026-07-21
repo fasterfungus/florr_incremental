@@ -23,7 +23,6 @@ set(SOURCES
     Process/Petal.cc
     Process/Score.cc
     Process/Segment.cc
-        SpatialHashCanonical.cc
     Client.cc
     Game.cc
     Main.cc
@@ -31,6 +30,7 @@ set(SOURCES
     Server.cc
     Simulation.cc
     Spawn.cc
+        BVHCollisionManager.cc
     TeamManager.cc
     ../Helpers/Math.cc
     ../Helpers/UTF8.cc
@@ -52,6 +52,7 @@ set(SOURCES
         ../Helpers/Collision/GJK/Simplex.cc
         ../Helpers/Collision/BoundingBox/BoundingBoxHelper.cc
         ../Helpers/Collision/CCD.cc
+        Wall.cc
 
 )
 
