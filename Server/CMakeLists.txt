@@ -51,6 +51,7 @@ set(SOURCES
         ../Helpers/Collision/GJK/ExpandingSimplex.cc
         ../Helpers/Collision/GJK/Simplex.cc
         ../Helpers/Collision/BoundingBox/BoundingBoxHelper.cc
+        ../Helpers/Collision/CCD.cc
 
 )
 

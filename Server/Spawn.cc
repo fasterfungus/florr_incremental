@@ -62,7 +62,7 @@ static Entity &__alloc_mob(
     mob.set_y(y);
     Set(mob);
     mob.friction = DEFAULT_FRICTION;
-    mob.mass = (1 + mob.get_radius() / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 10000 : 1);
+    mob.mass = (1 + mob.get_radius()*mob.get_scale() / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 10000 : 1);
     if (mob_id == MobID::kAntHole)
         BitMath::set(mob.flags, EntityFlags::kNoFriendlyCollision);
 
