@@ -198,74 +198,89 @@ class BVH {
         }
     }
 
-    // Balance node iA by promoting a grandchild if one subtree is too tall.
-    // Returns the node now occupying iA's position. (Box2D b2RotateNodes.)
+    // Refit an internal node's box + height from its two children.
+    void refit_node(int32_t i) {
+        int32_t c1 = nodes_[i].child1, c2 = nodes_[i].child2;
+        nodes_[i].box = AABB::combine(nodes_[c1].box, nodes_[c2].box);
+        nodes_[i].height = 1 + std::max(nodes_[c1].height, nodes_[c2].height);
+    }
+
+    // SAH-cost tree rotation (Box2D v3 b2RotateNodes style). Unlike an AVL /
+    // height-triggered balance, this fires whenever swapping a grandchild up to
+    // A strictly reduces the total surface area (perimeter, our 2D SAH proxy) of
+    // A's two children — keeping fat boxes tight and cutting false-positive pairs,
+    // not merely keeping the tree short.
+    //
+    // A has children B, C. Up to four grandchildren can swap up:
+    //   1: B<->F (F=C.child1)   pushes B under C, new C = {B, G}
+    //   2: B<->G (G=C.child2)   pushes B under C, new C = {F, B}
+    //   3: C<->D (D=B.child1)   pushes C under B, new B = {C, E}
+    //   4: C<->E (E=B.child2)   pushes C under B, new B = {D, C}
+    // Every one of these leaves A's own box invariant (it still covers the same
+    // grandchildren), so A never leaves its slot: we mutate one child subtree,
+    // refit that down-node here, and return iA for the caller's refit loop to
+    // recompute A itself.
     int32_t rotate(int32_t iA) {
         Node &A = nodes_[iA];
-        if (A.is_leaf() || A.height < 2) return iA;
+        if (A.height < 2) return iA;             // no grandchildren to rotate
+#ifdef BVH_DISABLE_ROTATE
+        return iA;                               // test-only: measure quality without SAH rotation
+#endif
         int32_t iB = A.child1, iC = A.child2;
-        int32_t balance = nodes_[iC].height - nodes_[iB].height;
+        float areaB = nodes_[iB].box.perimeter();
+        float areaC = nodes_[iC].box.perimeter();
 
-        // C is too tall: promote C above A. A keeps B plus one grandchild; the
-        // other grandchild stays with C. Put the grandchild that makes A's box
-        // smallest down with A (keeps the lower node tight).
-        if (balance > 1) {
+        float bestImprovement = 0.0f;            // require a STRICT improvement
+        int32_t bestCase = 0;                    // 0 = leave A as-is
+
+        // Push B down under C (only possible if C is internal).
+        if (!nodes_[iC].is_leaf()) {
             int32_t iF = nodes_[iC].child1, iG = nodes_[iC].child2;
-            float costA_F = AABB::combine(nodes_[iB].box, nodes_[iF].box).perimeter();
-            float costA_G = AABB::combine(nodes_[iB].box, nodes_[iG].box).perimeter();
-            int32_t toA, toC;
-            if (costA_F < costA_G) { toA = iF; toC = iG; } else { toA = iG; toC = iF; }
-
-            int32_t oldParent = A.parent;
-            nodes_[iC].child1 = iA;
-            nodes_[iC].parent = oldParent;
-            nodes_[iA].parent = iC;
-            if (oldParent != -1) {
-                if (nodes_[oldParent].child1 == iA) nodes_[oldParent].child1 = iC;
-                else nodes_[oldParent].child2 = iC;
-            } else root_ = iC;
-
-            nodes_[iC].child2 = toC;
-            nodes_[toC].parent = iC;
-            nodes_[iA].child2 = toA;
-            nodes_[toA].parent = iA;
-
-            nodes_[iA].box = AABB::combine(nodes_[iB].box, nodes_[toA].box);
-            nodes_[iC].box = AABB::combine(nodes_[iA].box, nodes_[toC].box);
-            nodes_[iA].height = 1 + std::max(nodes_[iB].height, nodes_[toA].height);
-            nodes_[iC].height = 1 + std::max(nodes_[iA].height, nodes_[toC].height);
-            return iC;
+            float costBF = AABB::combine(nodes_[iB].box, nodes_[iG].box).perimeter(); // new C={B,G}
+            float costBG = AABB::combine(nodes_[iF].box, nodes_[iB].box).perimeter(); // new C={F,B}
+            if (areaC - costBF > bestImprovement) { bestImprovement = areaC - costBF; bestCase = 1; }
+            if (areaC - costBG > bestImprovement) { bestImprovement = areaC - costBG; bestCase = 2; }
         }
-
-        // B is too tall (mirror).
-        if (balance < -1) {
+        // Push C down under B (only possible if B is internal).
+        if (!nodes_[iB].is_leaf()) {
             int32_t iD = nodes_[iB].child1, iE = nodes_[iB].child2;
-            float costA_D = AABB::combine(nodes_[iC].box, nodes_[iD].box).perimeter();
-            float costA_E = AABB::combine(nodes_[iC].box, nodes_[iE].box).perimeter();
-            int32_t toA, toB;
-            if (costA_D < costA_E) { toA = iD; toB = iE; } else { toA = iE; toB = iD; }
-
-            int32_t oldParent = A.parent;
-            nodes_[iB].child1 = iA;
-            nodes_[iB].parent = oldParent;
-            nodes_[iA].parent = iB;
-            if (oldParent != -1) {
-                if (nodes_[oldParent].child1 == iA) nodes_[oldParent].child1 = iB;
-                else nodes_[oldParent].child2 = iB;
-            } else root_ = iB;
-
-            nodes_[iB].child2 = toB;
-            nodes_[toB].parent = iB;
-            nodes_[iA].child1 = toA;
-            nodes_[toA].parent = iA;
-
-            nodes_[iA].box = AABB::combine(nodes_[iC].box, nodes_[toA].box);
-            nodes_[iB].box = AABB::combine(nodes_[iA].box, nodes_[toB].box);
-            nodes_[iA].height = 1 + std::max(nodes_[iC].height, nodes_[toA].height);
-            nodes_[iB].height = 1 + std::max(nodes_[iA].height, nodes_[toB].height);
-            return iB;
+            float costCD = AABB::combine(nodes_[iC].box, nodes_[iE].box).perimeter(); // new B={C,E}
+            float costCE = AABB::combine(nodes_[iD].box, nodes_[iC].box).perimeter(); // new B={D,C}
+            if (areaB - costCD > bestImprovement) { bestImprovement = areaB - costCD; bestCase = 3; }
+            if (areaB - costCE > bestImprovement) { bestImprovement = areaB - costCE; bestCase = 4; }
         }
 
+        switch (bestCase) {
+            case 1: {                            // F up to A.child1, B down to C.child1
+                int32_t iF = nodes_[iC].child1;
+                nodes_[iA].child1 = iF; nodes_[iF].parent = iA;
+                nodes_[iC].child1 = iB; nodes_[iB].parent = iC;
+                refit_node(iC);
+                break;
+            }
+            case 2: {                            // G up to A.child1, B down to C.child2
+                int32_t iG = nodes_[iC].child2;
+                nodes_[iA].child1 = iG; nodes_[iG].parent = iA;
+                nodes_[iC].child2 = iB; nodes_[iB].parent = iC;
+                refit_node(iC);
+                break;
+            }
+            case 3: {                            // D up to A.child2, C down to B.child1
+                int32_t iD = nodes_[iB].child1;
+                nodes_[iA].child2 = iD; nodes_[iD].parent = iA;
+                nodes_[iB].child1 = iC; nodes_[iC].parent = iB;
+                refit_node(iB);
+                break;
+            }
+            case 4: {                            // E up to A.child2, C down to B.child2
+                int32_t iE = nodes_[iB].child2;
+                nodes_[iA].child2 = iE; nodes_[iE].parent = iA;
+                nodes_[iB].child2 = iC; nodes_[iC].parent = iB;
+                refit_node(iB);
+                break;
+            }
+            default: break;                      // no beneficial rotation
+        }
         return iA;
     }
 
@@ -358,4 +373,21 @@ public:
         }
         return true;
     }
+
+    // Test-only tree-quality metric: the standard SAH cost of the tree, i.e. the
+    // sum of internal-node surface areas (here perimeters, our 2D SAH proxy).
+    // Lower is better — a tighter tree means fewer false-positive query/collide
+    // candidates. Used to prove the SAH rotation actually improves quality.
+    float total_sah_cost() const {
+        float sum = 0.0f;
+        for (int32_t i = 0; i < (int32_t)nodes_.size(); ++i) {
+            Node const &n = nodes_[i];
+            if (n.height <= 0) continue;               // skip free nodes and leaves
+            sum += n.box.perimeter();
+        }
+        return sum;
+    }
+
+    // Test-only: worst-case root-to-leaf depth, for balance sanity checks.
+    int32_t max_height() const { return root_ == -1 ? 0 : nodes_[root_].height; }
 };

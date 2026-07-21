@@ -227,11 +227,45 @@ static void test_ccd_sweep() {
     std::printf("test_ccd_sweep passed\n");
 }
 
+// ---------------------------------------------------------------------------
+// Tree-quality: after a churn of inserts + moves, the SAH cost (sum of internal
+// node surface areas) and max height should stay low. Prints the metrics so a
+// BVH_DISABLE_ROTATE build can be compared against the SAH-rotation build.
+static void test_tree_quality() {
+    std::mt19937 rng(2024);
+    std::uniform_real_distribution<float> pos(0, 4000), rad(5, 40), vel(-80, 80);
+    BVH tree;
+    int N = 500;
+    std::vector<Circle> c(N);
+    std::vector<int32_t> px(N);
+    for (int i = 0; i < N; ++i) {
+        c[i] = {pos(rng), pos(rng), rad(rng)};
+        px[i] = tree.create_proxy(AABB::from_circle(c[i].x, c[i].y, c[i].r), EntityID((uint16_t)i, 0));
+    }
+    for (int frame = 0; frame < 200; ++frame)
+        for (int i = 0; i < N; ++i) {
+            float dx = vel(rng), dy = vel(rng);
+            c[i].x += dx; c[i].y += dy;
+            tree.move_proxy(px[i], AABB::from_circle(c[i].x, c[i].y, c[i].r), Vector(dx, dy));
+        }
+    assert(tree.validate());
+
+    float cost = tree.total_sah_cost();
+    int32_t h = tree.max_height();
+    int32_t ideal = 0; for (int32_t n = 1; n < N; n <<= 1) ++ideal;   // ceil(log2 N)
+    std::printf("test_tree_quality: N=%d  SAH_cost=%.0f  max_height=%d (ideal ~%d)\n",
+                N, cost, h, ideal);
+    assert(h <= 3 * ideal && "tree height degenerate — rotations not keeping it balanced");
+    std::printf("test_tree_quality passed\n");
+}
+
+// ---------------------------------------------------------------------------
 int main() {
     test_aabb_helpers();
     test_edge_cases();
     test_move_noop_when_inside_fat();
     test_persistent_lifecycle();
+    test_tree_quality();
     test_ccd_sweep();
     if (test_superset_scenes() != 0) return 1;
     std::printf("ALL BVH TESTS PASSED\n");
