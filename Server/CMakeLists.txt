@@ -31,6 +31,7 @@ set(SOURCES
     Simulation.cc
     Spawn.cc
         BVHCollisionManager.cc
+        Walls.cc
     TeamManager.cc
     ../Helpers/Math.cc
     ../Helpers/UTF8.cc

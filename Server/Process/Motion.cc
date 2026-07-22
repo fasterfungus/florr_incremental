@@ -2,6 +2,7 @@
 
 #include <Shared/Simulation.hh>
 #include <Shared/Entity.hh>
+#include <Server/Wall.hh>
 #include <iostream>
 #include <Helpers/Collision/CCD.hh>
 
@@ -101,6 +102,20 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
             }
         });
 
+    // CCD against static walls: exact swept-circle-vs-segment so diagonal walls
+    // don't fire early due to AABB over-approximation.
+    sim->spatial_hash.query_walls_in_aabb(swept, [&](Wall const &wall) {
+        float half = wall.length * 0.5f;
+        float cx = std::cos(wall.angle), sy = std::sin(wall.angle);
+        Vector seg_a(wall.x - cx * half, wall.y - sy * half);
+        Vector seg_b(wall.x + cx * half, wall.y + sy * half);
+        CCD::SweepHit h = CCD::swept_circle_segment(start, dir, r, seg_a, seg_b);
+        if (h.hit && h.t < earliest_t) {
+            earliest_t = h.t;
+            earliest_normal = h.normal;
+        }
+    });
+
     if (earliest_t < 1.0f) {
         ent.set_x(start.x + dir.x * earliest_t);
         ent.set_y(start.y + dir.y * earliest_t);
@@ -109,7 +124,7 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
         // Keeping the tangential component allows sliding along walls.
         float dot = Vector::Dot(ent.velocity, earliest_normal);
         if (dot < 0.0f) {
-            ent.velocity += earliest_normal * (-dot - 0.1f); // 多减一点，让速度略微指向墙内
+            ent.velocity += earliest_normal * (-dot);
         }
         ++ent.ccd_hits;
     }

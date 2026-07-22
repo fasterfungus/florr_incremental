@@ -16,6 +16,13 @@ struct SweepHit {
     Vector normal;    // surface normal at the contact (unit, points away from box)
 };
 
+// Sweep a circle of radius `radius` from `start` along `dir` against a line
+// segment from `seg_a` to `seg_b`. Uses exact analytic geometry (side-plane
+// test + endpoint capsule tests) instead of the AABB approximation, so it
+// never fires early for diagonal segments.
+SweepHit swept_circle_segment(Vector start, Vector dir, float radius,
+                               Vector seg_a, Vector seg_b);
+
 // Sweep a circle of radius `radius` from `start` along `dir` (dir = end-start,
 // NOT normalized) against `box`. Uses the analytic slab method on the box
 // Minkowski-expanded by `radius`. Returns the first contact in [0,1].

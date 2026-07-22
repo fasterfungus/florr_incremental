@@ -74,3 +74,10 @@ void BVHCollisionManager::collide_stationary(
         on_wall_collide(simulation, simulation->get_ent(ent_id), walls[wall_id.id]);
     });
 }
+
+void BVHCollisionManager::query_walls_in_aabb(AABB const &region,
+        std::function<void(Wall const &)> cb) {
+    stationary_tree.query(region, [&](EntityID wall_id) {
+        cb(walls[wall_id.id]);
+    });
+}

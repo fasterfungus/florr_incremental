@@ -228,6 +228,59 @@ static void test_ccd_sweep() {
 }
 
 // ---------------------------------------------------------------------------
+// CCD swept-circle-vs-segment: exact test, must not fire for diagonal walls
+// that don't actually overlap the swept path.
+static void test_ccd_segment() {
+    // 1. Circle moving right, horizontal segment directly in its path.
+    //    Segment from (100,100) to (100,120), r=5. Contact when circle reaches x=95.
+    {
+        Vector a(100, 100), b(100, 120);
+        CCD::SweepHit h = CCD::swept_circle_segment(Vector(0, 110), Vector(200, 0), 5, a, b);
+        assert(h.hit && "horizontal motion into vertical segment should hit");
+        float contact_x = 0 + 200 * h.t;
+        assert(std::fabs(contact_x - 95.0f) < 1.0f && "contact at 95 (= 100 - radius)");
+        assert(h.normal.x < 0 && "normal points left (away from segment)");
+    }
+
+    // 2. Circle moving right, vertical segment 90 degrees off to the side (above).
+    //    This is the KEY regression: with AABB sweep, a diagonal wall's large AABB
+    //    would incorrectly fire. With exact segment sweep it must NOT fire.
+    {
+        // 45-degree segment, positioned to the right of the path but not in it.
+        // Start=(0,0), dir=(200,0), r=5. Segment at y=50 (above circle path).
+        Vector a(80, 50), b(120, 90);  // segment is above the circle path (y=0)
+        CCD::SweepHit h = CCD::swept_circle_segment(Vector(0, 0), Vector(200, 0), 5, a, b);
+        assert(!h.hit && "diagonal segment above path must NOT fire (AABB would)");
+    }
+
+    // 3. Circle moving diagonally, misses segment endpoint by a hair.
+    {
+        Vector a(100, 100), b(100, 200);
+        // Circle moves at y=100 - r - 1 = 94, so it barely clears the endpoint.
+        CCD::SweepHit h = CCD::swept_circle_segment(Vector(0, 94), Vector(200, 0), 5, a, b);
+        assert(!h.hit && "circle misses segment endpoint by 1 unit, no hit");
+    }
+
+    // 4. Tunneling: circle teleports past segment in one step, exact test catches it.
+    {
+        Vector a(100, 90), b(100, 110);
+        CCD::SweepHit h = CCD::swept_circle_segment(Vector(50, 100), Vector(200, 0), 5, a, b);
+        assert(h.hit && "tunneling past vertical segment must be caught");
+        assert(h.t < 1.0f);
+    }
+
+    // 5. End-cap hit: circle hits the tip of a segment.
+    {
+        Vector a(100, 100), b(200, 100);  // horizontal segment
+        // Circle moves vertically downward toward the left tip.
+        CCD::SweepHit h = CCD::swept_circle_segment(Vector(100, 0), Vector(0, 200), 5, a, b);
+        assert(h.hit && "circle hits segment tip (end cap)");
+    }
+
+    std::printf("test_ccd_segment passed\n");
+}
+
+// ---------------------------------------------------------------------------
 // Tree-quality: after a churn of inserts + moves, the SAH cost (sum of internal
 // node surface areas) and max height should stay low. Prints the metrics so a
 // BVH_DISABLE_ROTATE build can be compared against the SAH-rotation build.
@@ -310,6 +363,7 @@ int main() {
     test_tree_quality();
     test_cross_tree_pairs();
     test_ccd_sweep();
+    test_ccd_segment();
     if (test_superset_scenes() != 0) return 1;
     std::printf("ALL BVH TESTS PASSED\n");
     return 0;

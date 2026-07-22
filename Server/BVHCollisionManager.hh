@@ -43,5 +43,7 @@ public:
     void add_wall(Wall const &);
     // Cross-collide every dynamic entity against every overlapping wall.
     void collide_stationary(std::function<void(Simulation *, Entity &, Wall const &)>);
+    // Query all walls whose AABB overlaps the given region. Used by CCD.
+    void query_walls_in_aabb(AABB const &region, std::function<void(Wall const &)> cb);
 };
 

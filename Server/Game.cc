@@ -4,6 +4,7 @@
 #include <Server/PetalTracker.hh>
 #include <Server/Server.hh>
 #include <Server/Spawn.hh>
+#include <Server/Walls.hh>
 
 #include <Shared/Binary.hh>
 #include <Shared/Entity.hh>
@@ -61,6 +62,7 @@ static void _update_client(Simulation *sim, Client *client) {
 GameInstance::GameInstance() : simulation(), clients(), team_manager(&simulation) {}
 
 void GameInstance::init() {
+    init_walls(&simulation);
     for (uint32_t i = 0; i < ENTITY_CAP / 2; ++i)
         Map::spawn_random_mob(&simulation, frand() * ARENA_WIDTH, frand() * ARENA_HEIGHT);
     #ifdef GAMEMODE_TDM
