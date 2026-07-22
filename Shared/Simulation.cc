@@ -7,7 +7,7 @@ std::ostream &operator<<(std::ostream &out, EntityID const &id) {
 }
 #endif
 
-Simulation::Simulation() SERVER_ONLY(: spatial_hash(this)) {
+Simulation::Simulation() SERVER_ONLY(: bvh_collision_manager(this)) {
     reset();
 }
 
@@ -21,8 +21,8 @@ void Simulation::reset() {
 
     arena_info.init();
     #ifdef SERVERSIDE
-    spatial_hash.reset();
-    spatial_hash.refresh(ARENA_WIDTH, ARENA_HEIGHT);
+    bvh_collision_manager.reset();
+    bvh_collision_manager.refresh(ARENA_WIDTH, ARENA_HEIGHT);
     petal_count_tracker = {0};
     zone_mob_counts = {0};
     #endif
@@ -75,7 +75,7 @@ void Simulation::_delete_ent(EntityID const &id) {
     DEBUG_ONLY(assert(ent_exists(id)));
     #ifdef SERVERSIDE
     if (entities[id.id].bvh_proxy >= 0)
-        spatial_hash.remove(entities[id.id]);
+        bvh_collision_manager.remove(entities[id.id]);
     #endif
     BitMath::unset_arr(entity_tracker.data(), id.id);
     hash_tracker[id.id]++;

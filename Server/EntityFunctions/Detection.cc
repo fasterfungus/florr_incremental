@@ -8,7 +8,7 @@ EntityID find_nearest_enemy(Simulation *simulation, Entity const &entity, float 
     if (entity.immunity_ticks > 0) return NULL_ENTITY;
     EntityID ret;
     float min_dist = radius;
-    simulation->spatial_hash.query(entity.get_x(), entity.get_y(), radius, radius, [&](Simulation *sim, Entity &ent){
+    simulation->bvh_collision_manager.query(entity.get_x(), entity.get_y(), radius, radius, [&](Simulation *sim, Entity &ent){
         if (!sim->ent_alive(ent.id)) return;
         if (ent.get_team() == entity.get_team()) return;
         if (ent.immunity_ticks > 0) return;

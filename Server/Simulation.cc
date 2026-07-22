@@ -33,7 +33,7 @@ static void calculate_leaderboard(Simulation *sim) {
 }
 
 void Simulation::on_tick() {
-    spatial_hash.refresh(ARENA_WIDTH, ARENA_HEIGHT);
+    bvh_collision_manager.refresh(ARENA_WIDTH, ARENA_HEIGHT);
     if (frand() < 1.0f / TPS) {
         for (uint32_t i = 0; i < 10; ++i) {
             Vector v;
@@ -47,7 +47,7 @@ void Simulation::on_tick() {
 });
     for_each_entity([](Simulation *sim, Entity &ent) {
         if (ent.has_component(kPhysics))
-            sim->spatial_hash.sync(ent);
+            sim->bvh_collision_manager.sync(ent);
         if (BitMath::at(ent.flags, EntityFlags::kHasCulling))
             BitMath::set(ent.flags, EntityFlags::kIsCulled);
     });
@@ -57,8 +57,8 @@ void Simulation::on_tick() {
     for_each<kCamera>(tick_player_ai_behavior);
     for_each<kPetal>(tick_petal_behavior);
     for_each<kHealth>(tick_health_behavior);
-    spatial_hash.collide(on_collide);
-    spatial_hash.collide_stationary(on_wall_collide);
+    bvh_collision_manager.collide(on_collide);
+    bvh_collision_manager.collide_stationary(on_wall_collide);
     tick_curse_behavior(this);
     for_each<kPhysics>(tick_entity_motion);
     for_each<kSegmented>(tick_segment_behavior);

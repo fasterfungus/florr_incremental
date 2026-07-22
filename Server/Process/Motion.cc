@@ -104,7 +104,7 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
     */
     // CCD against static walls: exact swept-circle-vs-segment so diagonal walls
     // don't fire early due to AABB over-approximation.
-    sim->spatial_hash.query_walls_in_aabb(swept, [&](Wall const &wall) {
+    sim->bvh_collision_manager.query_walls_in_aabb(swept, [&](Wall const &wall) {
         float half = wall.length * 0.5f;
         float cx = std::cos(wall.angle), sy = std::sin(wall.angle);
         Vector seg_a(wall.x - cx * half, wall.y - sy * half);
