@@ -14,10 +14,10 @@ class Wall
     float x;
     float y;
     float length;
-    float angle;
+    float rotation;
     float minx;
     float miny;
     float maxx;
     float maxy;
-    Wall(float x, float y, float length, float angle);
+    Wall(float x, float y, float length, float rotation);
 };

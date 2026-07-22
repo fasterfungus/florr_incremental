@@ -106,7 +106,7 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
     // don't fire early due to AABB over-approximation.
     sim->bvh_collision_manager.query_walls_in_aabb(swept, [&](Wall const &wall) {
         float half = wall.length * 0.5f;
-        float cx = std::cos(wall.angle), sy = std::sin(wall.angle);
+        float cx = std::cos(wall.rotation), sy = std::sin(wall.rotation);
         Vector seg_a(wall.x - cx * half, wall.y - sy * half);
         Vector seg_b(wall.x + cx * half, wall.y + sy * half);
         CCD::SweepHit h = CCD::swept_circle_segment(start, dir, r, seg_a, seg_b);

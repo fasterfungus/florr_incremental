@@ -29,7 +29,7 @@ Geometry::Geometry(const Wall& wall)
     length = wall.length;
     x = wall.x;
     y = wall.y;
-    rotation = wall.angle;
+    rotation = wall.rotation;
     shape = CollisionShape::kSegment;
 }
 
