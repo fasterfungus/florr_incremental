@@ -260,12 +260,55 @@ static void test_tree_quality() {
 }
 
 // ---------------------------------------------------------------------------
+// Cross-tree collision (dynamic vs stationary): query_pairs must emit a
+// SUPERSET of the true dynamic-vs-static overlaps, with no self-pairs and no
+// within-tree pairs. Models entities (tree A) hitting walls (tree B).
+static void test_cross_tree_pairs() {
+    std::mt19937 rng(77);
+    std::uniform_real_distribution<float> pos(0, 2000), rad(5, 50);
+    int NA = 120, NB = 80;
+    std::vector<Circle> a(NA), b(NB);
+    BVH dyn, stat;
+    for (int i = 0; i < NA; ++i) {
+        a[i] = {pos(rng), pos(rng), rad(rng)};
+        dyn.create_proxy(AABB::from_circle(a[i].x, a[i].y, a[i].r), EntityID((uint16_t)i, 0));
+    }
+    for (int j = 0; j < NB; ++j) {
+        b[j] = {pos(rng), pos(rng), rad(rng)};
+        stat.create_proxy(AABB::from_circle(b[j].x, b[j].y, b[j].r), EntityID((uint16_t)j, 0));
+    }
+
+    // Brute-force truth: every (dynamic i, static j) whose tight AABBs overlap.
+    std::set<std::pair<int, int>> want;
+    for (int i = 0; i < NA; ++i)
+        for (int j = 0; j < NB; ++j)
+            if (AABB::from_circle(a[i].x, a[i].y, a[i].r)
+                    .overlaps(AABB::from_circle(b[j].x, b[j].y, b[j].r)))
+                want.insert({i, j});
+
+    std::set<std::pair<int, int>> got;
+    dyn.query_pairs(stat, [&](EntityID ea, EntityID eb) {
+        assert(got.insert({ea.id, eb.id}).second && "duplicate cross pair");
+    });
+    for (auto const &p : want)
+        assert(got.count(p) && "cross-tree query MISSED a dynamic-vs-static overlap");
+
+    // Empty stationary tree → no pairs.
+    BVH empty;
+    int calls = 0;
+    dyn.query_pairs(empty, [&](EntityID, EntityID) { ++calls; });
+    assert(calls == 0 && "no pairs against empty tree");
+    std::printf("test_cross_tree_pairs passed\n");
+}
+
+// ---------------------------------------------------------------------------
 int main() {
     test_aabb_helpers();
     test_edge_cases();
     test_move_noop_when_inside_fat();
     test_persistent_lifecycle();
     test_tree_quality();
+    test_cross_tree_pairs();
     test_ccd_sweep();
     if (test_superset_scenes() != 0) return 1;
     std::printf("ALL BVH TESTS PASSED\n");

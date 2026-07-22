@@ -14,6 +14,8 @@ void BVHCollisionManager::refresh(uint32_t _width, uint32_t _height) {
 
 void BVHCollisionManager::reset() {
     dynamic_tree.clear();
+    stationary_tree.clear();
+    walls.clear();
 }
 
 void BVHCollisionManager::sync(Entity &ent) {
@@ -52,5 +54,23 @@ void BVHCollisionManager::query(float x, float y, float w, float h, std::functio
         if (world_maxx < x - w || world_minx > x + w) return;
         if (world_maxy < y - h || world_miny > y + h) return;
         cb(simulation, ent);
+    });
+}
+
+void BVHCollisionManager::add_wall(Wall const &wall) {
+    // The stationary tree's leaf payload is the wall's index in `walls`, packed
+    // into EntityID's id field. Built once at map init; never moved after.
+    uint16_t index = (uint16_t)walls.size();
+    walls.push_back(wall);
+    stationary_tree.create_proxy(AABB::from_wall(wall), EntityID(index, 0));
+}
+
+void BVHCollisionManager::collide_stationary(
+        std::function<void(Simulation *, Entity &, Wall const &)> on_wall_collide) {
+    // For each dynamic entity, find every overlapping wall (fat-box broad phase)
+    // and hand the pair to the narrow phase. The wall payload is the index into
+    // `walls` we packed in add_wall.
+    dynamic_tree.query_pairs(stationary_tree, [&](EntityID ent_id, EntityID wall_id) {
+        on_wall_collide(simulation, simulation->get_ent(ent_id), walls[wall_id.id]);
     });
 }

@@ -2,6 +2,7 @@
 
 class Simulation;
 class Entity;
+class Wall;
 
 void tick_ai_behavior(Simulation *, Entity &);
 void tick_camera_behavior(Simulation *, Entity &);
@@ -16,3 +17,4 @@ void tick_player_ai_behavior(Simulation *, Entity &);
 void tick_segment_behavior(Simulation *, Entity &);
 void tick_score_behavior(Simulation *, Entity &);
 void on_collide(Simulation *, Entity &, Entity &);
+void on_wall_collide(Simulation *, Entity &, Wall const &);

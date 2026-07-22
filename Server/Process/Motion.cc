@@ -2,7 +2,7 @@
 
 #include <Shared/Simulation.hh>
 #include <Shared/Entity.hh>
-
+#include <iostream>
 #include <Helpers/Collision/CCD.hh>
 
 #include <cmath>
@@ -61,8 +61,7 @@ void tick_entity_motion(Simulation *sim, Entity &ent) {
 static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
     if (ent.pending_delete || !ent.has_component(kPhysics)) return;
     Vector end(ent.get_x(), ent.get_y());
-    Vector dir = end - start;
-
+    Vector dir = end - start; // dir == ent.velocity
     // Trigger on displacement (step size) — that is what actually risks
     // tunneling — not on velocity units. Threshold in world units per tick.
     const float CCD_THRESHOLD = 80.0f;
@@ -109,8 +108,9 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
         // normal. Without this the entity re-triggers CCD every tick and freezes.
         // Keeping the tangential component allows sliding along walls.
         float dot = Vector::Dot(ent.velocity, earliest_normal);
-        if (dot < 0.0f)
-            ent.velocity += earliest_normal * (-dot);
+        if (dot < 0.0f) {
+            ent.velocity += earliest_normal * (-dot - 0.1f); // 多减一点，让速度略微指向墙内
+        }
         ++ent.ccd_hits;
     }
 }

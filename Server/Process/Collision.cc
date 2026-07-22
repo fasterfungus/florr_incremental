@@ -109,3 +109,39 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
     if (ent2.has_component(kWeb) && !ent1.has_component(kPetal) && !ent1.has_component(kDrop))
         ent1.speed_ratio = 0.5;
 }
+
+// An entity has hit a static wall. The wall is immovable, so all of the
+// separation is applied to the entity: push it back out along the contact
+// normal and kill the velocity component that drives it into the wall.
+void on_wall_collide(Simulation *sim, Entity &entity, Wall const &wall) {
+    if (entity.pending_delete) return;
+
+    float dist;
+    Vector separation(0, 0);
+    Geometry g_ent = Geometry(entity);
+    Geometry g_wall = Geometry(wall);
+    // Detect(g1, g2, sep, dist): sep points the way to push g1 (the entity) off
+    // g2 (the wall).
+    if (!Detect(g_ent, g_wall, separation, dist)) return;
+
+    if (separation.x == 0 && separation.y == 0)
+        separation.unit_normal(frand() * 2 * M_PI);
+    else
+        separation.Normalize();
+
+    // Positional correction: move the entity out of penetration this tick.
+    entity.set_x(entity.get_x() + separation.x * dist);
+    entity.set_y(entity.get_y() + separation.y * dist);
+
+    // Cancel the into-the-wall velocity so it doesn't keep tunnelling next tick.
+    float into = entity.velocity.x * separation.x + entity.velocity.y * separation.y;
+    if (into < 0) {
+        entity.velocity.x -= separation.x * into;
+        entity.velocity.y -= separation.y * into;
+    }
+    float into_c = entity.collision_velocity.x * separation.x + entity.collision_velocity.y * separation.y;
+    if (into_c < 0) {
+        entity.collision_velocity.x -= separation.x * into_c;
+        entity.collision_velocity.y -= separation.y * into_c;
+    }
+}

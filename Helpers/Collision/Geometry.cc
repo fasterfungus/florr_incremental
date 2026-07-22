@@ -16,7 +16,8 @@ Geometry::Geometry(const Entity& ent)
     length = ent.get_length() * scale;
     x = ent.get_x();
     y = ent.get_y();
-    rotation = ent.get_angle();
+    rotation = ent.get_angle();  //实体角度
+    angle = ent.get_angle(); //扇形圆心角
     for (uint8_t i = 0; i < ent.get_vertics_size(); i++)
     {
         vertics.push_back(Vector(ent.get_vertics_x(i), ent.get_vertics_y(i)));

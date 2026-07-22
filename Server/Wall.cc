@@ -4,29 +4,25 @@
 
 #include "Wall.hh"
 #include <Helpers/Vector.hh>
-#include <Helpers/Collision/GeometryHelper.hh>
-#include "Helpers/Math.hh"
+#include <Helpers/Math.hh>
+#include <cmath>
 
 Wall::Wall(float x, float y, float length, float angle)
 {
     this->x = x;
     this->y = y;
     this->length = length;
-    this->angle  = angle;
-    Set(*this);
+    this->angle = angle;
 
-}
-
-void Set(Wall wall)
-{
-    Geometry g = Geometry(wall);
-    Vector p1 = GetFarthestProjectionPointAfterRotation(g, up);
-    Vector p2 = GetFarthestProjectionPointAfterRotation(g, right);
-    Vector p3 = GetFarthestProjectionPointAfterRotation(g, down);
-    Vector p4 = GetFarthestProjectionPointAfterRotation(g, left);
-    wall.maxx =Max(p1.x, p2.x, p3.x, p4.x);
-    wall.maxy = Max(p1.y, p2.y, p3.y, p4.y);
-    wall.minx = Min(p1.x, p2.x, p3.x, p4.x);
-    wall.miny = Min(p1.y, p2.y, p3.y, p4.y);
-
+    // A wall is a line segment centered at (x, y): its two endpoints sit at
+    // ±length/2 along `angle`. The AABB is just the min/max of those endpoints.
+    float half = length * 0.5f;
+    float dx = std::cos(angle) * half;
+    float dy = std::sin(angle) * half;
+    Vector a(x - dx, y - dy);
+    Vector b(x + dx, y + dy);
+    minx = Min(a.x, b.x);
+    maxx = Max(a.x, b.x);
+    miny = Min(a.y, b.y);
+    maxy = Max(a.y, b.y);
 }

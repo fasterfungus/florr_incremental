@@ -58,6 +58,7 @@ void Simulation::on_tick() {
     for_each<kPetal>(tick_petal_behavior);
     for_each<kHealth>(tick_health_behavior);
     spatial_hash.collide(on_collide);
+    spatial_hash.collide_stationary(on_wall_collide);
     tick_curse_behavior(this);
     for_each<kPhysics>(tick_entity_motion);
     for_each<kSegmented>(tick_segment_behavior);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Shared/Entity.hh>
+#include <Server/Wall.hh>
 #include <Helpers/Vector.hh>
 
 #include <algorithm>
@@ -28,6 +29,10 @@ struct AABB {
 
     static AABB from_circle(float x, float y, float r) {
         return AABB(x - r, y - r, x + r, y + r);
+    }
+
+    static AABB from_wall(Wall const &w) {
+        return AABB(w.minx, w.miny, w.maxx, w.maxy);
     }
 
     void expand(AABB const &o) {
@@ -351,6 +356,32 @@ public:
                 Node const &n = nodes_[ni];
                 if (!n.box.overlaps(ln.box)) continue;
                 if (n.is_leaf()) { if (ni > li) cb(ln.entity, n.entity); }
+                else { stack[sp++] = n.child1; stack[sp++] = n.child2; }
+            }
+        }
+    }
+
+    // Cross-tree broad phase: emit every pair (this_leaf, other_leaf) whose fat
+    // boxes overlap, where `this` and `other` are DIFFERENT trees holding
+    // disjoint entity sets (e.g. dynamic entities vs stationary walls). Each
+    // callback arg keeps its own tree's payload: cb(my_entity, other_entity).
+    // No dedup is needed — the two leaf sets are disjoint, so every ordered pair
+    // is produced exactly once. O(N_this * log N_other).
+    template <typename F>
+    void query_pairs(BVH const &other, F &&cb) const {
+        if (root_ == -1 || other.root_ == -1) return;
+        for (int32_t li = 0; li < (int32_t)nodes_.size(); ++li) {
+            Node const &ln = nodes_[li];
+            if (ln.height != 0) continue;              // only leaves of `this`
+            int32_t stack[256];
+            int32_t sp = 0;
+            stack[sp++] = other.root_;
+            while (sp > 0) {
+                int32_t ni = stack[--sp];
+                if (ni == -1) continue;
+                Node const &n = other.nodes_[ni];
+                if (!n.box.overlaps(ln.box)) continue;
+                if (n.is_leaf()) cb(ln.entity, n.entity);
                 else { stack[sp++] = n.child1; stack[sp++] = n.child2; }
             }
         }
