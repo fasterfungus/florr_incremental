@@ -6,8 +6,8 @@
 #include <cstdint>
 #include <vector>
 
-inline uint32_t const ARENA_WIDTH = 40000;
-inline uint32_t const ARENA_HEIGHT = 4000;
+inline uint32_t const ARENA_WIDTH = 61952;
+inline uint32_t const ARENA_HEIGHT = 61952;
 
 inline uint32_t const MAX_SLOT_COUNT = 8;
 inline uint32_t const MAX_POLY_VERTICES = 8;
