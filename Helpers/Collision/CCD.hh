@@ -26,6 +26,6 @@ SweepHit swept_circle_segment(Vector start, Vector dir, float radius,
 // Sweep a circle of radius `radius` from `start` along `dir` (dir = end-start,
 // NOT normalized) against `box`. Uses the analytic slab method on the box
 // Minkowski-expanded by `radius`. Returns the first contact in [0,1].
-SweepHit swept_circle_aabb(Vector start, Vector dir, float radius, AABB box);
+//SweepHit swept_circle_aabb(Vector start, Vector dir, float radius, AABB box);
 
 }  // namespace CCD

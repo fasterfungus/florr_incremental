@@ -132,6 +132,7 @@ SweepHit swept_circle_segment(Vector start, Vector dir, float radius,
 // boxes; the rounded Minkowski corners are treated as square, which only makes
 // the test slightly conservative (may report contact a hair early at corners),
 // which is the safe direction for anti-tunneling.
+    /*
 SweepHit swept_circle_aabb(Vector start, Vector dir, float radius, AABB box) {
     SweepHit result{false, 1.0f, Vector(0, 0)};
 
@@ -193,5 +194,5 @@ SweepHit swept_circle_aabb(Vector start, Vector dir, float radius, AABB box) {
     }
     return result;
 }
-
+*/
 }  // namespace CCD

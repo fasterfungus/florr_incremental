@@ -77,10 +77,10 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
 
     float earliest_t = 1.0f;
     Vector earliest_normal(0, 0);
+    /*
     EntityID const self_id = ent.id;
     EntityID const parent_id = ent.get_parent();
     EntityID const team = ent.get_team();
-
     sim->spatial_hash.query(
         swept.center_x(), swept.center_y(),
         (swept.max_x - swept.min_x) * 0.5f,
@@ -101,7 +101,7 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
                 earliest_normal = h.normal;
             }
         });
-
+    */
     // CCD against static walls: exact swept-circle-vs-segment so diagonal walls
     // don't fire early due to AABB over-approximation.
     sim->spatial_hash.query_walls_in_aabb(swept, [&](Wall const &wall) {
