@@ -308,6 +308,16 @@ public:
         ++proxy_count_;
         return id;
     }
+    int32_t create_proxy_wall(AABB tight, EntityID entity) {
+        int32_t id = allocate_node();
+        nodes_[id].box = tight;
+        nodes_[id].entity = entity;
+        nodes_[id].height = 0;
+        nodes_[id].child1 = nodes_[id].child2 = -1;
+        insert_leaf(id);
+        ++proxy_count_;
+        return id;
+    }
 
     void destroy_proxy(int32_t id) {
         remove_leaf(id);

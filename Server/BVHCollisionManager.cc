@@ -62,7 +62,7 @@ void BVHCollisionManager::add_wall(Wall const &wall) {
     // into EntityID's id field. Built once at map init; never moved after.
     uint16_t index = (uint16_t)walls.size();
     walls.push_back(wall);
-    stationary_tree.create_proxy(AABB::from_wall(wall), EntityID(index, 0));
+    stationary_tree.create_proxy_wall(AABB::from_wall(wall), EntityID(index, 0));
 }
 
 void BVHCollisionManager::collide_stationary(
