@@ -2,7 +2,7 @@
 
 #include <Shared/Simulation.hh>
 #include <Shared/Entity.hh>
-#include <Server/Wall.hh>
+#include <Helpers/Collision/Map/Wall.hh>
 #include <iostream>
 #include <Helpers/Collision/CCD.hh>
 

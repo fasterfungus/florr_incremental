@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Shared/Entity.hh>
-#include <Server/Wall.hh>
+#include <Helpers/Collision/Map/Wall.hh>
 #include <Helpers/Vector.hh>
 
 #include <algorithm>
@@ -351,24 +351,13 @@ public:
     }
 
     // Emit every overlapping leaf pair exactly once (dedup by node index).
-    template <typename F>
-    void collide(F &&cb) const {
-        if (root_ == -1) return;
-        for (int32_t li = 0; li < (int32_t)nodes_.size(); ++li) {
-            Node const &ln = nodes_[li];
-            if (ln.height != 0) continue;              // only leaves
-            int32_t stack[256];
-            int32_t sp = 0;
-            stack[sp++] = root_;
-            while (sp > 0) {
-                int32_t ni = stack[--sp];
-                if (ni == -1) continue;
-                Node const &n = nodes_[ni];
-                if (!n.box.overlaps(ln.box)) continue;
-                if (n.is_leaf()) { if (ni > li) cb(ln.entity, n.entity); }
-                else { stack[sp++] = n.child1; stack[sp++] = n.child2; }
-            }
-        }
+    template<typename F>
+    void collide(F&& cb) const
+    {
+        if (root_ == -1)
+            return;
+
+        self_collide(root_, cb);
     }
 
     // Cross-tree broad phase: emit every pair (this_leaf, other_leaf) whose fat
@@ -377,23 +366,60 @@ public:
     // callback arg keeps its own tree's payload: cb(my_entity, other_entity).
     // No dedup is needed — the two leaf sets are disjoint, so every ordered pair
     // is produced exactly once. O(N_this * log N_other).
-    template <typename F>
-    void query_pairs(BVH const &other, F &&cb) const {
-        if (root_ == -1 || other.root_ == -1) return;
-        for (int32_t li = 0; li < (int32_t)nodes_.size(); ++li) {
-            Node const &ln = nodes_[li];
-            if (ln.height != 0) continue;              // only leaves of `this`
-            int32_t stack[256];
-            int32_t sp = 0;
-            stack[sp++] = other.root_;
-            while (sp > 0) {
-                int32_t ni = stack[--sp];
-                if (ni == -1) continue;
-                Node const &n = other.nodes_[ni];
-                if (!n.box.overlaps(ln.box)) continue;
-                if (n.is_leaf()) cb(ln.entity, n.entity);
-                else { stack[sp++] = n.child1; stack[sp++] = n.child2; }
+    template<typename F>
+    void query_pairs(const BVH& other, F&& cb) const
+    {
+        if (root_ == -1 || other.root_ == -1)
+            return;
+
+        struct Pair
+        {
+            int32_t dynamicNode;
+            int32_t staticNode;
+        };
+
+        std::vector<Pair> stack;
+        stack.reserve(128);
+        stack.push_back({root_, other.root_});
+
+        while (!stack.empty())
+        {
+            Pair pair = stack.back();
+            stack.pop_back();
+
+            const Node& dyn = nodes_[pair.dynamicNode];
+            const Node& sta = other.nodes_[pair.staticNode];
+
+            // AABB 剪枝
+            if (!dyn.box.overlaps(sta.box))
+                continue;
+
+            //--------------------------------------------------
+            // 两个都是叶子
+            //--------------------------------------------------
+            if (dyn.is_leaf() && sta.is_leaf())
+            {
+                cb(dyn.entity, sta.entity);
+                continue;
             }
+
+            //--------------------------------------------------
+            // 动态节点不是叶子
+            // 优先展开动态树
+            //--------------------------------------------------
+            if (!dyn.is_leaf())
+            {
+                stack.push_back({dyn.child1, pair.staticNode});
+                stack.push_back({dyn.child2, pair.staticNode});
+                continue;
+            }
+
+            //--------------------------------------------------
+            // 动态已经是叶子
+            // 只能展开静态树
+            //--------------------------------------------------
+            stack.push_back({pair.dynamicNode, sta.child1});
+            stack.push_back({pair.dynamicNode, sta.child2});
         }
     }
 
@@ -430,4 +456,90 @@ public:
 
     // Test-only: worst-case root-to-leaf depth, for balance sanity checks.
     int32_t max_height() const { return root_ == -1 ? 0 : nodes_[root_].height; }
+private:
+    template<typename F>
+void self_collide(int32_t nodeIndex, F& cb) const
+    {
+        const Node& node = nodes_[nodeIndex];
+
+        if (node.is_leaf())
+            return;
+
+        self_collide(node.child1, cb);
+        self_collide(node.child2, cb);
+
+        collide_nodes(node.child1, node.child2, cb);
+    }
+
+    template<typename F>
+    void collide_nodes(int32_t aIndex, int32_t bIndex, F& cb) const
+    {
+        struct Pair
+        {
+            int32_t a;
+            int32_t b;
+        };
+
+        std::vector<Pair> stack;
+        stack.reserve(64);
+
+        stack.push_back({aIndex, bIndex});
+
+        while (!stack.empty())
+        {
+            Pair p = stack.back();
+            stack.pop_back();
+
+            const Node& A = nodes_[p.a];
+            const Node& B = nodes_[p.b];
+
+            //-----------------------------------
+            // AABB剪枝
+            //-----------------------------------
+
+            if (!A.box.overlaps(B.box))
+                continue;
+
+            //-----------------------------------
+            // 两个叶子
+            //-----------------------------------
+
+            if (A.is_leaf() && B.is_leaf())
+            {
+                cb(A.entity, B.entity);
+                continue;
+            }
+
+            //-----------------------------------
+            // A是叶子
+            //-----------------------------------
+
+            if (A.is_leaf())
+            {
+                stack.push_back({p.a, B.child1});
+                stack.push_back({p.a, B.child2});
+                continue;
+            }
+
+            //-----------------------------------
+            // B是叶子
+            //-----------------------------------
+
+            if (B.is_leaf())
+            {
+                stack.push_back({A.child1, p.b});
+                stack.push_back({A.child2, p.b});
+                continue;
+            }
+
+            //-----------------------------------
+            // 两个都是内部节点
+            //-----------------------------------
+
+            stack.push_back({A.child1, B.child1});
+            stack.push_back({A.child1, B.child2});
+            stack.push_back({A.child2, B.child1});
+            stack.push_back({A.child2, B.child2});
+        }
+    }
 };

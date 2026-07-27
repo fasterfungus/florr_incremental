@@ -7,7 +7,7 @@
 #include <Client/Storage.hh>
 
 #include <Shared/Config.hh>
-
+#include <Client/Render/Map/GardenTileLayers.hh>
 #include <cmath>
 
 static double g_last_time = 0;
@@ -32,7 +32,7 @@ namespace Game {
     std::array<PetalID::T, 2 * MAX_SLOT_COUNT> cached_loadout = {PetalID::kNone};
     bool show_collision = false;
     double timestamp = 0;
-
+    double scale;
     double score = 0;
     float overlevel_timer = 0;
     float slot_indicator_opacity = 0;
@@ -40,7 +40,7 @@ namespace Game {
 
     uint32_t respawn_level = 1;
 
-
+    uint8_t map = 0;
     uint8_t loadout_count = 5;
     uint8_t simulation_ready = 0;
     uint8_t on_game_screen = 0;
@@ -57,6 +57,7 @@ namespace Game {
 using namespace Game;
 
 void Game::init() {
+
     Input::is_mobile = check_mobile();
     Storage::retrieve();
     reset();
@@ -156,6 +157,8 @@ void Game::init() {
     );
     other_ui_window.style.no_polling = 1;
     socket.connect(WS_URL);
+    Renderer::preload_external_images(GardenTileLayers::kImageNames,
+                              GardenTileLayers::kImageCount);
 }
 
 void Game::reset() {
@@ -221,6 +224,7 @@ void Game::tick(double time) {
     double a = Ui::window_width / 1920;
     double b = Ui::window_height / 1080;
     Ui::scale = std::max(a, b);
+    Game::scale = Ui::scale = std::max(a, b);
     if (alive()) {
         on_game_screen = 1;
         player_id = simulation.get_ent(camera_id).get_player();

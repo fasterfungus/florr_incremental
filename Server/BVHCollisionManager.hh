@@ -4,7 +4,7 @@
 #include <Shared/StaticData.hh>
 
 #include <Server/BVH.hh>
-#include <Server/Wall.hh>
+#include <Helpers/Collision/Map/Wall.hh>
 
 #include <cstdint>
 #include <functional>

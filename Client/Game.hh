@@ -25,7 +25,8 @@ namespace Game {
     extern std::array<uint8_t, MobID::kNumMobs> seen_mobs;
     extern bool show_collision;
     extern double timestamp;
-    
+    extern uint8_t map;
+    extern double scale;
     extern double score;
     extern float overlevel_timer;
     extern float slot_indicator_opacity;

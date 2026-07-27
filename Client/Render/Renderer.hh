@@ -96,5 +96,12 @@ public:
     void stroke_text(char const *);
     void draw_text(char const *, struct TextArgs const);
     float get_text_size(char const *);
+    static void preload_external_images(char const *const *urls, uint32_t count);
+    int ensure_and_draw_terrain_chunk(
+    int cx, int cy, int subtile_div, float tile_size, int grid_w, int grid_h,
+    uint32_t layer_count, uint32_t grass_color,
+    int (*tile_fn)(uint32_t layer, int tx, int ty, uint8_t *img_i, uint8_t *flags, void *ud),
+    void *ud);
+    int draw_external_image(uint32_t slot, float x, float y, float w, float h, uint8_t flags = 0);
     //text ops
 };

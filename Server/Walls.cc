@@ -4,7 +4,7 @@
 
 #include <Server/Walls.hh>
 #include <Shared/Simulation.hh>
-#include <Server/Wall.hh>
+#include <Helpers/Collision/Map/Wall.hh>
 #include <Helpers/Math.hh>
 #include <iostream>
 #include <fstream>
@@ -25,6 +25,7 @@ static void add(Simulation *sim, float x1, float y1, float x2, float y2) {
     sim->bvh_collision_manager.add_wall(Wall((x1+x2)/2, (y1+y2)/2, length, rotation));
 }
 void init_walls(Simulation *sim) {
+
     std::ifstream file("garden.txt");
     if (!file.is_open()) {
         std::cerr << "错误：无法打开 garden.txt" << std::endl;
@@ -48,5 +49,6 @@ void init_walls(Simulation *sim) {
 
     file.close();
     std::cout << "共执行了 " << count << " 次 add 调用" << std::endl;
+
 }
 

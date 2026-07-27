@@ -1,6 +1,6 @@
 #pragma once
 #include <Shared/Entity.hh>
-#include <Server/Wall.hh>
+#include <Helpers/Collision/Map/Wall.hh>
 #include <vector>
 
 class Geometry

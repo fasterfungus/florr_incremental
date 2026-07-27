@@ -65,6 +65,7 @@ void GameInstance::init() {
     init_walls(&simulation);
     for (uint32_t i = 0; i < ENTITY_CAP / 2; ++i)
         Map::spawn_random_mob(&simulation, frand() * ARENA_WIDTH, frand() * ARENA_HEIGHT);
+
     #ifdef GAMEMODE_TDM
     team_manager.add_team(ColorID::kBlue);
     team_manager.add_team(ColorID::kRed);

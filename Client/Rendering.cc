@@ -5,7 +5,7 @@
 
 #include <Client/Ui/Extern.hh>
 #include <Client/Render/RenderEntity.hh>
-
+#include <Client/Render/Map/GardenTileLayers.hh>
 #include <Helpers/Vector.hh>
 
 #include <Shared/Map.hh>
@@ -53,36 +53,78 @@ void Game::render_game() {
         renderer.fill_rect(0,0,renderer.width,renderer.height);
     }
     {
-        RenderContext context(&renderer);
-        for (ZoneDefinition const &def : MAP_DATA) {
-            renderer.set_fill(def.color);
-            renderer.fill_rect(def.left, def.top, def.right - def.left, def.bottom - def.top);
-            if (Map::difficulty_at_level(score_to_level(Game::score)) > def.difficulty) {
-                renderer.set_fill(0x40000000);
-                renderer.fill_rect(def.left, def.top, def.right - def.left, def.bottom - def.top);
-            }
-        }
-        renderer.set_stroke(alpha);
-        renderer.set_line_width(0.5);
-        float scale = 1 / (2 * camera.get_fov() * Ui::scale);
+                RenderContext context(&renderer);
+        float scale = 1 / (2 * camera.get_fov() * Game::scale);
         float leftX = camera.get_camera_x() - renderer.width * scale;
         float rightX = camera.get_camera_x() + renderer.width * scale;
         float topY = camera.get_camera_y() - renderer.height * scale;
         float bottomY = camera.get_camera_y() + renderer.height * scale;
-        float newLeftX = ceilf(leftX / 50) * 50;
-        float newTopY = ceilf(topY / 50) * 50;
-        renderer.begin_path();
-        for (; newLeftX < rightX; newLeftX += 50)
+        // External image slots are global; re-preload whenever the active map set changes.
+        static int8_t tiles_for_gm = -1;
+        if (Game::map == (uint8_t)Maps::kGarden)
         {
-            renderer.move_to(newLeftX, topY);
-            renderer.line_to(newLeftX, bottomY);
+            // Chunk-baked terrain: 1 chunk per tile.
+            float const ts = static_cast<float>(GardenTileLayers::kTileSize);
+            int const gw = static_cast<int>(GardenTileLayers::kGridW);
+            int const gh = static_cast<int>(GardenTileLayers::kGridH);
+            int const subdiv = 1;
+            float const sub_ts = ts / static_cast<float>(subdiv);
+            int const sx0 = std::max(0, static_cast<int>(std::floor(leftX / sub_ts)) - 1);
+            int const sy0 = std::max(0, static_cast<int>(std::floor(topY / sub_ts)) - 1);
+            int const sx1 = std::min(gw * subdiv - 1, static_cast<int>(std::ceil(rightX / sub_ts)) + 1);
+            int const sy1 = std::min(gh * subdiv - 1, static_cast<int>(std::ceil(bottomY / sub_ts)) + 1);
+            //uint32_t const grass_col = GardenTerrain::color_of(GardenTerrain::kGrass);
+            uint32_t const grass_col = 0;
+            auto garden_tile = +[](uint32_t layer, int tx, int ty, uint8_t* img_i, uint8_t* flags, void*) -> int
+            {
+                uint8_t const pal = GardenTileLayers::at_layer_tile(layer, tx, ty);
+                if (pal == 0 || pal >= GardenTileLayers::kPaletteSize) return 0;
+                uint8_t const ii = GardenTileLayers::kPalImage[pal];
+                if (ii >= GardenTileLayers::kImageCount) return 0;
+                *img_i = ii;
+                *flags = GardenTileLayers::kPalFlags[pal];
+                return 1;
+            };
+
+            for (int sy = sy0; sy <= sy1; ++sy)
+            {
+                for (int sx = sx0; sx <= sx1; ++sx)
+                {
+                    int const ok = renderer.ensure_and_draw_terrain_chunk(
+                        sx, sy, subdiv, ts, gw, gh,
+                        GardenTileLayers::kLayerCount, grass_col,
+                        garden_tile, nullptr);
+                    if (!ok)
+                    {
+                        float const wx = sx * sub_ts;
+                        float const wy = sy * sub_ts;
+                        renderer.set_fill(grass_col);
+                        renderer.fill_rect(wx, wy, sub_ts + 1.f, sub_ts + 1.f);
+                        int const tx = sx / subdiv;
+                        int const ty = sy / subdiv;
+                        for (uint32_t layer = 0; layer < GardenTileLayers::kLayerCount; ++layer)
+                        {
+                            uint8_t img_i = 0, flags = 0;
+                            if (!garden_tile(layer, tx, ty, &img_i, &flags, nullptr)) continue;
+                            renderer.draw_external_image(
+                                img_i, tx * ts, ty * ts, ts + 0.5f, ts + 0.5f, flags);
+                        }
+                    }
+                }
+            }
+            // Object-layer decorations (entrances, etc.).
+            /*
+            for (uint32_t i = 0; i < GardenTileLayers::kActiveDecorCount; ++i)
+            {
+                GardenTileLayers::Decor const& d = GardenTileLayers::kDecors[i];
+                if (d.x + d.w < leftX || d.x > rightX ||
+                    d.y + d.h < topY || d.y > bottomY)
+                    continue;
+                if (d.image >= GardenTileLayers::kImageCount) continue;
+                renderer.draw_external_image(d.image, d.x, d.y, d.w, d.h, d.flags);
+            }
+            */
         }
-        for (; newTopY < bottomY; newTopY += 50)
-        {
-            renderer.move_to(leftX, newTopY);
-            renderer.line_to(rightX, newTopY);
-        }
-        renderer.stroke();
     }
 
     if (alive() && Input::movement_helper && !Input::keyboard_movement && !Input::is_mobile) {

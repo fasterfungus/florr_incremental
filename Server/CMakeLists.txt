@@ -31,6 +31,7 @@ set(SOURCES
     Simulation.cc
     Spawn.cc
         BVHCollisionManager.cc
+        BVHTest.cc
         Walls.cc
     TeamManager.cc
     ../Helpers/Math.cc
@@ -53,7 +54,7 @@ set(SOURCES
         ../Helpers/Collision/GJK/Simplex.cc
         ../Helpers/Collision/BoundingBox/BoundingBoxHelper.cc
         ../Helpers/Collision/CCD.cc
-        Wall.cc
+        ../Helpers/Collision/Map/Wall.cc
 
 )
 
