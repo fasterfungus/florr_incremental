@@ -9,6 +9,7 @@
 #include <string>
 #include "Shared/Simulation.hh"
 constexpr float CHUNK_QUERY_PADDING = 2.0f;
+
 void ChunkBVHCollisionManager::reset()
 {
     for (uint8_t i = 0; i < 121; i++)
@@ -26,11 +27,11 @@ ChunkBVHCollisionManager::ChunkBVHCollisionManager(Simulation* sim)
 std::vector<uint8_t> ChunkBVHCollisionManager::query_overlapping_chunks(AABB const& region) //返回index
 {
     std::vector<uint8_t> indexs;
-    int sx0 = static_cast<int>(std::floor((region.min_x-CHUNK_QUERY_PADDING) / 5632));
-    int sy0 = static_cast<int>(std::floor((region.min_y-CHUNK_QUERY_PADDING) / 5632));
+    int sx0 = static_cast<int>(std::floor((region.min_x - CHUNK_QUERY_PADDING) / 5632));
+    int sy0 = static_cast<int>(std::floor((region.min_y - CHUNK_QUERY_PADDING) / 5632));
 
-    int sx1 = static_cast<int>(std::floor((region.max_x+CHUNK_QUERY_PADDING) / 5632));
-    int sy1 = static_cast<int>(std::floor((region.max_y+CHUNK_QUERY_PADDING) / 5632));
+    int sx1 = static_cast<int>(std::floor((region.max_x + CHUNK_QUERY_PADDING) / 5632));
+    int sy1 = static_cast<int>(std::floor((region.max_y + CHUNK_QUERY_PADDING) / 5632));
 
     sx0 = std::clamp(sx0, 0, 10);
     sy0 = std::clamp(sy0, 0, 10);
@@ -103,6 +104,7 @@ void ChunkBVHCollisionManager::add(float x1, float y1, float x2, float y2, uint8
     float rotation = atan2f(dy, dx);
     add_wall(Wall((x1 + x2) / 2, (y1 + y2) / 2, length, rotation), x, y);
 }
+
 void ChunkBVHCollisionManager::load_chunks()
 {
     std::string path = "map/chunks";

@@ -15,17 +15,19 @@
 // motion). As long as an entity's tight box stays inside its fat box, moving it
 // is a no-op; only escaped leaves are re-inserted (remove + insert + rotate),
 // costing O(log N) instead of an O(N log N) full rebuild every tick.
-class BVH {
-    static constexpr float AABB_MARGIN = 10.0f;      // fat-AABB skin (world units)
+class BVH
+{
+    static constexpr float AABB_MARGIN = 10.0f; // fat-AABB skin (world units)
     static constexpr float WALL_AABB_MARGIN = 2.0f;
-    static constexpr float AABB_MULTIPLIER = 2.0f;   // motion-prediction factor
+    static constexpr float AABB_MULTIPLIER = 2.0f; // motion-prediction factor
 
-    struct Node {
-        AABB box;                 // FAT aabb for leaves; union of children for internal
-        int32_t parent = -1;      // reused as free-list "next" when node is free
+    struct Node
+    {
+        AABB box; // FAT aabb for leaves; union of children for internal
+        int32_t parent = -1; // reused as free-list "next" when node is free
         int32_t child1 = -1;
         int32_t child2 = -1;
-        int32_t height = -1;      // 0 = leaf, >0 = internal, -1 = free
+        int32_t height = -1; // 0 = leaf, >0 = internal, -1 = free
         EntityID entity;
         bool is_leaf() const { return child1 == -1; }
     };
@@ -35,55 +37,70 @@ class BVH {
     int32_t free_list_ = -1;
     uint32_t proxy_count_ = 0;
 
-    int32_t allocate_node() {
-        if (free_list_ == -1) {
+    int32_t allocate_node()
+    {
+        if (free_list_ == -1)
+        {
             int32_t id = (int32_t)nodes_.size();
             nodes_.emplace_back();
             return id;
         }
         int32_t id = free_list_;
-        free_list_ = nodes_[id].parent;   // pop free list
-        nodes_[id] = Node{};              // reset
+        free_list_ = nodes_[id].parent; // pop free list
+        nodes_[id] = Node{}; // reset
         return id;
     }
 
-    void free_node(int32_t id) {
-        nodes_[id].parent = free_list_;   // push onto free list
+    void free_node(int32_t id)
+    {
+        nodes_[id].parent = free_list_; // push onto free list
         nodes_[id].height = -1;
         free_list_ = id;
     }
 
-    static AABB fatten(AABB t, Vector d) {
+    static AABB fatten(AABB t, Vector d)
+    {
         AABB f(t.min_x - AABB_MARGIN, t.min_y - AABB_MARGIN,
                t.max_x + AABB_MARGIN, t.max_y + AABB_MARGIN);
         float dx = d.x * AABB_MULTIPLIER, dy = d.y * AABB_MULTIPLIER;
-        if (dx < 0) f.min_x += dx; else f.max_x += dx;
-        if (dy < 0) f.min_y += dy; else f.max_y += dy;
+        if (dx < 0) f.min_x += dx;
+        else f.max_x += dx;
+        if (dy < 0) f.min_y += dy;
+        else f.max_y += dy;
         return f;
     }
-    void insert_leaf(int32_t leaf) {
-        if (root_ == -1) { root_ = leaf; nodes_[leaf].parent = -1; return; }
+
+    void insert_leaf(int32_t leaf)
+    {
+        if (root_ == -1)
+        {
+            root_ = leaf;
+            nodes_[leaf].parent = -1;
+            return;
+        }
 
         AABB leafBox = nodes_[leaf].box;
 
         // 1. Descend from root to the best sibling (least SA growth).
         int32_t index = root_;
-        while (!nodes_[index].is_leaf()) {
+        while (!nodes_[index].is_leaf())
+        {
             int32_t c1 = nodes_[index].child1, c2 = nodes_[index].child2;
             float area = nodes_[index].box.perimeter();
             AABB combined = AABB::combine(nodes_[index].box, leafBox);
             float combinedArea = combined.perimeter();
-            float cost = 2.0f * combinedArea;                    // cost of a new parent here
-            float inheritCost = 2.0f * (combinedArea - area);    // cost pushed to descendants
+            float cost = 2.0f * combinedArea; // cost of a new parent here
+            float inheritCost = 2.0f * (combinedArea - area); // cost pushed to descendants
 
-            auto descendCost = [&](int32_t child) {
+            auto descendCost = [&](int32_t child)
+            {
                 AABB b = AABB::combine(leafBox, nodes_[child].box);
                 float c = b.perimeter();
                 if (!nodes_[child].is_leaf()) c -= nodes_[child].box.perimeter();
                 return c + inheritCost;
             };
             float cost1 = descendCost(c1), cost2 = descendCost(c2);
-            if (cost < cost1 && cost < cost2) break;             // stop: create parent here
+            if (cost < cost1 && cost < cost2) break; // stop: create parent here
             index = (cost1 < cost2) ? c1 : c2;
         }
 
@@ -99,16 +116,20 @@ class BVH {
         nodes_[sibling].parent = newParent;
         nodes_[leaf].parent = newParent;
 
-        if (oldParent != -1) {
+        if (oldParent != -1)
+        {
             if (nodes_[oldParent].child1 == sibling) nodes_[oldParent].child1 = newParent;
             else nodes_[oldParent].child2 = newParent;
-        } else {
+        }
+        else
+        {
             root_ = newParent;
         }
 
         // 3. Walk back up refitting boxes/heights and rotating for balance.
         int32_t i = nodes_[leaf].parent;
-        while (i != -1) {
+        while (i != -1)
+        {
             i = rotate(i);
             int32_t c1 = nodes_[i].child1, c2 = nodes_[i].child2;
             nodes_[i].height = 1 + std::max(nodes_[c1].height, nodes_[c2].height);
@@ -117,27 +138,37 @@ class BVH {
         }
     }
 
-    void remove_leaf(int32_t leaf) {
-        if (leaf == root_) { root_ = -1; return; }
+    void remove_leaf(int32_t leaf)
+    {
+        if (leaf == root_)
+        {
+            root_ = -1;
+            return;
+        }
         int32_t parent = nodes_[leaf].parent;
         int32_t grandParent = nodes_[parent].parent;
-        int32_t sibling = (nodes_[parent].child1 == leaf) ? nodes_[parent].child2
-                                                          : nodes_[parent].child1;
-        if (grandParent != -1) {
+        int32_t sibling = (nodes_[parent].child1 == leaf)
+                              ? nodes_[parent].child2
+                              : nodes_[parent].child1;
+        if (grandParent != -1)
+        {
             if (nodes_[grandParent].child1 == parent) nodes_[grandParent].child1 = sibling;
             else nodes_[grandParent].child2 = sibling;
             nodes_[sibling].parent = grandParent;
             free_node(parent);
             // Refit ancestors.
             int32_t i = grandParent;
-            while (i != -1) {
+            while (i != -1)
+            {
                 i = rotate(i);
                 int32_t c1 = nodes_[i].child1, c2 = nodes_[i].child2;
                 nodes_[i].box = AABB::combine(nodes_[c1].box, nodes_[c2].box);
                 nodes_[i].height = 1 + std::max(nodes_[c1].height, nodes_[c2].height);
                 i = nodes_[i].parent;
             }
-        } else {
+        }
+        else
+        {
             root_ = sibling;
             nodes_[sibling].parent = -1;
             free_node(parent);
@@ -145,7 +176,8 @@ class BVH {
     }
 
     // Refit an internal node's box + height from its two children.
-    void refit_node(int32_t i) {
+    void refit_node(int32_t i)
+    {
         int32_t c1 = nodes_[i].child1, c2 = nodes_[i].child2;
         nodes_[i].box = AABB::combine(nodes_[c1].box, nodes_[c2].box);
         nodes_[i].height = 1 + std::max(nodes_[c1].height, nodes_[c2].height);
@@ -166,72 +198,109 @@ class BVH {
     // grandchildren), so A never leaves its slot: we mutate one child subtree,
     // refit that down-node here, and return iA for the caller's refit loop to
     // recompute A itself.
-    int32_t rotate(int32_t iA) {
-        Node &A = nodes_[iA];
-        if (A.height < 2) return iA;             // no grandchildren to rotate
+    int32_t rotate(int32_t iA)
+    {
+        Node& A = nodes_[iA];
+        if (A.height < 2) return iA; // no grandchildren to rotate
 #ifdef BVH_DISABLE_ROTATE
-        return iA;                               // test-only: measure quality without SAH rotation
+        return iA; // test-only: measure quality without SAH rotation
 #endif
         int32_t iB = A.child1, iC = A.child2;
         float areaB = nodes_[iB].box.perimeter();
         float areaC = nodes_[iC].box.perimeter();
 
-        float bestImprovement = 0.0f;            // require a STRICT improvement
-        int32_t bestCase = 0;                    // 0 = leave A as-is
+        float bestImprovement = 0.0f; // require a STRICT improvement
+        int32_t bestCase = 0; // 0 = leave A as-is
 
         // Push B down under C (only possible if C is internal).
-        if (!nodes_[iC].is_leaf()) {
+        if (!nodes_[iC].is_leaf())
+        {
             int32_t iF = nodes_[iC].child1, iG = nodes_[iC].child2;
             float costBF = AABB::combine(nodes_[iB].box, nodes_[iG].box).perimeter(); // new C={B,G}
             float costBG = AABB::combine(nodes_[iF].box, nodes_[iB].box).perimeter(); // new C={F,B}
-            if (areaC - costBF > bestImprovement) { bestImprovement = areaC - costBF; bestCase = 1; }
-            if (areaC - costBG > bestImprovement) { bestImprovement = areaC - costBG; bestCase = 2; }
+            if (areaC - costBF > bestImprovement)
+            {
+                bestImprovement = areaC - costBF;
+                bestCase = 1;
+            }
+            if (areaC - costBG > bestImprovement)
+            {
+                bestImprovement = areaC - costBG;
+                bestCase = 2;
+            }
         }
         // Push C down under B (only possible if B is internal).
-        if (!nodes_[iB].is_leaf()) {
+        if (!nodes_[iB].is_leaf())
+        {
             int32_t iD = nodes_[iB].child1, iE = nodes_[iB].child2;
             float costCD = AABB::combine(nodes_[iC].box, nodes_[iE].box).perimeter(); // new B={C,E}
             float costCE = AABB::combine(nodes_[iD].box, nodes_[iC].box).perimeter(); // new B={D,C}
-            if (areaB - costCD > bestImprovement) { bestImprovement = areaB - costCD; bestCase = 3; }
-            if (areaB - costCE > bestImprovement) { bestImprovement = areaB - costCE; bestCase = 4; }
+            if (areaB - costCD > bestImprovement)
+            {
+                bestImprovement = areaB - costCD;
+                bestCase = 3;
+            }
+            if (areaB - costCE > bestImprovement)
+            {
+                bestImprovement = areaB - costCE;
+                bestCase = 4;
+            }
         }
 
-        switch (bestCase) {
-            case 1: {                            // F up to A.child1, B down to C.child1
+        switch (bestCase)
+        {
+        case 1:
+            {
+                // F up to A.child1, B down to C.child1
                 int32_t iF = nodes_[iC].child1;
-                nodes_[iA].child1 = iF; nodes_[iF].parent = iA;
-                nodes_[iC].child1 = iB; nodes_[iB].parent = iC;
+                nodes_[iA].child1 = iF;
+                nodes_[iF].parent = iA;
+                nodes_[iC].child1 = iB;
+                nodes_[iB].parent = iC;
                 refit_node(iC);
                 break;
             }
-            case 2: {                            // G up to A.child1, B down to C.child2
+        case 2:
+            {
+                // G up to A.child1, B down to C.child2
                 int32_t iG = nodes_[iC].child2;
-                nodes_[iA].child1 = iG; nodes_[iG].parent = iA;
-                nodes_[iC].child2 = iB; nodes_[iB].parent = iC;
+                nodes_[iA].child1 = iG;
+                nodes_[iG].parent = iA;
+                nodes_[iC].child2 = iB;
+                nodes_[iB].parent = iC;
                 refit_node(iC);
                 break;
             }
-            case 3: {                            // D up to A.child2, C down to B.child1
+        case 3:
+            {
+                // D up to A.child2, C down to B.child1
                 int32_t iD = nodes_[iB].child1;
-                nodes_[iA].child2 = iD; nodes_[iD].parent = iA;
-                nodes_[iB].child1 = iC; nodes_[iC].parent = iB;
+                nodes_[iA].child2 = iD;
+                nodes_[iD].parent = iA;
+                nodes_[iB].child1 = iC;
+                nodes_[iC].parent = iB;
                 refit_node(iB);
                 break;
             }
-            case 4: {                            // E up to A.child2, C down to B.child2
+        case 4:
+            {
+                // E up to A.child2, C down to B.child2
                 int32_t iE = nodes_[iB].child2;
-                nodes_[iA].child2 = iE; nodes_[iE].parent = iA;
-                nodes_[iB].child2 = iC; nodes_[iC].parent = iB;
+                nodes_[iA].child2 = iE;
+                nodes_[iE].parent = iA;
+                nodes_[iB].child2 = iC;
+                nodes_[iC].parent = iB;
                 refit_node(iB);
                 break;
             }
-            default: break;                      // no beneficial rotation
+        default: break; // no beneficial rotation
         }
         return iA;
     }
 
 public:
-    void clear() {
+    void clear()
+    {
         nodes_.clear();
         root_ = -1;
         free_list_ = -1;
@@ -240,7 +309,8 @@ public:
 
     uint32_t size() const { return proxy_count_; }
 
-    int32_t create_proxy(AABB tight, EntityID entity) {
+    int32_t create_proxy(AABB tight, EntityID entity)
+    {
         int32_t id = allocate_node();
         nodes_[id].box = fatten(tight, Vector(0, 0));
         nodes_[id].entity = entity;
@@ -250,7 +320,9 @@ public:
         ++proxy_count_;
         return id;
     }
-    int32_t create_proxy_wall(AABB tight, EntityID entity) {
+
+    int32_t create_proxy_wall(AABB tight, EntityID entity)
+    {
         int32_t id = allocate_node();
         nodes_[id].box = tight;
         nodes_[id].entity = entity;
@@ -261,15 +333,17 @@ public:
         return id;
     }
 
-    void destroy_proxy(int32_t id) {
+    void destroy_proxy(int32_t id)
+    {
         remove_leaf(id);
         free_node(id);
         --proxy_count_;
     }
 
     // Returns true iff the tree was modified (tight box escaped the fat box).
-    bool move_proxy(int32_t id, AABB tight, Vector displacement) {
-        if (nodes_[id].box.contains(tight)) return false;   // still inside fat box: no-op
+    bool move_proxy(int32_t id, AABB tight, Vector displacement)
+    {
+        if (nodes_[id].box.contains(tight)) return false; // still inside fat box: no-op
         remove_leaf(id);
         nodes_[id].box = fatten(tight, displacement);
         insert_leaf(id);
@@ -277,23 +351,29 @@ public:
     }
 
     template <typename F>
-    void query(AABB const &region, F &&cb) const {
+    void query(AABB const& region, F&& cb) const
+    {
         if (root_ == -1) return;
         int32_t stack[256];
         int32_t sp = 0;
         stack[sp++] = root_;
-        while (sp > 0) {
+        while (sp > 0)
+        {
             int32_t ni = stack[--sp];
             if (ni == -1) continue;
-            Node const &n = nodes_[ni];
+            Node const& n = nodes_[ni];
             if (!n.box.overlaps(region)) continue;
             if (n.is_leaf()) cb(n.entity);
-            else { stack[sp++] = n.child1; stack[sp++] = n.child2; }
+            else
+            {
+                stack[sp++] = n.child1;
+                stack[sp++] = n.child2;
+            }
         }
     }
 
     // Emit every overlapping leaf pair exactly once (dedup by node index).
-    template<typename F>
+    template <typename F>
     void collide(F&& cb) const
     {
         if (root_ == -1)
@@ -308,7 +388,7 @@ public:
     // callback arg keeps its own tree's payload: cb(my_entity, other_entity).
     // No dedup is needed — the two leaf sets are disjoint, so every ordered pair
     // is produced exactly once. O(N_this * log N_other).
-    template<typename F>
+    template <typename F>
     void query_pairs(const BVH& other, F&& cb) const
     {
         if (root_ == -1 || other.root_ == -1)
@@ -366,13 +446,19 @@ public:
     }
 
     // Test-only invariant checker. O(N). Returns true if the tree is well-formed.
-    bool validate() const {
+    bool validate() const
+    {
         if (root_ == -1) return true;
         if (nodes_[root_].parent != -1) return false;
-        for (int32_t i = 0; i < (int32_t)nodes_.size(); ++i) {
-            Node const &n = nodes_[i];
-            if (n.height == -1) continue;              // free node
-            if (n.is_leaf()) { if (n.height != 0) return false; continue; }
+        for (int32_t i = 0; i < (int32_t)nodes_.size(); ++i)
+        {
+            Node const& n = nodes_[i];
+            if (n.height == -1) continue; // free node
+            if (n.is_leaf())
+            {
+                if (n.height != 0) return false;
+                continue;
+            }
             int32_t c1 = n.child1, c2 = n.child2;
             if (nodes_[c1].parent != i || nodes_[c2].parent != i) return false;
             if (!n.box.contains(nodes_[c1].box) || !n.box.contains(nodes_[c2].box)) return false;
@@ -386,11 +472,13 @@ public:
     // sum of internal-node surface areas (here perimeters, our 2D SAH proxy).
     // Lower is better — a tighter tree means fewer false-positive query/collide
     // candidates. Used to prove the SAH rotation actually improves quality.
-    float total_sah_cost() const {
+    float total_sah_cost() const
+    {
         float sum = 0.0f;
-        for (int32_t i = 0; i < (int32_t)nodes_.size(); ++i) {
-            Node const &n = nodes_[i];
-            if (n.height <= 0) continue;               // skip free nodes and leaves
+        for (int32_t i = 0; i < (int32_t)nodes_.size(); ++i)
+        {
+            Node const& n = nodes_[i];
+            if (n.height <= 0) continue; // skip free nodes and leaves
             sum += n.box.perimeter();
         }
         return sum;
@@ -398,9 +486,10 @@ public:
 
     // Test-only: worst-case root-to-leaf depth, for balance sanity checks.
     int32_t max_height() const { return root_ == -1 ? 0 : nodes_[root_].height; }
+
 private:
-    template<typename F>
-void self_collide(int32_t nodeIndex, F& cb) const
+    template <typename F>
+    void self_collide(int32_t nodeIndex, F& cb) const
     {
         const Node& node = nodes_[nodeIndex];
 
@@ -413,7 +502,7 @@ void self_collide(int32_t nodeIndex, F& cb) const
         collide_nodes(node.child1, node.child2, cb);
     }
 
-    template<typename F>
+    template <typename F>
     void collide_nodes(int32_t aIndex, int32_t bIndex, F& cb) const
     {
         struct Pair

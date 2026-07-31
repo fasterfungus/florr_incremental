@@ -9,12 +9,10 @@ void BVHCollisionManager::refresh(uint32_t _width, uint32_t _height) {
     DEBUG_ONLY(assert(_width <= ARENA_WIDTH && _height <= ARENA_HEIGHT));
     width = _width;
     height = _height;
-    // NO tree.clear() here — the dynamic tree persists across ticks now.
 }
 
 void BVHCollisionManager::reset() {
     dynamic_tree.clear();
-    //stationary_tree.clear();
     walls.clear();
 }
 
@@ -57,21 +55,3 @@ void BVHCollisionManager::query(float x, float y, float w, float h, std::functio
     });
 }
 
-/*
-void BVHCollisionManager::collide_stationary(
-        std::function<void(Simulation *, Entity &, Wall const &)> on_wall_collide) {
-    // For each dynamic entity, find every overlapping wall (fat-box broad phase)
-    // and hand the pair to the narrow phase. The wall payload is the index into
-    // `walls` we packed in add_wall.
-    dynamic_tree.query_pairs(stationary_tree, [&](EntityID ent_id, EntityID wall_id) {
-        on_wall_collide(simulation, simulation->get_ent(ent_id), walls[wall_id.id]);
-    });
-}
-
-void BVHCollisionManager::query_walls_in_aabb(AABB const &region,
-        std::function<void(Wall const &)> cb) {
-    stationary_tree.query(region, [&](EntityID wall_id) {
-        cb(walls[wall_id.id]);
-    });
-}
-*/

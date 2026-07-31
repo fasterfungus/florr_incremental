@@ -135,7 +135,7 @@ void GameInstance::chat(EntityID sender, std::string const& text) {
 
         bool send = false;
         if (sender_ent.get_team() == camera.get_team()) {
-            send = true; // ͬ����Զ�ɼ�
+            send = true;
         }
         else if (client->in_view.contains(sender_ent.id)) {
             send = true;
@@ -144,7 +144,7 @@ void GameInstance::chat(EntityID sender, std::string const& text) {
         if (send) {
             Writer writer(Server::OUTGOING_PACKET);
             writer.write<uint8_t>(Clientbound::kChat);
-            writer.write<EntityID>(sender);   // ����ʵ�� ID
+            writer.write<EntityID>(sender);
             writer.write<std::string>(text);
             client->send_packet(writer.packet, writer.at - writer.packet);
         }
@@ -155,7 +155,7 @@ void GameInstance::broadcast_message(std::string const& msg) {
     for (Client* client : clients) {
 
         Writer writer(Server::OUTGOING_PACKET);
-        writer.write<uint8_t>(Clientbound::kBroadcast); // ������ö������
+        writer.write<uint8_t>(Clientbound::kBroadcast);
         writer.write<std::string>(msg);
 
         client->send_packet(writer.packet, writer.at - writer.packet);

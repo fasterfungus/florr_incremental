@@ -1,12 +1,5 @@
-// Standalone correctness test for the persistent dynamic BVH broad phase.
-// Compiles the REAL Server/BVH.hh and checks that its candidate-pair set and
-// region queries are a SUPERSET of brute force (fat AABBs may add extras but
-// must never MISS a true overlap), plus persistent-tree lifecycle + invariants.
-//
-//   g++ -std=c++20 -DSERVERSIDE=1 -I. -IServer -IShared \
-//       Server/BVHTest.cc Shared/EntityDef.cc -o bvhtest && ./bvhtest
+
 #include <Server/BVH.hh>
-#include <Helpers/Collision/Map/Wall.hh>
 #include <Helpers/Collision/CCD.hh>
 
 #include <cassert>
@@ -356,19 +349,3 @@ static void test_cross_tree_pairs() {
     assert(calls == 0 && "no pairs against empty tree");
     std::printf("test_cross_tree_pairs passed\n");
 }
-/*
-// ---------------------------------------------------------------------------
-int main() {
-    test_aabb_helpers();
-    test_edge_cases();
-    test_move_noop_when_inside_fat();
-    test_persistent_lifecycle();
-    test_tree_quality();
-    test_cross_tree_pairs();
-    //test_ccd_sweep();
-    test_ccd_segment();
-    if (test_superset_scenes() != 0) return 1;
-    std::printf("ALL BVH TESTS PASSED\n");
-    return 0;
-}
-*/

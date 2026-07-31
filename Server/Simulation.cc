@@ -3,7 +3,6 @@
 #include <Server/Process.hh>
 #include <Server/Client.hh>
 #include <Server/EntityFunctions.hh>
-#include <Server/Server.hh>
 #include <Server/Spawn.hh>
 #include <Server/BVHCollisionManager.hh>
 

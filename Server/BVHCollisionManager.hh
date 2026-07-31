@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Shared/Entity.hh>
-#include <Shared/StaticData.hh>
 
 #include <Server/BVH.hh>
 #include <Helpers/Collision/Map/Wall.hh>
