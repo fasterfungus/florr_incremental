@@ -14,7 +14,7 @@ void BVHCollisionManager::refresh(uint32_t _width, uint32_t _height) {
 
 void BVHCollisionManager::reset() {
     dynamic_tree.clear();
-    stationary_tree.clear();
+    //stationary_tree.clear();
     walls.clear();
 }
 
@@ -57,14 +57,7 @@ void BVHCollisionManager::query(float x, float y, float w, float h, std::functio
     });
 }
 
-void BVHCollisionManager::add_wall(Wall const &wall) {
-    // The stationary tree's leaf payload is the wall's index in `walls`, packed
-    // into EntityID's id field. Built once at map init; never moved after.
-    uint16_t index = (uint16_t)walls.size();
-    walls.push_back(wall);
-    stationary_tree.create_proxy_wall(AABB::from_wall(wall), EntityID(index, 0));
-}
-
+/*
 void BVHCollisionManager::collide_stationary(
         std::function<void(Simulation *, Entity &, Wall const &)> on_wall_collide) {
     // For each dynamic entity, find every overlapping wall (fat-box broad phase)
@@ -81,3 +74,4 @@ void BVHCollisionManager::query_walls_in_aabb(AABB const &region,
         cb(walls[wall_id.id]);
     });
 }
+*/

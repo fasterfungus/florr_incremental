@@ -7,7 +7,7 @@ std::ostream &operator<<(std::ostream &out, EntityID const &id) {
 }
 #endif
 
-Simulation::Simulation() SERVER_ONLY(: bvh_collision_manager(this)) {
+Simulation::Simulation() SERVER_ONLY(: bvh_collision_manager(this),chunk_bvh_collision_manager(this) ) {
     reset();
 }
 

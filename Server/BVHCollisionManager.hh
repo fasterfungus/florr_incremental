@@ -25,12 +25,12 @@ class Entity;
 // walls.
 class BVHCollisionManager {
     Simulation *simulation;
-    BVH dynamic_tree;
-    BVH stationary_tree;
+    //BVH stationary_tree;
     std::vector<Wall> walls;      // stationary_tree leaf payload = index into this
     uint32_t width;
     uint32_t height;
 public:
+    BVH dynamic_tree;
     BVHCollisionManager(Simulation *);
     void refresh(uint32_t, uint32_t);
     void reset();
@@ -40,10 +40,10 @@ public:
     void query(float, float, float, float, std::function<void(Simulation *, Entity &)>);
 
     // Map init: register a static wall obstacle into the stationary tree.
-    void add_wall(Wall const &);
+   // void add_wall(Wall const &);
     // Cross-collide every dynamic entity against every overlapping wall.
-    void collide_stationary(std::function<void(Simulation *, Entity &, Wall const &)>);
+    //void collide_stationary(std::function<void(Simulation *, Entity &, Wall const &)>);
     // Query all walls whose AABB overlaps the given region. Used by CCD.
-    void query_walls_in_aabb(AABB const &region, std::function<void(Wall const &)> cb);
+    //void query_walls_in_aabb(AABB const &region, std::function<void(Wall const &)> cb);
 };
 

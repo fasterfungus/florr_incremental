@@ -59,73 +59,163 @@ void tick_entity_motion(Simulation *sim, Entity &ent) {
 // contact an enemy obstacle mid-path, clamps the entity's position to that
 // contact point. The next tick's narrow phase (GJK in on_collide) then registers
 // the now-touching pair and applies damage/knockback as usual.
-static void apply_ccd(Simulation *sim, Entity &ent, Vector start) {
-    if (ent.pending_delete || !ent.has_component(kPhysics)) return;
-    Vector end(ent.get_x(), ent.get_y());
-    Vector dir = end - start; // dir == ent.velocity
-    // Trigger on displacement (step size) — that is what actually risks
-    // tunneling — not on velocity units. Threshold in world units per tick.
-    const float CCD_THRESHOLD = 80.0f;
-    if (dir.magnitude() < CCD_THRESHOLD) return;
+static void apply_ccd(Simulation *sim, Entity &ent, Vector start)
+{
+    if (ent.pending_delete || !ent.has_component(kPhysics))
+        return;
+
+    Vector current(start.x, start.y);
+
+    Vector target(
+        ent.get_x(),
+        ent.get_y()
+    );
+
+    // 本 tick 的总位移
+    Vector remaining = target - start;
+
 
     float r = ent.get_radius() * ent.get_scale();
 
-    // Swept AABB covering the whole path, for the broad-phase query.
-    AABB tight_start = AABB::from_circle(start.x, start.y, r);
-    AABB tight_end = AABB::from_circle(end.x, end.y, r);
-    AABB swept = AABB::combine(tight_start, tight_end);
+    constexpr int MAX_CCD_ITER = 4;
+    constexpr float EPS = 0.001f;
+    constexpr float SKIN = 0.05f;
 
-    float earliest_t = 1.0f;
-    Vector earliest_normal(0, 0);
-    /*
-    EntityID const self_id = ent.id;
-    EntityID const parent_id = ent.get_parent();
-    EntityID const team = ent.get_team();
-    sim->spatial_hash.query(
-        swept.center_x(), swept.center_y(),
-        (swept.max_x - swept.min_x) * 0.5f,
-        (swept.max_y - swept.min_y) * 0.5f,
-        [&](Simulation *s, Entity &other) {
-            if (other.id == self_id) return;
-            if (other.id == parent_id) return;
-            if (!other.has_component(kPhysics)) return;
-            if (other.pending_delete) return;
-            // Only stop for things we would actually collide with: enemies.
-            // Same-team pass-through matches the discrete collision filter.
-            if (other.get_team() == team) return;
-            if (!other.has_component(kMob) && !other.has_component(kFlower)) return;
 
-            CCD::SweepHit h = CCD::swept_circle_aabb(start, dir, r, AABB::from_entity(other));
-            if (h.hit && h.t < earliest_t) {
+    for (int iter = 0; iter < MAX_CCD_ITER; iter++)
+    {
+        if (remaining.magnitude() < EPS)
+            break;
+
+
+        AABB swept =
+            AABB::combine(
+                AABB::from_circle(
+                    current.x,
+                    current.y,
+                    r
+                ),
+                AABB::from_circle(
+                    current.x + remaining.x,
+                    current.y + remaining.y,
+                    r
+                )
+            );
+
+
+        float earliest_t = 1.0f;
+        Vector hit_normal(0, 0);
+
+
+        sim->chunk_bvh_collision_manager.query_walls_in_aabb(
+            swept,
+            [&](Wall const &wall)
+        {
+            float half = wall.length * 0.5f;
+
+            float c = std::cos(wall.rotation);
+            float s = std::sin(wall.rotation);
+
+
+            Vector a(
+                wall.x - c * half,
+                wall.y - s * half
+            );
+
+            Vector b(
+                wall.x + c * half,
+                wall.y + s * half
+            );
+
+
+            CCD::SweepHit h =
+                CCD::swept_circle_segment(
+                    current,
+                    remaining,
+                    r,
+                    a,
+                    b
+                );
+
+
+            if (h.hit && h.t < earliest_t)
+            {
                 earliest_t = h.t;
-                earliest_normal = h.normal;
+                hit_normal = h.normal;
             }
         });
-    */
-    // CCD against static walls: exact swept-circle-vs-segment so diagonal walls
-    // don't fire early due to AABB over-approximation.
-    sim->bvh_collision_manager.query_walls_in_aabb(swept, [&](Wall const &wall) {
-        float half = wall.length * 0.5f;
-        float cx = std::cos(wall.rotation), sy = std::sin(wall.rotation);
-        Vector seg_a(wall.x - cx * half, wall.y - sy * half);
-        Vector seg_b(wall.x + cx * half, wall.y + sy * half);
-        CCD::SweepHit h = CCD::swept_circle_segment(start, dir, r, seg_a, seg_b);
-        if (h.hit && h.t < earliest_t) {
-            earliest_t = h.t;
-            earliest_normal = h.normal;
-        }
-    });
 
-    if (earliest_t < 1.0f) {
-        ent.set_x(start.x + dir.x * earliest_t);
-        ent.set_y(start.y + dir.y * earliest_t);
-        // Cancel the velocity component going into the obstacle along the hit
-        // normal. Without this the entity re-triggers CCD every tick and freezes.
-        // Keeping the tangential component allows sliding along walls.
-        float dot = Vector::Dot(ent.velocity, earliest_normal);
-        if (dot < 0.0f) {
-            ent.velocity += earliest_normal * (-dot);
+
+
+        // 没有碰撞，直接结束
+        if (earliest_t >= 1.0f)
+        {
+            current += remaining;
+            break;
         }
-        ++ent.ccd_hits;
+
+
+
+        // =============================
+        // 1. 移动到碰撞点
+        // =============================
+
+        current += remaining * earliest_t;
+
+
+        // 防止浮点误差重新进入墙
+        current += hit_normal * SKIN;
+
+
+
+        // =============================
+        // 2. 计算剩余位移
+        // =============================
+
+        remaining *= (1.0f - earliest_t);
+
+
+
+        // =============================
+        // 3. 投影到墙的切向方向
+        // =============================
+
+        float vn =
+            Vector::Dot(
+                remaining,
+                hit_normal
+            );
+
+
+        if (vn < 0)
+        {
+            remaining -= hit_normal * vn;
+        }
+
+
+
+        // =============================
+        // 4. 同步速度方向
+        //    只去掉法向速度
+        //    不改变速度大小
+        // =============================
+
+        float velocity_normal =
+            Vector::Dot(
+                ent.velocity,
+                hit_normal
+            );
+
+
+        if (velocity_normal < 0)
+        {
+            ent.velocity -=
+                hit_normal * velocity_normal;
+        }
     }
+
+
+    // 最终位置
+    ent.set_x(current.x);
+    ent.set_y(current.y);
 }

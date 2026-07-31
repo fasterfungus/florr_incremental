@@ -5,22 +5,25 @@
 
 #ifdef SERVERSIDE
 #include <Server/BVHCollisionManager.hh>
+#include <Server/ChunkBVHCollisionManager.hh>
+#include <Server/Lib/BS_thread_pool.hpp>
 #endif
 
 #include <functional>
 #include <string>
 
 inline uint32_t const ENTITY_CAP = 8192;
-
 class Simulation {
     std::array<uint8_t, div_round_up(ENTITY_CAP, 8)> entity_tracker;
     std::array<EntityID::hash_type, ENTITY_CAP> hash_tracker;
     std::array<Entity, ENTITY_CAP> entities;
+
     StaticArray<EntityID::id_type, ENTITY_CAP> active_entities;
 public:
     SERVER_ONLY(std::array<uint32_t, PetalID::kNumPetals> petal_count_tracker;)
     SERVER_ONLY(std::array<uint32_t, MAP_DATA.size()> zone_mob_counts;)
     SERVER_ONLY(BVHCollisionManager bvh_collision_manager;)
+    SERVER_ONLY(ChunkBVHCollisionManager chunk_bvh_collision_manager;)
     Arena arena_info;
     Simulation();
     void reset();

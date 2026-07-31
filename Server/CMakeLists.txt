@@ -32,7 +32,6 @@ set(SOURCES
     Spawn.cc
         BVHCollisionManager.cc
         BVHTest.cc
-        Walls.cc
     TeamManager.cc
     ../Helpers/Math.cc
     ../Helpers/UTF8.cc
@@ -55,6 +54,10 @@ set(SOURCES
         ../Helpers/Collision/BoundingBox/BoundingBoxHelper.cc
         ../Helpers/Collision/CCD.cc
         ../Helpers/Collision/Map/Wall.cc
+        ../Helpers/Collision/Map/Chunk/Chunk.cc
+        ../Helpers/Collision/Map/Chunk/Chunk.hh
+        ChunkBVHCollisionManager.cc
+        ChunkBVHCollisionManager.hh
 
 )
 
