@@ -263,13 +263,16 @@ namespace MobID {
 };
 
 namespace RarityID {
-    enum {
+    typedef uint8_t T;
+    enum : T {
         kCommon,
         kUnusual,
         kRare,
         kEpic,
         kLegendary,
         kMythic,
+        kUltra,
+        kSuper,
         kUnique,
         kNumRarities
     };
@@ -374,6 +377,8 @@ struct PetalAttributes {
     uint8_t equipment = EquipmentFlags::kNone;
 };
 
+
+
 struct PetalData {
     char const *name;
     char const *description;
@@ -382,11 +387,9 @@ struct PetalData {
     float scale;
     float radius;
     float reload;
-    uint8_t count;
-    uint8_t rarity;
-    struct PetalAttributes attributes;
+    int count;
+    PetalAttributes attributes;
 };
-
 struct MobAttributes {
     float aggro_radius = 500;
     uint8_t segments = 1;
