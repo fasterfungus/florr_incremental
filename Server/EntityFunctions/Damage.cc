@@ -11,6 +11,7 @@ static bool _yggdrasil_revival_clause(Simulation *sim, Entity &player) {
         if (!player.loadout[i].already_spawned) continue;
         if (player.loadout[i].get_petal_id() != PetalID::kYggdrasil) continue;
         player.set_loadout_ids(i, PetalID::kNone);
+        //TODO
         return true;
     }
     return false;

@@ -106,17 +106,17 @@ void draw_static_flower(Renderer &ctx, FlowerRenderAttributes attributes) {
             ctx.stroke();
         }
         else
-            draw_static_petal(PetalID::kThirdEye, ctx);
+            draw_static_petal(PetalID::kThirdEye,RarityID::kCommon, ctx);
     }
     if (BitMath::at(attributes.equip_flags, EquipmentFlags::kObserver))
     {
         RenderContext g(&ctx);
         ctx.translate(0, -35);
-        draw_static_petal(PetalID::kObserver, ctx);
+        draw_static_petal(PetalID::kObserver,RarityID::kCommon, ctx);
     } else if (BitMath::at(attributes.equip_flags, EquipmentFlags::kAntennae))
     {
         RenderContext g(&ctx);
         ctx.translate(0, -35);
-        draw_static_petal(PetalID::kAntennae, ctx);
+        draw_static_petal(PetalID::kAntennae,RarityID::kCommon, ctx);
     }
 }

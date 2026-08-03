@@ -10,7 +10,7 @@
 #include <Helpers/Collision/BoundingBox/BoundingBoxHelper.hh>
 #include <cmath>
 
-Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
+Entity &alloc_drop(Simulation *sim, PetalID::T drop_id ,RarityID::T drop_rarity) {
     DEBUG_ONLY(assert(drop_id < PetalID::kNumPetals);)
     PetalTracker::add_petal(sim, drop_id);
     Entity &drop = sim->alloc_ent();
@@ -29,7 +29,8 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id) {
 
     drop.add_component(kDrop);
     drop.set_drop_id(drop_id);
-    entity_set_despawn_tick(drop, 10 * (2 + PETAL_DATA[drop_id].rarity) * TPS);
+    drop.set_drop_rarity(drop_rarity);
+    entity_set_despawn_tick(drop, 10 * (2 + drop_rarity) * TPS);
     drop.immunity_ticks = TPS / 3;
     return drop;
 }
@@ -164,9 +165,9 @@ Entity &alloc_player(Simulation *sim, EntityID const team) {
     return player;
 }
 
-Entity &alloc_petal(Simulation *sim, PetalID::T petal_id, Entity const &parent) {
+Entity &alloc_petal(Simulation *sim, PetalID::T petal_id,RarityID::T petal_rarity, Entity const &parent) {
     DEBUG_ONLY(assert(petal_id < PetalID::kNumPetals);)
-    struct PetalData const &petal_data = PETAL_DATA[petal_id];
+    struct PetalData const &petal_data = PETAL_DATA[petal_id][petal_rarity];
     Entity &petal = sim->alloc_ent();
     petal.add_component(kPhysics);
     petal.set_x(parent.get_x());
@@ -187,6 +188,7 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id, Entity const &parent) 
     petal.set_color(parent.get_color());
     petal.add_component(kPetal);
     petal.set_petal_id(petal_id);
+    petal.set_petal_rarity(petal_rarity);
     petal.set_split_projectile(petal_data.attributes.split_projectile);
     petal.add_component(kHealth);
     petal.health = petal.max_health = petal_data.health;
@@ -221,7 +223,7 @@ Entity &alloc_web(Simulation *sim, float radius, Entity const &parent) {
     entity_set_despawn_tick(web, 10 * TPS);
     return web;
 }
-
+/*
 Entity &alloc_cpu_camera(Simulation *sim, EntityID const team) {
     Entity &ent = sim->alloc_ent();
     ent.add_component(kCamera);
@@ -240,7 +242,9 @@ Entity &alloc_cpu_camera(Simulation *sim, EntityID const team) {
     };
 
     for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
-        ent.set_inventory(i, inventory[i]);
+    {
+        ent.set_inventory_ids(i, inventory[i]);
+    }
 
     if (frand() < 0.001 && PetalTracker::get_count(sim, PetalID::kUniqueBasic) == 0)
         ent.set_inventory(0, PetalID::kUniqueBasic);
@@ -248,7 +252,7 @@ Entity &alloc_cpu_camera(Simulation *sim, EntityID const team) {
         PetalTracker::add_petal(sim, ent.get_inventory(i));
     return ent;
 }
-
+*/
 void player_spawn(Simulation *sim, Entity &camera, Entity &player) {
     camera.set_player(player.id);
     player.set_parent(camera.id);
@@ -265,17 +269,24 @@ void player_spawn(Simulation *sim, Entity &camera, Entity &player) {
     player.set_loadout_count(loadout_slots_at_level(camera.get_respawn_level()));
     player.health = player.max_health = hp_at_level(camera.get_respawn_level());
     for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
-        PetalID::T id = camera.get_inventory(i);
+        PetalID::T id = camera.get_inventory_ids(i);
+        RarityID::T rarity = camera.get_inventory_rarities(i);
         LoadoutSlot &slot = player.loadout[i];
         player.set_loadout_ids(i, id);
-        slot.update_id(sim, id);
+        player.set_loadout_rarities(i,rarity);
+        slot.update(sim, id , rarity);
         slot.force_reload();
     }
 
     for (uint32_t i = player.get_loadout_count(); i < player.get_loadout_count() + MAX_SLOT_COUNT; ++i)
-        player.set_loadout_ids(i, camera.get_inventory(i));
-
+    {
+        player.set_loadout_ids(i, camera.get_inventory_ids(i));
+        player.set_loadout_rarities(i,camera.get_inventory_rarities(i));
+    }
     //peaceful transfer, no petal tracking needed
     for (uint32_t i = 0; i < MAX_SLOT_COUNT * 2; ++i)
-        camera.set_inventory(i, PetalID::kNone);
+    {
+        camera.set_inventory_ids(i, PetalID::kNone);
+        camera.set_inventory_rarities(i, RarityID::kCommon);
+    }
 }

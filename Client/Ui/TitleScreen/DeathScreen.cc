@@ -18,25 +18,32 @@ DeadFlowerIcon::DeadFlowerIcon(float width) : Element(width, width, {}) {}
 
 void DeadFlowerIcon::on_render(Renderer &ctx) {
     if (Game::loadout_count == 0) return;
-    StaticArray<PetalID::T, MAX_SLOT_COUNT> physical_loadout;
+    StaticArray<PetalID::T, MAX_SLOT_COUNT> physical_loadout_ids;
+    StaticArray<RarityID::T, MAX_SLOT_COUNT> physical_loadout_rarities;
     uint8_t equip_flags = 0;
     for (uint32_t i = 0; i < Game::loadout_count; ++i) {
-        PetalData const &data = PETAL_DATA[Game::cached_loadout[i]];
-        if (data.count > 0) physical_loadout.push(Game::cached_loadout[i]);
+        PetalData const &data = PETAL_DATA[Game::cached_loadout_ids[i]][Game::cached_loadout_rarities[i]];
+        if (data.count > 0)
+        {
+            physical_loadout_ids.push(Game::cached_loadout_ids[i]);
+            physical_loadout_rarities.push(Game::cached_loadout_rarities[i]);
+
+        }
         if (data.attributes.equipment != EquipmentFlags::kNone) 
             BitMath::set(equip_flags, data.attributes.equipment);
     }
     ctx.scale((width / 4) / 25);
-    for (uint32_t i = 0; i < physical_loadout.size(); ++i) {
-        float angle = 2 * M_PI * i / physical_loadout.size() + 0.5;
+    for (uint32_t i = 0; i < physical_loadout_ids.size(); ++i) {
+        float angle = 2 * M_PI * i / physical_loadout_ids.size() + 0.5;
         float offset_x = cosf(angle) * 40;
         float offset_y = sinf(angle) * 25;
         if (offset_y > 0) continue;
         RenderContext c(&ctx);
-        PetalID::T id = physical_loadout[i];
+        PetalID::T id = physical_loadout_ids[i];
+        RarityID::T rarity = physical_loadout_rarities[i];
         ctx.translate(offset_x, offset_y);
-        ctx.rotate(PETAL_DATA[id].attributes.icon_angle);
-        if (PETAL_DATA[id].radius > 20) ctx.scale(20 / PETAL_DATA[id].radius);
+        ctx.rotate(PETAL_DATA[id][rarity].attributes.icon_angle);
+        if (PETAL_DATA[id][rarity].radius > 20) ctx.scale(20 / PETAL_DATA[id][rarity].radius);
         draw_static_petal_single(id, ctx);
     }
     {
@@ -45,16 +52,17 @@ void DeadFlowerIcon::on_render(Renderer &ctx) {
         float flower_radius = width / 3;
         draw_static_flower(ctx, { .radius = 25, .mouth = 5, .face_flags = (1<<FaceFlags::kDeadEyes), .equip_flags = equip_flags });
     }
-    for (uint32_t i = 0; i < physical_loadout.size(); ++i) {
-        float angle = 2 * M_PI * i / physical_loadout.size() + 0.5;
+    for (uint32_t i = 0; i < physical_loadout_ids.size(); ++i) {
+        float angle = 2 * M_PI * i / physical_loadout_ids.size() + 0.5;
         float offset_x = cosf(angle) * 40;
         float offset_y = sinf(angle) * 25;
         if (offset_y <= 0) continue;
         RenderContext c(&ctx);
-        PetalID::T id = physical_loadout[i];
+        PetalID::T id = physical_loadout_ids[i];
+        RarityID::T rarity = physical_loadout_rarities[i];
         ctx.translate(offset_x, offset_y);
-        ctx.rotate(PETAL_DATA[id].attributes.icon_angle);
-        if (PETAL_DATA[id].radius > 20) ctx.scale(20 / PETAL_DATA[id].radius);
+        ctx.rotate(PETAL_DATA[id][rarity].attributes.icon_angle);
+        if (PETAL_DATA[id][rarity].radius > 20) ctx.scale(20 / PETAL_DATA[id][rarity].radius);
         draw_static_petal_single(id, ctx);
     }
 }

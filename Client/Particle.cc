@@ -18,7 +18,7 @@ void Particle::tick_title(Renderer &ctx, double dt) {
     size_t len = title_particles.size();
     for (size_t i = len; i > 0; --i) {
         TitleParticleEntity &part = title_particles[i - 1];
-        if (part.x > ctx.width + std::max(10.0f, PETAL_DATA[part.id].radius) * part.radius) {
+        if (part.x > ctx.width + std::max(10.0f, PETAL_DATA[part.id][RarityID::kCommon].radius) * part.radius) {
             part = title_particles[title_particles.size() - 1];
             title_particles.pop_back();
             continue;
@@ -28,17 +28,17 @@ void Particle::tick_title(Renderer &ctx, double dt) {
         part.angle += dt / 1000 * Ui::scale;
         ctx.translate(part.x, part.y + 12.5 * sin(Game::timestamp / 500 + part.sin_offset));
         ctx.scale(Ui::scale * part.radius);
-        if (PETAL_DATA[part.id].attributes.rotation_style == PetalAttributes::kPassiveRot)
+        if (PETAL_DATA[part.id][RarityID::kCommon].attributes.rotation_style == PetalAttributes::kPassiveRot)
             ctx.rotate(part.angle);
         if (part.id == PetalID::kPeas || part.id == PetalID::kPoisonPeas)
-            draw_static_petal(part.id, ctx);
+            draw_static_petal(part.id,part.rarity, ctx);
         else
             draw_static_petal_single(part.id, ctx);
     }
     std::vector<PetalID::T> ids = {PetalID::kBasic};
     float freq_sum = 1;
     for (PetalID::T pot = PetalID::kBasic + 1; pot < PetalID::kNumPetals; ++pot)
-        if (Game::seen_petals[pot]) { ids.push_back(pot); freq_sum += pow(0.5, PETAL_DATA[pot].rarity); }
+        if (Game::seen_petals[pot]) { ids.push_back(pot); freq_sum += pow(0.5, RarityID::kCommon); } //TODO 修改
 
     for (size_t i = 0; i < 4; ++i) {
         if (frand() > 0.02) continue;
@@ -47,7 +47,7 @@ void Particle::tick_title(Renderer &ctx, double dt) {
         
         float freq_score = freq_sum * frand();
         for (PetalID::T id : ids) {
-            freq_score -= pow(0.5, PETAL_DATA[id].rarity);
+            freq_score -= pow(0.5,  RarityID::kCommon);//TODO 修改
             if (freq_score > 0) continue;
             npart.id = id;   
             npart.y = frand() * ctx.height;

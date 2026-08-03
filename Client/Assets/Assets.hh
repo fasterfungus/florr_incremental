@@ -27,13 +27,13 @@ struct MobRenderAttributes {
     FlowerRenderAttributes flower_attrs;
 };
 
-void draw_loadout_background(Renderer &, PetalID::T, float=1);
+void draw_loadout_background(Renderer &, PetalID::T,RarityID::T, float=1);
 
 void draw_static_flower(Renderer &, FlowerRenderAttributes);
 
 void draw_static_petal_single(PetalID::T, Renderer &);
 
-void draw_static_petal(PetalID::T, Renderer &);
+void draw_static_petal(PetalID::T, RarityID::T, Renderer &);
 
 void draw_static_mob(MobID::T, Renderer &, MobRenderAttributes);
 

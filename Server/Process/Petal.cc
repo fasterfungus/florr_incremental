@@ -15,7 +15,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
         return;
     }
     Entity &player = sim->get_ent(petal.get_parent());
-    struct PetalData const &petal_data = PETAL_DATA[petal.get_petal_id()];
+    struct PetalData const &petal_data = PETAL_DATA[petal.get_petal_id()][petal.get_petal_rarity()];
     if (petal_data.attributes.rotation_style == PetalAttributes::kPassiveRot) {
         //simulate on clientside
         float rot_amt = petal.get_petal_id() == PetalID::kWing ? 10.0 : 1.0;
@@ -119,7 +119,7 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 petal.heading_angle = spray_angle;
                 entity_set_despawn_tick(petal, 1.0 * TPS);
                 for (uint32_t i = 1; i < petal_data.count; ++i) {
-                    Entity &new_petal = alloc_petal(sim, petal.get_petal_id(), player);
+                    Entity &new_petal = alloc_petal(sim, petal.get_petal_id(),petal.get_petal_rarity(), player);
                     new_petal.friction = DEFAULT_FRICTION;
                     new_petal.set_x(petal.get_x());
                     new_petal.set_y(petal.get_y());

@@ -14,6 +14,7 @@ namespace Particle {
         float sin_offset;
         float radius;
         PetalID::T id;
+        RarityID::T rarity;
     };
 
     class GameParticleEntity {

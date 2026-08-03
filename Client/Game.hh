@@ -34,8 +34,8 @@ namespace Game {
 
     extern uint32_t respawn_level;
 
-    extern std::array<PetalID::T, 2 * MAX_SLOT_COUNT> cached_loadout;
-
+    extern std::array<PetalID::T, 2 * MAX_SLOT_COUNT> cached_loadout_ids;
+    extern std::array<RarityID::T, 2 * MAX_SLOT_COUNT> cached_loadout_rarities;
     extern uint8_t loadout_count;
     extern uint8_t simulation_ready;
     extern uint8_t on_game_screen;

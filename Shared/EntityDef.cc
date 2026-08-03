@@ -33,6 +33,7 @@ LoadoutSlot::LoadoutSlot() {
 
 void LoadoutSlot::reset() {
     id = PetalID::kNone;
+    rarity = RarityID::kCommon;
     already_spawned = 0;
     for (uint32_t i = 0; i < MAX_PETALS_IN_CLUMP; ++i) {
         petals[i].reload = 0;
@@ -43,9 +44,12 @@ void LoadoutSlot::reset() {
 PetalID::T LoadoutSlot::get_petal_id() const {
     return id;
 }
-
-void LoadoutSlot::update_id(Simulation *sim, PetalID::T petal_id) {
-    struct PetalData const &petal_data = PETAL_DATA[id];
+RarityID::T LoadoutSlot::get_petal_rarity() const
+{
+    return rarity;
+}
+void LoadoutSlot::update(Simulation *sim, PetalID::T petal_id ,RarityID::T petal_rarity) {
+    struct PetalData const &petal_data = PETAL_DATA[id][rarity];
     for (uint32_t j = 0; j < size(); ++j) {
         LoadoutPetal &petal_slot = petals[j];
         if (sim->ent_alive(petal_slot.ent_id))
@@ -53,16 +57,17 @@ void LoadoutSlot::update_id(Simulation *sim, PetalID::T petal_id) {
     }
     reset();
     id = petal_id;
+    rarity = petal_rarity;
 }
 
 void LoadoutSlot::force_reload() {
     already_spawned = 1;
     for (uint32_t j = 0; j < size(); ++j)
-        petals[j].reload = PETAL_DATA[id].reload * TPS;
+        petals[j].reload = PETAL_DATA[id][rarity].reload * TPS;
 }
 
 uint32_t LoadoutSlot::size() const {
-    if (PETAL_DATA[id].attributes.split_projectile)
+    if (PETAL_DATA[id][rarity].attributes.split_projectile)
         return 1;
-    return std::min(static_cast<uint32_t>(PETAL_DATA[id].count), MAX_PETALS_IN_CLUMP);
+    return std::min(static_cast<uint32_t>(PETAL_DATA[id][rarity].count), MAX_PETALS_IN_CLUMP);
 }

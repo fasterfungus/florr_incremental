@@ -10,7 +10,7 @@
 
 #include <algorithm>
 #include <cstring>
-
+/*
 using namespace Ui;
 
 GalleryPetal::GalleryPetal(PetalID::T id, float w) : 
@@ -99,3 +99,4 @@ Element *Ui::make_petal_gallery() {
     Ui::Panel::petal_gallery = elt;
     return elt;
 }
+*/

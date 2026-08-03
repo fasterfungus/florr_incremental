@@ -56,7 +56,8 @@ SINGLE(Physics, shape, uint8_t)
 #define FIELDS_Camera \
 SINGLE(Camera, player, EntityID) \
 SINGLE(Camera, respawn_level, uint8_t) \
-MULTIPLE(Camera, inventory, PetalID::T, 2 * MAX_SLOT_COUNT) \
+MULTIPLE(Camera, inventory_ids, PetalID::T, 2 * MAX_SLOT_COUNT) \
+MULTIPLE(Camera, inventory_rarities, RarityID::T, 2 * MAX_SLOT_COUNT) \
 SINGLE(Camera, killed_by, std::string) \
 SINGLE(Camera, camera_x, Float) \
 SINGLE(Camera, camera_y, Float) \
@@ -73,10 +74,12 @@ SINGLE(Flower, loadout_count, uint8_t) \
 SINGLE(Flower, face_flags, uint8_t) \
 SINGLE(Flower, equip_flags, uint8_t) \
 MULTIPLE(Flower, loadout_ids, PetalID::T, 2 * MAX_SLOT_COUNT) \
+MULTIPLE(Flower, loadout_rarities, RarityID::T, 2 * MAX_SLOT_COUNT) \
 MULTIPLE(Flower, loadout_reloads, uint8_t, MAX_SLOT_COUNT)
 
 #define FIELDS_Petal \
 SINGLE(Petal, petal_id, PetalID::T) \
+SINGLE(Petal, petal_rarity, PetalID::T) \
 SINGLE(Petal, split_projectile, uint8_t)
 
 #define FIELDS_Health \
@@ -87,8 +90,8 @@ SINGLE(Health, damaged, StickyFlag)
 SINGLE(Mob, mob_id, MobID::T)
 
 #define FIELDS_Drop \
-SINGLE(Drop, drop_id, PetalID::T)
-
+SINGLE(Drop, drop_id, PetalID::T) \
+SINGLE(Drop, drop_rarity, RarityID::T)
 #define FIELDS_Segmented
 
 #define FIELDS_Web
@@ -203,15 +206,17 @@ struct LoadoutPetal
 class LoadoutSlot
 {
     PetalID::T id;
+    RarityID::T rarity;
 
 public:
     uint8_t already_spawned;
     LoadoutPetal petals[MAX_PETALS_IN_CLUMP];
     LoadoutSlot();
     void reset();
-    void update_id(Simulation*, PetalID::T);
+    void update(Simulation*, PetalID::T,RarityID::T);
     void force_reload();
     PetalID::T get_petal_id() const;
+    RarityID::T get_petal_rarity() const;
     uint32_t size() const;
 };
 #endif

@@ -15,14 +15,14 @@ using namespace Ui;
 StatPetalSlot::StatPetalSlot(uint8_t p) : Element(60,60,{ .no_animation = 1 }), pos(p) {
     //style.v_justify = Style::Bottom;
     style.should_render = [=](){
-        return p < Game::loadout_count + MAX_SLOT_COUNT && Game::cached_loadout[p] != PetalID::kNone;
+        return p < Game::loadout_count + MAX_SLOT_COUNT && Game::cached_loadout_ids[p] != PetalID::kNone;
     };
 }
 
 void StatPetalSlot::refactor() {
     if (pos < Game::loadout_count) {
         width = height = 60;
-    } else if (Game::cached_loadout[pos] != PetalID::kNone) {
+    } else if (Game::cached_loadout_ids[pos] != PetalID::kNone) {
         width = height = 50;
     } else {
         width = height = 0;
@@ -30,14 +30,16 @@ void StatPetalSlot::refactor() {
 }
 
 void StatPetalSlot::on_render(Renderer &ctx) {
-    uint8_t id = Game::cached_loadout[pos];
+    uint8_t id = Game::cached_loadout_ids[pos];
+    uint8_t rarity = Game::cached_loadout_rarities[pos];
     if (id == PetalID::kNone) return;
     ctx.scale(width / 60);
-    draw_loadout_background(ctx, id);
+    draw_loadout_background(ctx,rarity, id);
 }
 
 void StatPetalSlot::on_event(uint8_t event) {
-    uint8_t id = Game::cached_loadout[pos];
+    uint8_t id = Game::cached_loadout_ids[pos];
+    uint8_t rarity = Game::cached_loadout_rarities[pos];
     if (event != kFocusLost && id != PetalID::kNone) {
         rendering_tooltip = 1;
         tooltip = Ui::UiLoadout::petal_tooltips[id];
@@ -53,7 +55,7 @@ TitlePetalSlot::TitlePetalSlot(uint8_t p) : Element(50,50,{}), pos(p) {
             return false;
         Entity const &camera = Game::simulation.get_ent(Game::camera_id);
         if (p >= loadout_slots_at_level(camera.get_respawn_level()) + MAX_SLOT_COUNT) return false;
-        return camera.get_inventory(p) > PetalID::kBasic;
+        return camera.get_inventory_ids(p) > PetalID::kBasic;
     };
 }
 
@@ -61,17 +63,19 @@ void TitlePetalSlot::on_render(Renderer &ctx) {
     if (!Game::simulation.ent_exists(Game::camera_id))
         return;
     Entity const &camera = Game::simulation.get_ent(Game::camera_id);
-    uint8_t id = camera.get_inventory(pos);
+    PetalID::T id = camera.get_inventory_ids(pos);
+    RarityID::T rarity = camera.get_inventory_rarities(pos);
     if (id == PetalID::kNone) return;
     ctx.scale(width / 60);
-    draw_loadout_background(ctx, id);
+    draw_loadout_background(ctx,rarity, id);
 }
 
 void TitlePetalSlot::on_event(uint8_t event) {
     if (!Game::simulation.ent_exists(Game::camera_id))
         return;
     Entity const &camera = Game::simulation.get_ent(Game::camera_id);
-    uint8_t id = camera.get_inventory(pos);
+    PetalID::T id = camera.get_inventory_ids(pos);
+    RarityID::T rarity = camera.get_inventory_rarities(pos);
     if (event != kFocusLost && id != PetalID::kNone) {
         rendering_tooltip = 1;
         tooltip = Ui::UiLoadout::petal_tooltips[id];

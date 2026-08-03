@@ -37,7 +37,8 @@ static struct PlayerBuffs _get_petal_passive_buffs(Simulation *sim, Entity &play
     for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
         LoadoutSlot const &slot = player.loadout[i];
         PetalID::T slot_petal_id = slot.get_petal_id();
-        struct PetalData const &petal_data = PETAL_DATA[slot_petal_id];
+        RarityID::T slot_petal_rarity = slot.get_petal_rarity();
+        struct PetalData const &petal_data = PETAL_DATA[slot_petal_id][slot_petal_rarity];
         struct PetalAttributes const &attrs = petal_data.attributes;
         if (attrs.equipment != EquipmentFlags::kNone)
             player.set_equip_flags(player.get_equip_flags() | (1 << attrs.equipment));
@@ -67,7 +68,7 @@ static uint32_t _get_petal_rotation_count(Simulation *sim, Entity &player) {
     uint32_t count = 0;
     for (uint8_t i = 0; i < player.get_loadout_count(); ++i) {
         LoadoutSlot const &slot = player.loadout[i];
-        struct PetalData const &petal_data = PETAL_DATA[slot.get_petal_id()];
+        struct PetalData const &petal_data = PETAL_DATA[slot.get_petal_id()][slot.get_petal_rarity()];
         if (petal_data.attributes.clump_radius > 0)
             ++count;
         else {
@@ -138,9 +139,10 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
         //player.set_loadout_ids(i, slot.id);
         //other way around. loadout_ids should dictate loadout
         if (slot.get_petal_id() != player.get_loadout_ids(i) || player.get_overlevel_timer() >= PETAL_DISABLE_DELAY * TPS)
-            slot.update_id(sim, player.get_loadout_ids(i));
+            slot.update(sim, player.get_loadout_ids(i),player.get_loadout_rarities(i));
         PetalID::T slot_petal_id = slot.get_petal_id();
-        struct PetalData const &petal_data = PETAL_DATA[slot_petal_id];
+        RarityID::T slot_petal_rarity = slot.get_petal_rarity();
+        struct PetalData const &petal_data = PETAL_DATA[slot_petal_id][slot_petal_rarity];
         DEBUG_ONLY(assert(petal_data.count <= MAX_PETALS_IN_CLUMP);)
 
         if (slot_petal_id == PetalID::kNone || petal_data.count == 0)
@@ -160,7 +162,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                 float this_reload = reload_time == 0 ? 1 : (float) petal_slot.reload / reload_time;
                 min_reload = std::min(min_reload, this_reload);
                 if (petal_slot.reload >= reload_time) {
-                    petal_slot.ent_id = alloc_petal(sim, slot_petal_id, player).id;
+                    petal_slot.ent_id = alloc_petal(sim, slot_petal_id,slot_petal_rarity, player).id;
                     sim->get_ent(petal_slot.ent_id).damage *= buffs.damage_factor;
                     sim->get_ent(petal_slot.ent_id).set_x(rotation_center.x);
                     sim->get_ent(petal_slot.ent_id).set_y(rotation_center.y);

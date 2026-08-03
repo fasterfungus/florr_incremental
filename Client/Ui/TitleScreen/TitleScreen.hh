@@ -32,7 +32,7 @@ namespace Ui {
 
         virtual void on_event(uint8_t) override;
     };
-
+    /*
     class GalleryPetal final : public Element {
     public:
         PetalID::T id;
@@ -41,14 +41,14 @@ namespace Ui {
         virtual void on_render(Renderer &) override;
         virtual void on_event(uint8_t) override;
     };
-
+    */
     class PetalsCollectedIndicator final : public Element {
     public:
         PetalsCollectedIndicator(float);
 
         virtual void on_render(Renderer &) override;
     };
-
+    /*
     class GalleryMob final : public Element {
     public:
         MobID::T id;
@@ -56,7 +56,7 @@ namespace Ui {
 
         virtual void on_render(Renderer &) override;
     };
-
+    */
     Element *make_title_input_box();
     Element *make_title_info_box();
     Element *make_panel_buttons();

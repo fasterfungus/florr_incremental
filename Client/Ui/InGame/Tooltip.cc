@@ -12,13 +12,13 @@
 using namespace Ui;
 
 Element *Ui::UiLoadout::petal_tooltips[PetalID::kNumPetals] = {nullptr};
-
+//TODO 把kcommon删掉
 static float get_reload_factor() {
     if (!Game::alive()) return 1;
     float factor = 1;
     Entity &player = Game::simulation.get_ent(Game::player_id);
     for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
-        factor *= PETAL_DATA[player.get_loadout_ids(i)].attributes.extra_reload_factor;
+        factor *= PETAL_DATA[player.get_loadout_ids(i)][RarityID::kCommon].attributes.extra_reload_factor;
     }
     return factor;
 }
@@ -28,14 +28,14 @@ static float get_damage_factor() {
     float factor = 1;
     Entity &player = Game::simulation.get_ent(Game::player_id);
     for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
-        factor *= PETAL_DATA[player.get_loadout_ids(i)].attributes.extra_damage_factor;
+        factor *= PETAL_DATA[player.get_loadout_ids(i)][RarityID::kCommon].attributes.extra_damage_factor;
     }
     return factor;
 }
 
 static Ui::Element *make_petal_stat_container(PetalID::T id) {
     std::vector<Ui::Element *> stats = {new Ui::Element(0,10)};
-    struct PetalData const &petal_data = PETAL_DATA[id];
+    struct PetalData const &petal_data = PETAL_DATA[id][RarityID::kCommon];
     struct PetalAttributes const &attrs = petal_data.attributes;
     if (petal_data.health > 0) {
         stats.push_back(new Ui::HContainer({
@@ -159,11 +159,11 @@ static void make_petal_tooltip(PetalID::T id) {
             5, 10, {}
         ),
         #else
-        new Ui::StaticText(20, PETAL_DATA[id].name, { .fill = 0xffffffff, .h_justify = Style::Left }),
+        new Ui::StaticText(20, PETAL_DATA[id][RarityID::kCommon].name, { .fill = 0xffffffff, .h_justify = Style::Left }),
         #endif
-        new Ui::StaticText(14, RARITY_NAMES[PETAL_DATA[id].rarity], { .fill = RARITY_COLORS[PETAL_DATA[id].rarity], .h_justify = Style::Left }),
+        new Ui::StaticText(14, RARITY_NAMES[RarityID::kCommon], { .fill = RARITY_COLORS[RarityID::kCommon], .h_justify = Style::Left }),
         new Ui::Element(0,8),
-        new Ui::StaticText(12, PETAL_DATA[id].description, { .fill = 0xffffffff, .h_justify = Style::Left }),
+        new Ui::StaticText(12, PETAL_DATA[id][RarityID::kCommon].description, { .fill = 0xffffffff, .h_justify = Style::Left }),
         DEBUG_ONLY(make_petal_stat_container(id))
     }, 5, 2);
     tooltip->style.fill = 0x80000000;

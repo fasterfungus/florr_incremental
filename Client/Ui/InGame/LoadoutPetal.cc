@@ -21,7 +21,7 @@ void Ui::forward_secondary_select() {
         ++Ui::UiLoadout::selected_with_keys;
     for (uint8_t i = 0; i < MAX_SLOT_COUNT; ++i) {
         Ui::UiLoadout::selected_with_keys = Ui::UiLoadout::selected_with_keys % MAX_SLOT_COUNT;
-        if (Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] != PetalID::kNone) return;
+        if (Game::cached_loadout_ids[Game::loadout_count + Ui::UiLoadout::selected_with_keys] != PetalID::kNone) return;
         ++Ui::UiLoadout::selected_with_keys;
     }
     Ui::UiLoadout::selected_with_keys = MAX_SLOT_COUNT;
@@ -33,7 +33,7 @@ void Ui::backward_secondary_select() {
         return Ui::forward_secondary_select();
     for (uint8_t i = 0; i < MAX_SLOT_COUNT; ++i) {
         Ui::UiLoadout::selected_with_keys = (Ui::UiLoadout::selected_with_keys - 1 + MAX_SLOT_COUNT) % MAX_SLOT_COUNT;
-        if (Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] != PetalID::kNone) return;
+        if (Game::cached_loadout_ids[Game::loadout_count + Ui::UiLoadout::selected_with_keys] != PetalID::kNone) return;
     }
     Ui::UiLoadout::selected_with_keys = MAX_SLOT_COUNT;
 }
@@ -55,8 +55,10 @@ void Ui::ui_swap_petals(uint8_t static_pos1, uint8_t static_pos2) {
     UiLoadoutPetal *a1 = Ui::UiLoadout::petal_slots[static_pos1];
     UiLoadoutPetal *a2 = Ui::UiLoadout::petal_slots[static_pos2];
     if (a1->petal_id == a2->petal_id) return;
-    a2->petal_id = Game::cached_loadout[static_pos1];
-    a1->petal_id = Game::cached_loadout[static_pos2];
+    a2->petal_id = Game::cached_loadout_ids[static_pos1];
+    a2->petal_rarity = Game::cached_loadout_rarities[static_pos1];
+    a1->petal_id = Game::cached_loadout_ids[static_pos2];
+    a1->petal_rarity = Game::cached_loadout_rarities[static_pos2];
     a1->static_pos = static_pos2;
     a2->static_pos = static_pos1;
     Ui::UiLoadout::petal_slots[static_pos1] = a2;
@@ -88,7 +90,7 @@ static uint8_t find_viable_target(float x, float y) {
 }
 
 UiLoadoutPetal::UiLoadoutPetal(uint8_t pos) : Element(60, 60), 
-    static_pos(pos), no_change_ticks(0), petal_id(PetalID::kNone), last_id(PetalID::kNone) 
+    static_pos(pos), no_change_ticks(0), petal_id(PetalID::kNone),petal_rarity(RarityID::kCommon) ,last_id(PetalID::kNone) ,last_rarity(RarityID::kCommon)
 {
     reload = 1;
     style.should_render = [&](){
@@ -98,12 +100,17 @@ UiLoadoutPetal::UiLoadoutPetal(uint8_t pos) : Element(60, 60),
         if (curr_pos == 2 * MAX_SLOT_COUNT) return false;
         if (Game::alive()) {
             Entity const &player = Game::simulation.get_ent(Game::player_id);
-            if (no_change_ticks == 0 || player.get_state_loadout_ids(static_pos)) {
+            if (no_change_ticks == 0 || player.get_state_loadout_ids(static_pos))
+            {
                 no_change_ticks = 0;
-                petal_id = Game::cached_loadout[static_pos];
-                if (petal_id != PetalID::kNone && petal_id < PetalID::kNumPetals)
+                petal_id = Game::cached_loadout_ids[static_pos];
+                petal_rarity = Game::cached_loadout_rarities[static_pos];
+                if (petal_id != PetalID::kNone && petal_id < PetalID::kNumPetals){
                     last_id = petal_id;
-            } else --no_change_ticks;
+                    last_rarity = petal_rarity;
+                }
+            }
+                else --no_change_ticks;
         }
         if (static_pos < Game::loadout_count && Game::alive()) {
             Entity const &player = Game::simulation.get_ent(Game::player_id);
@@ -203,10 +210,10 @@ UiLoadoutPetal::UiLoadoutPetal(uint8_t pos) : Element(60, 60),
 void UiLoadoutPetal::on_render(Renderer &ctx) {
     if (last_id == PetalID::kNone) return;
     ctx.scale(width / 60);
-    if (static_pos < Game::loadout_count && PETAL_DATA[last_id].count != 0)
-        draw_loadout_background(ctx, last_id, (float) reload);
+    if (static_pos < Game::loadout_count && PETAL_DATA[last_id][last_rarity].count != 0)
+        draw_loadout_background(ctx, last_id,last_rarity, (float) reload);
     else
-        draw_loadout_background(ctx, last_id);
+        draw_loadout_background(ctx, last_id,last_rarity);
 }
 
 void UiLoadoutPetal::on_render_skip(Renderer &ctx) {

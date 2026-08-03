@@ -319,7 +319,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.set_stroke(0xffa760b1);
             ctx.set_line_width(3);
             ctx.begin_path();
-            ctx.arc(0,0,PETAL_DATA[id].radius);
+            ctx.arc(0,0,7.0);
             ctx.fill();
             ctx.stroke();
             break;
@@ -328,7 +328,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.set_stroke(0xff709d45);
             ctx.set_line_width(3);
             ctx.begin_path();
-            ctx.arc(0,0,PETAL_DATA[id].radius);
+            ctx.arc(0,0,7.0);
             ctx.fill();
             ctx.stroke();
             break;
@@ -946,8 +946,8 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
     }
 }
 
-void draw_static_petal(PetalID::T id, Renderer &ctx) {
-    struct PetalData const &data = PETAL_DATA[id];
+void draw_static_petal(PetalID::T id,RarityID::T rarity, Renderer &ctx) {
+    struct PetalData const &data = PETAL_DATA[id][rarity];
     uint32_t count = data.count > 1 ? data.count : 1;
     for (uint32_t i = 0; i < count; ++i) {
         RenderContext context(&ctx);
@@ -961,15 +961,15 @@ void draw_static_petal(PetalID::T id, Renderer &ctx) {
     }
 }
 
-void draw_loadout_background(Renderer &ctx, uint8_t id, float reload) {
+void draw_loadout_background(Renderer &ctx, PetalID::T id,RarityID::T rarity, float reload) {
     RenderContext c(&ctx);
-    ctx.set_fill(Renderer::HSV(RARITY_COLORS[PETAL_DATA[id].rarity], 0.8));
+    ctx.set_fill(Renderer::HSV(RARITY_COLORS[rarity], 0.8));
     ctx.round_line_join();
     ctx.round_line_cap();
     ctx.begin_path();
     ctx.round_rect(-30, -30, 60, 60, 3);
     ctx.fill();
-    ctx.set_fill(RARITY_COLORS[PETAL_DATA[id].rarity]);
+    ctx.set_fill(RARITY_COLORS[rarity]);
     ctx.begin_path();
     ctx.rect(-25, -25, 50, 50);
     ctx.fill();
@@ -990,12 +990,12 @@ void draw_loadout_background(Renderer &ctx, uint8_t id, float reload) {
     {
         RenderContext r(&ctx);
         ctx.scale(0.833);
-        if (PETAL_DATA[id].radius > 20) ctx.scale(20 / PETAL_DATA[id].radius);
-        draw_static_petal(id, ctx);
+        if (PETAL_DATA[id][rarity].radius > 20) ctx.scale(20 / PETAL_DATA[id][rarity].radius);
+        draw_static_petal(id,rarity, ctx);
     }
-    float text_width = 12 * Renderer::get_ascii_text_size(PETAL_DATA[id].name);
+    float text_width = 12 * Renderer::get_ascii_text_size(PETAL_DATA[id][rarity].name);
     if (text_width < 50) text_width = 12;
     else text_width = 12 * 50 / text_width;
     ctx.translate(0, 20);
-    ctx.draw_text(PETAL_DATA[id].name, { .size = text_width });
+    ctx.draw_text(PETAL_DATA[id][rarity].name, { .size = text_width });
 }

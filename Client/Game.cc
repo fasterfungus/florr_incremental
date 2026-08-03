@@ -29,7 +29,8 @@ namespace Game {
     std::string disconnect_message;
     std::array<uint8_t, PetalID::kNumPetals> seen_petals;
     std::array<uint8_t, MobID::kNumMobs> seen_mobs;
-    std::array<PetalID::T, 2 * MAX_SLOT_COUNT> cached_loadout = {PetalID::kNone};
+    std::array<PetalID::T, 2 * MAX_SLOT_COUNT> cached_loadout_ids = {PetalID::kNone};
+    std::array<RarityID::T, 2 * MAX_SLOT_COUNT> cached_loadout_rarities = {RarityID::kCommon};
     bool show_collision = false;
     double timestamp = 0;
     double scale;
@@ -81,12 +82,14 @@ void Game::init() {
     title_ui_window.add_child(
         Ui::make_settings_panel()
     );
+    /*
     title_ui_window.add_child(
         Ui::make_petal_gallery()
     );
     title_ui_window.add_child(
         Ui::make_mob_gallery()
     );
+    */
     title_ui_window.add_child(
         Ui::make_changelog()
     );
@@ -172,7 +175,10 @@ void Game::reset() {
     loadout_count = 5;
     camera_id = player_id = NULL_ENTITY;
     for (uint32_t i = 0; i < 2 * MAX_SLOT_COUNT; ++i)
-        cached_loadout[i] = PetalID::kNone;
+    {
+        cached_loadout_ids[i] = PetalID::kNone;
+        cached_loadout_rarities[i] = RarityID::kCommon;
+    }
     simulation.reset();
 }
 
@@ -231,8 +237,9 @@ void Game::tick(double time) {
         Entity const &player = simulation.get_ent(player_id);
         Game::loadout_count = player.get_loadout_count();
         for (uint32_t i = 0; i < MAX_SLOT_COUNT + Game::loadout_count; ++i) {
-            cached_loadout[i] = player.get_loadout_ids(i);
-            Game::seen_petals[cached_loadout[i]] = 1;
+            cached_loadout_ids[i] = player.get_loadout_ids(i);
+            cached_loadout_rarities[i] = player.get_loadout_rarities(i);
+            Game::seen_petals[cached_loadout_ids[i]] = 1; //TODO 啊啊
         }
         score = player.get_score();
         overlevel_timer = player.get_overlevel_timer();
@@ -302,10 +309,10 @@ void Game::tick(double time) {
                     }
                 }
             }
-        } else if (Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] == PetalID::kNone)
+        } else if (Game::cached_loadout_ids[Game::loadout_count + Ui::UiLoadout::selected_with_keys] == PetalID::kNone)
             Ui::UiLoadout::selected_with_keys = MAX_SLOT_COUNT;
         if (!show_chat && Ui::UiLoadout::selected_with_keys < MAX_SLOT_COUNT
-            && Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] != PetalID::kNone) {
+            && Game::cached_loadout_ids[Game::loadout_count + Ui::UiLoadout::selected_with_keys] != PetalID::kNone) {
             if (Input::keys_held_this_tick.contains('T')) {
                 Ui::ui_delete_petal(Ui::UiLoadout::selected_with_keys + Game::loadout_count);
                 Ui::forward_secondary_select();
@@ -313,7 +320,7 @@ void Game::tick(double time) {
                 for (uint8_t i = 0; i < Game::loadout_count; ++i) {
                     if (Input::keys_held_this_tick.contains(SLOT_KEYBINDS[i])) {
                         Ui::ui_swap_petals(i, Ui::UiLoadout::selected_with_keys + Game::loadout_count);
-                        if (Game::cached_loadout[Game::loadout_count + Ui::UiLoadout::selected_with_keys] == PetalID::kNone)
+                        if (Game::cached_loadout_ids[Game::loadout_count + Ui::UiLoadout::selected_with_keys] == PetalID::kNone)
                             Ui::forward_secondary_select();
                         break;
                     }

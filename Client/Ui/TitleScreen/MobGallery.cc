@@ -10,7 +10,7 @@
 
 #include <algorithm>
 #include <cstring>
-
+/*
 using namespace Ui;
 
 GalleryMob::GalleryMob(MobID::T id, float w) : 
@@ -152,3 +152,4 @@ Element *Ui::make_mob_gallery() {
     Ui::Panel::mob_gallery = elt;
     return elt;
 }
+*/

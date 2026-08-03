@@ -10,30 +10,33 @@
 #include <algorithm>
 #include <iostream>
 
-static void _alloc_drops(Simulation *sim, std::vector<PetalID::T> &success_drops, float x, float y) {
+static void _alloc_drops(Simulation *sim, std::vector<PetalID::T> &success_drops_id,std::vector<RarityID::T> &success_drops_rarity, float x, float y) {
     #ifdef DEBUG
     for (PetalID::T id : success_drops)
         assert(id != PetalID::kNone && id < PetalID::kNumPetals);
     #endif
-    size_t count = success_drops.size();
+    size_t count = success_drops_id.size();
     for (size_t i = count; i > 0; --i) {
-        PetalID::T drop_id = success_drops[i - 1];
+        PetalID::T drop_id = success_drops_id[i - 1];
+        RarityID::T drop_rarity = success_drops_rarity[i - 1];
+        /*
         if (PETAL_DATA[drop_id].rarity == RarityID::kUnique && PetalTracker::get_count(sim, drop_id) > 0) {
             success_drops[i - 1] = success_drops[count - 1];
             --count;
             success_drops.pop_back();
         }
+        */
     }
     DEBUG_ONLY(assert(success_drops.size() == count);)
     if (count > 1) {
         for (size_t i = 0; i < count; ++i) {
-            Entity &drop = alloc_drop(sim, success_drops[i]);
+            Entity &drop = alloc_drop(sim, success_drops_id[i],success_drops_rarity[i]);
             drop.set_x(x);
             drop.set_y(y);
             drop.velocity.unit_normal(i * 2 * M_PI / count).set_magnitude(25);
         }
     } else if (count == 1) {
-        Entity &drop = alloc_drop(sim, success_drops[0]);
+        Entity &drop = alloc_drop(sim, success_drops_id[0],success_drops_rarity[0]);
         drop.set_x(x);
         drop.set_y(y);
     }
@@ -69,11 +72,17 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
             Map::remove_mob(sim, ent.zone);
         if (!natural_despawn && !(BitMath::at(ent.flags, EntityFlags::kNoDrops))) {
             struct MobData const &mob_data = MOB_DATA[ent.get_mob_id()];
-            std::vector<PetalID::T> success_drops = {};
+            std::vector<PetalID::T> success_drops_id = {};
+            std::vector<RarityID::T> success_drops_rarity = {};
             StaticArray<float, MAX_DROPS_PER_MOB> const &drop_chances = MOB_DROP_CHANCES[ent.get_mob_id()];
+            RarityID::T success_drop_rarity = RarityID::kCommon; //TODO 修改这里的内容
             for (uint32_t i = 0; i < mob_data.drops.size(); ++i)
-                if (frand() < drop_chances[i]) success_drops.push_back(mob_data.drops[i]);
-            _alloc_drops(sim, success_drops, ent.get_x(), ent.get_y());
+                if (frand() < drop_chances[i])
+                {
+                    success_drops_id.push_back(mob_data.drops[i]);
+                    success_drops_rarity.push_back(success_drop_rarity);
+                }
+            _alloc_drops(sim, success_drops_id,success_drops_rarity, ent.get_x(), ent.get_y());
         }
         if (ent.get_mob_id() == MobID::kAntHole &&
             BitMath::at(ent.flags, EntityFlags::kSpawnedFromZone) &&
@@ -88,66 +97,17 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         if (ent.get_petal_id() == PetalID::kWeb || ent.get_petal_id() == PetalID::kTriweb)
             alloc_web(sim, 100, ent);
     } else if (ent.has_component(kFlower)) {
-        std::vector<PetalID::T> potential = {};
-        for (uint32_t i = 0; i < ent.get_loadout_count() + MAX_SLOT_COUNT; ++i) {
-            DEBUG_ONLY(assert(ent.get_loadout_ids(i) < PetalID::kNumPetals));
-            PetalTracker::remove_petal(sim, ent.get_loadout_ids(i));
-            if (ent.get_loadout_ids(i) != PetalID::kNone && ent.get_loadout_ids(i) != PetalID::kBasic && frand() < 0.95)
-                potential.push_back(ent.get_loadout_ids(i));
-        }
-        for (uint32_t i = 0; i < ent.deleted_petals.size(); ++i) {
-            DEBUG_ONLY(assert(ent.deleted_petals[i] < PetalID::kNumPetals));
-            PetalTracker::remove_petal(sim, ent.deleted_petals[i]);
-            if (ent.deleted_petals[i] != PetalID::kNone && ent.deleted_petals[i] != PetalID::kBasic && frand() < 0.95)
-                potential.push_back(ent.deleted_petals[i]);
-        }
-        //no need to deleted_petals.clear, the player dies
-        std::sort(potential.begin(), potential.end(), [](PetalID::T a, PetalID::T b) {
-            return PETAL_DATA[a].rarity < PETAL_DATA[b].rarity;
-        });
-
-        std::vector<PetalID::T> success_drops = {};
-        uint32_t numDrops = potential.size();
-        if (numDrops > 3)
-            numDrops = 3;
-        for (uint32_t i = 0; i < numDrops; ++i) {
-            PetalID::T p_id = potential.back();
-            if (PETAL_DATA[p_id].rarity >= RarityID::kRare && frand() < 0.05) p_id = PetalID::kPollen;
-            success_drops.push_back(p_id);
-            potential.pop_back();
-        }
-        _alloc_drops(sim, success_drops, ent.get_x(), ent.get_y());
-        //if the camera is the one that disconnects
-        //no need to re-add the petals to the petal tracker
         if (!sim->ent_alive(ent.get_parent()))
             return;
         Entity &camera = sim->get_ent(ent.get_parent());
-        //reset all reloads and stuff
-        uint32_t num_left = potential.size();
-        //set respawn level
-        uint32_t respawn_level = div_round_up(3 * score_to_level(ent.get_score()), 4);
-        if (respawn_level > MAX_LEVEL) respawn_level = MAX_LEVEL;
-        camera.set_respawn_level(respawn_level);
-        uint32_t max_possible = MAX_SLOT_COUNT + loadout_slots_at_level(respawn_level);
-        num_left = std::min(num_left, max_possible);
-        //fill petals
         for (uint32_t i = 0; i < 2 * MAX_SLOT_COUNT; ++i)
-            camera.set_inventory(i, PetalID::kNone); //force reset
-        for (uint32_t i = 0; i < num_left; ++i) {
-            DEBUG_ONLY(assert(potential.back() < PetalID::kNumPetals));
-            PetalTracker::add_petal(sim, potential.back());
-            camera.set_inventory(i, potential.back());
-            potential.pop_back();
+        {
+            camera.set_inventory_ids(i,ent.get_inventory_ids(i));
+            camera.set_inventory_rarities(i, ent.get_inventory_rarities(i));
         }
-        //only track up to max_possible
-        for (uint32_t i = num_left; i < max_possible; ++i)
-            camera.set_inventory(i, PetalID::kNone); //don't track kNone
-        //fill with basics
-        for (uint32_t i = num_left; i < loadout_slots_at_level(respawn_level); ++i) {
-            PetalTracker::add_petal(sim, PetalID::kBasic);
-            camera.set_inventory(i, PetalID::kBasic);
-        }
-    } else if (ent.has_component(kDrop)) {
+        camera.set_respawn_level(score_to_level(ent.get_score()));
+    }
+    else if (ent.has_component(kDrop)) {
         if (BitMath::at(ent.flags, EntityFlags::kIsDespawning))
             PetalTracker::remove_petal(sim, ent.get_drop_id());
     }

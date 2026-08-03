@@ -121,8 +121,9 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             uint8_t pos = reader.read<uint8_t>();
             if (pos >= MAX_SLOT_COUNT + player.get_loadout_count()) break;
             PetalID::T old_id = player.get_loadout_ids(pos);
+                RarityID::T old_rarity = player.get_loadout_rarities(pos);
             if (old_id != PetalID::kNone && old_id != PetalID::kBasic) {
-                uint8_t rarity = PETAL_DATA[old_id].rarity;
+                uint8_t rarity = old_rarity;
                 player.set_score(player.get_score() + RARITY_TO_XP[rarity]);
                 //need to delete if over cap
                 if (player.deleted_petals.size() == player.deleted_petals.capacity())
@@ -131,6 +132,7 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
                 player.deleted_petals.push_back(old_id);
             }
             player.set_loadout_ids(pos, PetalID::kNone);
+                player.set_loadout_rarities(pos,RarityID::kCommon); //TODO aaa
             break;
         }
         case Serverbound::kPetalSwap: {
@@ -143,9 +145,12 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             if (pos1 >= MAX_SLOT_COUNT + player.get_loadout_count()) break;
             uint8_t pos2 = reader.read<uint8_t>();
             if (pos2 >= MAX_SLOT_COUNT + player.get_loadout_count()) break;
-            PetalID::T tmp = player.get_loadout_ids(pos1);
+            PetalID::T tmp_id = player.get_loadout_ids(pos1);
+                RarityID::T tmp_rarity = player.get_loadout_rarities(pos1);
             player.set_loadout_ids(pos1, player.get_loadout_ids(pos2));
-            player.set_loadout_ids(pos2, tmp);
+                player.set_loadout_rarities(pos1, player.get_loadout_rarities(pos2));
+            player.set_loadout_ids(pos2, tmp_id);
+                player.set_loadout_rarities(pos2, tmp_rarity);
             break;
         }
         case Serverbound::kChatSend: {
@@ -160,13 +165,11 @@ void Client::on_message(WebSocket *ws, std::string_view message, uint64_t code) 
             text = UTF8Parser::trunc_string(text, MAX_CHAT_LENGTH);
             if (text.empty()) break;
 
-            // ������� '/' ��ͷ�Ĳ�����ת��
             if (!text.empty() && text[0] == '/') {
                 command(client, text.substr(1), client->mouse_world_x, client->mouse_world_y);
-                break; // ������㲥
+                break;
             }
 
-            // ֱ�ӹ㲥������ά������
             client->game->chat(player.id, text);
             break;
         }
@@ -190,6 +193,7 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
         simulation->get_ent(player.get_parent()).set_killed_by(player.get_name());
         simulation->request_delete(player.id);
     }
+    /*
     else if (command == "bbht") {
         std::vector<PetalID::T> fixed_loadout = {
            PetalID::kDahlia,
@@ -237,6 +241,7 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
             drop.set_x(x), drop.set_y(y);
         }
     }
+    */
     else if (command == "tp") {
         try { iss >> arg, x = std::stof(arg), iss >> arg, y = std::stof(arg); }
         catch (const std::invalid_argument&) { return; }

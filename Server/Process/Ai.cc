@@ -157,7 +157,7 @@ static void tick_hornet_aggro(Simulation *sim, Entity &ent) {
         if (ent.ai_tick >= 1.5 * TPS && dist < 800) {
             ent.ai_tick = 0;
 
-            Entity &missile = alloc_petal(sim, PetalID::kMissile, ent);
+            Entity &missile = alloc_petal(sim, PetalID::kMissile, RarityID::kCommon,ent); //TODO 修改
             missile.damage = 10;
             missile.health = missile.max_health = 10;
             missile.friction = DEFAULT_FRICTION;

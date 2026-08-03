@@ -41,7 +41,9 @@ namespace Ui {
         uint8_t no_change_ticks;
         uint8_t selected;
         PetalID::T petal_id;
+        RarityID::T petal_rarity;
         PetalID::T last_id;
+        RarityID::T last_rarity;
         UiLoadoutPetal(uint8_t);
 
         virtual void on_render(Renderer &) override;

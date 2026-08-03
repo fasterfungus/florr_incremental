@@ -271,8 +271,6 @@ namespace RarityID {
         kEpic,
         kLegendary,
         kMythic,
-        kUltra,
-        kSuper,
         kUnique,
         kNumRarities
     };

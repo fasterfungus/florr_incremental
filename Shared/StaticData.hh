@@ -68,11 +68,11 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
     {
         .name = "None",
         .description = "How can you see this?",
-        .health = 0.0,       // 直接写死常量！模板会广播给所有品质
-        .damage = 0.0,
-        .radius = 0.0,
+        .health = 1.0,       // 直接写死常量！模板会广播给所有品质
+        .damage = 1.0,
+        .radius = 1.0,
         .reload = 1.0,
-        .count = 0,
+        .count = 1,
         .attributes = PetalAttributes{}
     },
     // [1] Basic
