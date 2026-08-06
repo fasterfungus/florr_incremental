@@ -34,7 +34,7 @@ void StatPetalSlot::on_render(Renderer &ctx) {
     uint8_t rarity = Game::cached_loadout_rarities[pos];
     if (id == PetalID::kNone) return;
     ctx.scale(width / 60);
-    draw_loadout_background(ctx,rarity, id);
+    draw_loadout_background(ctx,id,rarity);
 }
 
 void StatPetalSlot::on_event(uint8_t event) {
