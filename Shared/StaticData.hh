@@ -81,7 +81,7 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
         .description = "A nice petal, not too strong but not too weak",
         .health = 10.0,      // 常量，相当于全品质都是 10.0
         .damage = [](int r) {
-            return r == RarityID::kMythic ? 9999.0 : ScaleBy3(10.0, r);
+            return r == RarityID::kMythic ? 99.0 : ScaleBy3(10.0, r);
         },
         .radius = 10.0,
         .reload = 2.5,

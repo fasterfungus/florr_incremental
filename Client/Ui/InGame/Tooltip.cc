@@ -18,7 +18,7 @@ static float get_reload_factor() {
     float factor = 1;
     Entity &player = Game::simulation.get_ent(Game::player_id);
     for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
-        factor *= PETAL_DATA[player.get_loadout_ids(i)][RarityID::kCommon].attributes.extra_reload_factor;
+        factor *= PETAL_DATA[player.get_loadout_ids(i)][player.get_loadout_rarities(i)].attributes.extra_reload_factor;
     }
     return factor;
 }
@@ -28,7 +28,7 @@ static float get_damage_factor() {
     float factor = 1;
     Entity &player = Game::simulation.get_ent(Game::player_id);
     for (uint32_t i = 0; i < player.get_loadout_count(); ++i) {
-        factor *= PETAL_DATA[player.get_loadout_ids(i)][RarityID::kCommon].attributes.extra_damage_factor;
+        factor *= PETAL_DATA[player.get_loadout_ids(i)][player.get_loadout_rarities(i)].attributes.extra_damage_factor;
     }
     return factor;
 }

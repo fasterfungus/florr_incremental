@@ -101,7 +101,7 @@ void GameInstance::add_client(Client *client) {
     for (uint32_t i = 0; i < loadout_slots_at_level(ent.get_respawn_level()); ++i)
     {
         ent.set_inventory_ids(i, PetalID::kBasic);
-        ent.set_inventory_rarities(i , RarityID::kCommon);
+        ent.set_inventory_rarities(i , RarityID::kMythic);
     }
     /*
     if (frand() < 0.001 && PetalTracker::get_count(&simulation, PetalID::kUniqueBasic) == 0)

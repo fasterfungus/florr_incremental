@@ -68,6 +68,7 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         else camera.set_killed_by("");
     }
     if (ent.has_component(kMob)) {
+        std::cout<<(int)ent.get_mob_id();
         if (BitMath::at(ent.flags, EntityFlags::kSpawnedFromZone))
             Map::remove_mob(sim, ent.zone);
         if (!natural_despawn && !(BitMath::at(ent.flags, EntityFlags::kNoDrops))) {

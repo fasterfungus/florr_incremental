@@ -67,7 +67,7 @@ void TitlePetalSlot::on_render(Renderer &ctx) {
     RarityID::T rarity = camera.get_inventory_rarities(pos);
     if (id == PetalID::kNone) return;
     ctx.scale(width / 60);
-    draw_loadout_background(ctx,rarity, id);
+    draw_loadout_background(ctx,id,rarity);
 }
 
 void TitlePetalSlot::on_event(uint8_t event) {

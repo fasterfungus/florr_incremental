@@ -54,7 +54,7 @@ void Ui::ui_swap_petals(uint8_t static_pos1, uint8_t static_pos2) {
     //found static pos, now swap
     UiLoadoutPetal *a1 = Ui::UiLoadout::petal_slots[static_pos1];
     UiLoadoutPetal *a2 = Ui::UiLoadout::petal_slots[static_pos2];
-    if (a1->petal_id == a2->petal_id) return;
+    if (a1->petal_id == a2->petal_id && a1->petal_rarity == a2->petal_rarity) return;
     a2->petal_id = Game::cached_loadout_ids[static_pos1];
     a2->petal_rarity = Game::cached_loadout_rarities[static_pos1];
     a1->petal_id = Game::cached_loadout_ids[static_pos2];

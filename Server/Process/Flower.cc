@@ -138,7 +138,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
         LoadoutSlot &slot = player.loadout[i];
         //player.set_loadout_ids(i, slot.id);
         //other way around. loadout_ids should dictate loadout
-        if (slot.get_petal_id() != player.get_loadout_ids(i) || player.get_overlevel_timer() >= PETAL_DISABLE_DELAY * TPS)
+        if ((slot.get_petal_id() != player.get_loadout_ids(i) || slot.get_petal_rarity() != player.get_loadout_rarities(i)) || player.get_overlevel_timer() >= PETAL_DISABLE_DELAY * TPS)
             slot.update(sim, player.get_loadout_ids(i),player.get_loadout_rarities(i));
         PetalID::T slot_petal_id = slot.get_petal_id();
         RarityID::T slot_petal_rarity = slot.get_petal_rarity();

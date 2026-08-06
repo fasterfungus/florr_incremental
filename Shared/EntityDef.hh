@@ -79,7 +79,7 @@ MULTIPLE(Flower, loadout_reloads, uint8_t, MAX_SLOT_COUNT)
 
 #define FIELDS_Petal \
 SINGLE(Petal, petal_id, PetalID::T) \
-SINGLE(Petal, petal_rarity, PetalID::T) \
+SINGLE(Petal, petal_rarity, RarityID::T) \
 SINGLE(Petal, split_projectile, uint8_t)
 
 #define FIELDS_Health \
@@ -92,6 +92,7 @@ SINGLE(Mob, mob_id, MobID::T)
 #define FIELDS_Drop \
 SINGLE(Drop, drop_id, PetalID::T) \
 SINGLE(Drop, drop_rarity, RarityID::T)
+
 #define FIELDS_Segmented
 
 #define FIELDS_Web
