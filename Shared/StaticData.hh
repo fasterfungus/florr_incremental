@@ -29,12 +29,10 @@ template <typename T>
 struct RarityValue {
     std::array<T, NUM_RARITIES> values;
 
-    // 模式 A：如果你填的是一个常量 (比如 .health = 10.0)，自动赋值给所有品质
     constexpr RarityValue(const T& val) : values{} {
         for (std::size_t i = 0; i < NUM_RARITIES; ++i) values[i] = val;
     }
 
-    // 模式 B：如果你填的是匿名函数 (Lambda)，自动在此刻计算出所有品质的值！
     template <typename F, typename = std::enable_if_t<std::is_invocable_v<F, int>>>
     constexpr RarityValue(F f) : values{} {
         for (std::size_t i = 0; i < NUM_RARITIES; ++i) {
@@ -68,7 +66,7 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
     {
         .name = "None",
         .description = "How can you see this?",
-        .health = 1.0,       // 直接写死常量！模板会广播给所有品质
+        .health = 1.0,
         .damage = 1.0,
         .radius = 1.0,
         .reload = 1.0,
@@ -79,7 +77,7 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
     {
         .name = "Basic",
         .description = "A nice petal, not too strong but not too weak",
-        .health = 10.0,      // 常量，相当于全品质都是 10.0
+        .health = 10.0,
         .damage = [](int r) {
             return r == RarityID::kMythic ? 99.0 : ScaleBy3(10.0, r);
         },
@@ -87,7 +85,7 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
         .reload = 2.5,
         .count = 1,
         .attributes = [](int r) -> PetalAttributes {
-            PetalAttributes attr{}; // 自动享受你的所有默认值 (比如 vision_factor = 1)
+            PetalAttributes attr{}; // 自动默认值 (比如 vision_factor = 1)
 
             if (r >= RarityID::kEpic) {
                 attr.armor = 15.0f;
