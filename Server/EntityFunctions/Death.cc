@@ -103,8 +103,8 @@ void entity_on_death(Simulation *sim, Entity const &ent) {
         Entity &camera = sim->get_ent(ent.get_parent());
         for (uint32_t i = 0; i < 2 * MAX_SLOT_COUNT; ++i)
         {
-            camera.set_inventory_ids(i,ent.get_inventory_ids(i));
-            camera.set_inventory_rarities(i, ent.get_inventory_rarities(i));
+            camera.set_inventory_ids(i,ent.get_loadout_ids(i));
+            camera.set_inventory_rarities(i, ent.get_loadout_rarities(i));
         }
         camera.set_respawn_level(score_to_level(ent.get_score()));
     }

@@ -3,7 +3,7 @@ set(CMAKE_SYSTEM_NAME Generic)
 cmake_minimum_required(VERSION 3.16)
 project(florr_incremental-server)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer ")
 include_directories(..)
 
 set(SOURCES
@@ -60,7 +60,6 @@ set(SOURCES
         ChunkBVHCollisionManager.hh
 
 )
-
 if(WASM_SERVER)
     set(SOURCES ${SOURCES} Wasm.cc)
 else()

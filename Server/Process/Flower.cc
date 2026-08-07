@@ -70,11 +70,16 @@ static uint32_t _get_petal_rotation_count(Simulation *sim, Entity &player) {
         LoadoutSlot const &slot = player.loadout[i];
         struct PetalData const &petal_data = PETAL_DATA[slot.get_petal_id()][slot.get_petal_rarity()];
         if (petal_data.attributes.clump_radius > 0)
+        {
             ++count;
-        else {
-            for (uint32_t j = 0; j < slot.size(); ++j) {
-                if (!sim->ent_alive(slot.petals[j].ent_id))
+        }
+        else
+        {
+            for (uint32_t j = 0; j < slot.size(); ++j)
+            {
+                if (!sim->ent_alive(slot.petals[j].ent_id)) {
                     ++count;
+                }
                 else if (!BitMath::at(sim->get_ent(slot.petals[j].ent_id).flags, EntityFlags::kIsDetached))
                     ++count;
             }

@@ -79,7 +79,7 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
         .description = "A nice petal, not too strong but not too weak",
         .health = 10.0,
         .damage = [](int r) {
-            return r == RarityID::kMythic ? 99.0 : ScaleBy3(10.0, r);
+            return ScaleBy3(10.0, r);
         },
         .radius = 10.0,
         .reload = 2.5,
@@ -715,7 +715,15 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
             .health = 1.0,
             .damage = 4.0,
             .scale = 1.0,
-            .radius = 13.0,
+            .radius = [](int r)
+            {
+                if (r >= RarityID::kMythic)
+                {
+                    return 26.0;
+                }
+                return 13.0;
+            },
+
             .reload = 0.05,
             .count = 1,
             .attributes = PetalAttributes{
@@ -807,6 +815,7 @@ constexpr std::array<std::array<PetalData, NUM_RARITIES>, NUM_PETALS> BakePetalD
             result[p][r].description = config.description;
             result[p][r].health      = config.health.values[r];
             result[p][r].damage      = config.damage.values[r];
+            result[p][r].scale      = config.scale.values[r];
             result[p][r].radius      = config.radius.values[r];
             result[p][r].reload      = config.reload.values[r];
             result[p][r].count       = config.count.values[r];
@@ -817,7 +826,7 @@ constexpr std::array<std::array<PetalData, NUM_RARITIES>, NUM_PETALS> BakePetalD
 }
 inline constexpr auto PETAL_DATA = BakePetalData();
 //map extends from (0,0) to (ARENA_WIDTH,ARENA_HEIGHT)
-inline std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
+inline  std::array const MAP_DATA = std::to_array<struct ZoneDefinition>({
     {
         .left = 0,
         .top = 0,
