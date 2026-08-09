@@ -41,12 +41,16 @@ static void _pickup_drop(Simulation *sim, Entity &player, Entity &drop) {
 
 static void _deal_push(Entity &ent, Vector knockback, float mass_ratio, float scale) {
     if (fabsf(mass_ratio) < 0.01) return;
+    if (!is_finite(knockback.x) || !is_finite(knockback.y)) return;
+    if (!is_finite(mass_ratio) || !is_finite(scale)) return;
     knockback *= scale * mass_ratio;
     ent.collision_velocity += knockback;
 }
 
 static void _deal_knockback(Entity &ent, Vector knockback, float mass_ratio) {
     if (fabsf(mass_ratio) < 0.01) return;
+    if (!is_finite(knockback.x) || !is_finite(knockback.y)) return;
+    if (!is_finite(mass_ratio)) return;
     float scale = PLAYER_ACCELERATION * 2;
     knockback *= scale * mass_ratio;
     ent.collision_velocity += knockback;
@@ -76,7 +80,8 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
             separation.unit_normal(frand() * 2 * M_PI);
         else
             separation.Normalize();
-        float ratio = ent2.mass*ent2.get_scale() / (ent1.mass*ent2.get_scale() + ent2.mass*ent2.get_scale());
+        float ratio = ent2.mass*ent2.get_scale() / (ent1.mass*ent1.get_scale() + ent2.mass*ent2.get_scale());
+        if (!is_finite(ratio)) ratio = 0.5f;
         if (!(ent1.get_team() == ent2.get_team())) {
             if (ent1.has_component(kFlower) && !ent2.has_component(kPetal))
                 _cancel_movement(ent1, separation, ent2.velocity - ent1.velocity);

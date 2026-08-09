@@ -18,6 +18,22 @@ constexpr float RAD2DEG = 180.0f / (float) M_PI;
 #endif
 constexpr uint32_t div_round_up(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
+// True if x is NOT NaN and NOT ±Inf. Uses a bit check on the IEEE-754 exponent
+// field so it works even under -ffast-math / -ffinite-math-only, where the
+// compiler is allowed to assume every float is finite and optimizes
+// std::isfinite(x) into a constant `true`, silently defeating NaN guards.
+static inline bool is_finite(float x) {
+    uint32_t bits;
+    __builtin_memcpy(&bits, &x, sizeof(bits));
+    return (bits & 0x7f800000u) != 0x7f800000u;
+}
+// double-precision variant (for values that may be double-promoted).
+static inline bool is_finite(double x) {
+    uint64_t bits;
+    __builtin_memcpy(&bits, &x, sizeof(bits));
+    return (bits & 0x7ff0000000000000ull) != 0x7ff0000000000000ull;
+}
+
 double frand();
 float fclamp(float, float, float);
 float lerp(float, float, float);

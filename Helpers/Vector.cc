@@ -96,7 +96,10 @@ float Vector::angle() const
 void Vector::Normalize()
 {
     float mag = magnitude();
-    if (mag == 0.0f){return;}
+    // Order matters: under -ffast-math, `mag == 0.0f` is also true for NaN, so
+    // the NaN check must run first (bit-based, immune to fast-math).
+    if (!is_finite(mag)) return;
+    if (mag == 0.0f) return;
     x /= mag;
     y /= mag;
 }
@@ -104,7 +107,8 @@ void Vector::Normalize()
 const Vector Vector::normalized() const
 {
     float mag = magnitude();
-    if (mag == 0.0f){return Vector(0,0);}
+    if (!is_finite(mag)) return Vector(1,0);
+    if (mag == 0.0f) return Vector(0,0);
     return Vector(x / mag, y / mag);
 }
 
@@ -165,9 +169,13 @@ void Vector::CCW90()
 
 Vector& Vector::set_magnitude(float v)
 {
-    Normalize();
-    x *= v;
-    y *= v;
+    float mag = magnitude();
+    // Bit-exact zero check: under -ffast-math a plain `mag == 0.0f` also
+    // matches NaN, which would let a poisoned vector slip past the guard.
+    if (!is_finite(mag)) { x = 0; y = 0; return *this; } // heal NaN/Inf: stop instead of spreading
+    if (mag == 0.0f) return *this;                        // preserve zero vector (original behavior)
+    x = x / mag * v;
+    y = y / mag * v;
     return *this;
 }
 

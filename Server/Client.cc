@@ -101,10 +101,15 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code)
                 return;
             float x = reader.read<float>();
             float y = reader.read<float>();
+            // Reject NaN/Inf outright. Comparisons against NaN are always false,
+            // so `x == 0` and `|x| > 5e3` alone would let a NaN payload slip
+            // straight into player.acceleration and then into velocity/position
+            // via tick_entity_motion. is_finite catches it.
+            if (!is_finite(x) || !is_finite(y)) break;
+            if (std::abs(x) > 5e3 || std::abs(y) > 5e3) break;
             if (x == 0 && y == 0) player.acceleration.set(0, 0);
             else
             {
-                if (std::abs(x) > 5e3 || std::abs(y) > 5e3) break;
                 Vector accel(x, y);
                 float m = accel.magnitude();
                 if (m > 200) accel.set_magnitude(PLAYER_ACCELERATION);
@@ -306,11 +311,13 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
         try { iss >> arg, x = std::stof(arg), iss >> arg, y = std::stof(arg); }
         catch (const std::invalid_argument&) { return; }
         catch (const std::out_of_range&) { return; }
-        player.set_x(x), player.set_y(y);
+        if (!is_finite(x) || !is_finite(y)) return;
+        player.set_x(fclamp(x, 0, ARENA_WIDTH)), player.set_y(fclamp(y, 0, ARENA_HEIGHT));
     }
     else if (command == "tpto")
     {
-        player.set_x(x), player.set_y(y);
+        if (!is_finite(x) || !is_finite(y)) return;
+        player.set_x(fclamp(x, 0, ARENA_WIDTH)), player.set_y(fclamp(y, 0, ARENA_HEIGHT));
     }
     else if (command == "xp")
     {

@@ -154,6 +154,14 @@ Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
                 float sign = dir.x < 0.0f ? -1 : 1;
                 x = sign * A;
             }
+            else if (fabsf(dir.x) < 1e-3f)
+            {
+                // dir almost vertical: answer directly instead of computing a
+                // huge k = dir.y/dir.x whose k² overflows to inf and yields
+                // sqrt(inf/inf) = NaN for the support point.
+                float sign = dir.y < 0.0f ? -1 : 1;
+                y = sign * B;
+            }
             else
             {
                 float k = dir.y / dir.x;
@@ -161,6 +169,7 @@ Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
                 float a2 = std::pow(A, 2);
                 float b2 = std::pow(B, 2);
                 float k2 = std::pow(k, 2);
+                if (!is_finite(k2)) { k2 = 1e30f; }
 
                 float t = std::sqrt((a2 + b2 * k2) / k2);
                 Vector v = Vector(0.0f, t);
@@ -171,6 +180,10 @@ Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
 
                 x = k * t - (b2 * k2 * k * t) / (a2 + b2 * k2);
                 y = (b2 * k2 * t) / (a2 + b2 * k2);
+                if (!is_finite(x) || !is_finite(y)) {
+                    x = A * (dir.x < 0 ? -1 : 1);
+                    y = B * (dir.y < 0 ? -1 : 1);
+                }
             }
             return Vector(x, y);
             break;

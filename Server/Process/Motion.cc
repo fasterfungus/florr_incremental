@@ -14,6 +14,24 @@ static void apply_ccd(Simulation *sim, Entity &ent, Vector start);
 
 void tick_entity_motion(Simulation *sim, Entity &ent) {
     if (ent.pending_delete) return;
+    // Self-heal any NaN/Inf that leaked into the physics state. This is the last
+    // line of defense: a single bad float elsewhere would otherwise bake NaN
+    // into velocity, acceleration and position forever. Healing here keeps one
+    // poisoned entity from freezing the whole arena (or teleporting to (NaN,NaN)
+    // and breaking collision broadphase).
+    if (!is_finite(ent.get_x()) || !is_finite(ent.get_y())) {
+        ent.set_x(ent.get_radius());
+        ent.set_y(ent.get_radius());
+    }
+    if (!is_finite(ent.velocity.x) || !is_finite(ent.velocity.y))
+        ent.velocity.set(0, 0);
+    if (!is_finite(ent.acceleration.x) || !is_finite(ent.acceleration.y))
+        ent.acceleration.set(0, 0);
+    if (!is_finite(ent.collision_velocity.x) || !is_finite(ent.collision_velocity.y))
+        ent.collision_velocity.set(0, 0);
+    if (!is_finite(ent.friction)) ent.friction = DEFAULT_FRICTION;
+    if (!is_finite(ent.speed_ratio)) ent.speed_ratio = 1;
+
     // Capture the pre-motion position so CCD can sweep the path this tick.
     Vector const ccd_start(ent.get_x(), ent.get_y());
     if (ent.slow_ticks > 0) {
