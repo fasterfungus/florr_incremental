@@ -24,14 +24,16 @@ namespace DamageType {
         kReflect
     };
 }
-enum class CollisionShape : uint8_t {
-    kCapsule,
-    kCircle,
-    kEllipse,
-    kPie,
-    kPolygon,
-    kRectangle,
-    kSegment
+namespace CollisionShape{
+        enum : uint8_t{
+            kCapsule,
+            kCircle,
+            kEllipse,
+            kPie,
+            kPolygon,
+            kRectangle,
+            kSegment
+        };
 };
 namespace PetalID {
     typedef uint8_t T;
@@ -271,7 +273,8 @@ namespace RarityID {
         kEpic,
         kLegendary,
         kMythic,
-        kUnique,
+        kUltra,
+        kSuper,
         kNumRarities
     };
 };
@@ -406,12 +409,11 @@ struct MobData {
     float width;
     float height;
     float length;
-    std::vector<std::vector<float>> vertics;
-    CollisionShape shape;
+    StaticArray<std::array<float,2>,8> vertics;
+    uint8_t shape;
 
     uint32_t xp;
-    StaticArray<PetalID::T, MAX_DROPS_PER_MOB> drops;
-    struct MobAttributes attributes;
+    MobAttributes attributes;
 };
 
 struct SpawnChance {

@@ -8,7 +8,7 @@
 
 Geometry::Geometry(const Entity& ent)
 {
-    shape = static_cast<CollisionShape>(ent.get_shape());
+    shape = ent.get_shape();
     scale = ent.get_scale();
     radius = ent.get_radius() * scale;
     width = ent.get_width() * scale;
@@ -124,21 +124,22 @@ Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
         }
     case CollisionShape::kPolygon:
         {
+            // 先在原始顶点中找支撑点（不缩放）
             point = geometry.vertics[0];
             float max = Vector::Dot(point, dir);
-            for (int i = 1; i < geometry.vertics.size(); i++)
-            {
+            for (int i = 1; i < geometry.vertics.size(); i++) {
                 Vector vertic = geometry.vertics[i];
                 float dot = Vector::Dot(vertic, dir);
-                if (dot > max)
-                {
+                if (dot > max) {
                     max = dot;
                     point = vertic;
                 }
             }
+            // 最后应用缩放
+            point = point * geometry.scale;
             return point;
-            break;
         }
+
     case CollisionShape::kEllipse:
         {
             float x = 0;

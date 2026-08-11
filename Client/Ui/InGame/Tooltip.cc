@@ -108,13 +108,13 @@ static Ui::Element *make_petal_stat_container(PetalID::T id) {
     if (attrs.spawns != MobID::kNumMobs && attrs.spawn_count == 0) {
         stats.push_back(new Ui::HContainer({
             new Ui::StaticText(12, "Contents:", { .fill = 0xffd2eb34 }),
-            new Ui::StaticText(12, (petal_data.count > 1 ? format_number(petal_data.count) + "x " : "") + (MOB_DATA[attrs.spawns].name))
+            new Ui::StaticText(12, (petal_data.count > 1 ? format_number(petal_data.count) + "x " : "") + (MOB_DATA[attrs.spawns][RarityID::kCommon].name))
         }, 0, 5, { .h_justify = Style::Left }));
     }
     if (attrs.spawns != MobID::kNumMobs && attrs.spawn_count > 0) {
         stats.push_back(new Ui::HContainer({
             new Ui::StaticText(12, "Spawns:", { .fill = 0xffd2eb34 }),
-            new Ui::StaticText(12, format_number(attrs.spawn_count) + "x " + (MOB_DATA[attrs.spawns].name))
+            new Ui::StaticText(12, format_number(attrs.spawn_count) + "x " + (MOB_DATA[attrs.spawns][RarityID::kCommon].name))
         }, 0, 5, { .h_justify = Style::Left }));
     }
     if (attrs.vision_factor < 1) {

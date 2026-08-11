@@ -13,7 +13,7 @@ public:
     float length;
     float angle;
     std::vector<Vector> vertics;
-    CollisionShape shape;
+    uint8_t shape;
     float x;
     float y;
     float rotation;

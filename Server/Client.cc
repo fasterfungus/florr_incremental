@@ -329,16 +329,35 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
     }
     else if (command == "spawn")
     {
-        MobID::T id;
-        while (iss >> arg)
+        std::string arg_id, arg_rarity;
+        if (iss >> arg_id >> arg_rarity)
         {
-            try { id = std::stoi(arg); }
-            catch (const std::invalid_argument&) { continue; }
-            catch (const std::out_of_range&) { continue; }
-            if (id >= MobID::kNumMobs) continue;
-            alloc_mob(simulation, id, player.get_x(), player.get_y(), NULL_ENTITY);
+            try
+            {
+                int id_int = std::stoi(arg_id);
+                int rarity_int = std::stoi(arg_rarity);
+                if (id_int < 0 || id_int >= MobID::kNumMobs)
+                {
+                    return;
+                }
+                if (rarity_int < 0 || rarity_int >= RarityID::kNumRarities)
+                {
+                    return;
+                }
+                MobID::T id = static_cast<MobID::T>(id_int);
+                RarityID::T rarity = static_cast<RarityID::T>(rarity_int);
+                alloc_mob(simulation, id, rarity, player.get_x(), player.get_y(),NULL_ENTITY);
+            }
+            catch (const std::invalid_argument&) { return; }
+            catch (const std::out_of_range&) { return; }
+
+        }
+        else
+        {
+
         }
     }
+    /*
     else if (command == "spawnto")
     {
         MobID::T id;
@@ -351,6 +370,7 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
             alloc_mob(simulation, id, x, y, NULL_ENTITY);
         }
     }
+
     else if (command == "spawnally")
     {
         MobID::T id;
@@ -375,6 +395,7 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
             alloc_mob(simulation, id, x, y, player.get_team());
         }
     }
+    */
     else if (command == "killallmobs")
     {
         for (uint16_t i = 0; i < ENTITY_CAP; ++i)

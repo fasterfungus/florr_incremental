@@ -9,7 +9,7 @@
 #include <Shared/StaticData.hh>
 void render_mob_health(Renderer &ctx, Entity const &ent) {
     if (!ent.has_component(kMob) && ent.healthbar_opacity < 0.01) return;
-    float w = ent.get_radius() *ent.get_scale()* 1.33;
+    float w = ent.get_radius()*ent.get_scale() * 1.33;
     ctx.set_global_alpha((1 - ent.deletion_animation) * (ent.has_component(kMob) && !ent.has_component(kSegmented) ? 1 : ent.healthbar_opacity));
     ctx.scale(1 + 0.5 * ent.deletion_animation);
     ctx.translate(-w, w + 15);
@@ -38,8 +38,8 @@ void render_mob_health(Renderer &ctx, Entity const &ent) {
         float name_width = 12 * Renderer::get_ascii_text_size(ent.get_name().c_str());
         ctx.translate(-(9 / 2) + name_width / 2, -10);
         ctx.draw_text(ent.get_name().c_str(), { .size = 12 });
-        float rarity_width = 12 * Renderer::get_ascii_text_size(RARITY_NAMES[MOB_DATA[ent.get_mob_id()].rarity]);
+        float rarity_width = 12 * Renderer::get_ascii_text_size(RARITY_NAMES[ent.get_mob_rarity()]);
         ctx.translate(-(-(9 / 2) + name_width / 2) + 2 * w + (9 / 2) - rarity_width / 2, 20);
-        ctx.draw_text(RARITY_NAMES[MOB_DATA[ent.get_mob_id()].rarity], { .fill = RARITY_COLORS[MOB_DATA[ent.get_mob_id()].rarity], .size = 12 });
+        ctx.draw_text(RARITY_NAMES[ent.get_mob_rarity()], { .fill = RARITY_COLORS[ent.get_mob_rarity()], .size = 12 });
     }
 }

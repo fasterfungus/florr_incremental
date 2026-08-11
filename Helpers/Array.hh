@@ -10,11 +10,11 @@
 template<typename T, uint32_t capacity>
 class StaticArray {
     std::array<T, capacity> values;
-    uint32_t length;
+    uint32_t length = 0;
 public:
-    constexpr StaticArray() : length(0) {};
-    constexpr StaticArray(std::initializer_list<T> elts) : length(0) {
-        assert(elts.size() <= capacity);
+    constexpr StaticArray(): values{}, length(0){};
+    constexpr StaticArray(std::initializer_list<T> elts) : values{},length(0) {
+        DEBUG_ONLY(assert(elts.size() <= capacity);)
         for (T x : elts) values[length++] = x;
     };
     constexpr T &operator[](uint32_t at) { return values[at]; };

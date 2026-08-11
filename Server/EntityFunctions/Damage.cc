@@ -36,7 +36,6 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
     //ant hole spawns
     //floor start, ceil end
     if (defender.has_component(kMob) && defender.get_mob_id() == MobID::kAntHole) {
-        std::cout<<(int)defender.get_mob_id();
         uint32_t const num_waves = ANTHOLE_SPAWNS.size() - 1;
         uint32_t start = ceilf((defender.max_health - old_health) / defender.max_health * num_waves);
         uint32_t end = ceilf((defender.max_health - defender.health) / defender.max_health * num_waves);
@@ -44,10 +43,10 @@ void inflict_damage(Simulation *sim, EntityID const atk_id, EntityID const def_i
         for (uint32_t i = start; i < end; ++i) {
             for (MobID::T mob_id : ANTHOLE_SPAWNS[i]) {
                 Entity &child = alloc_mob(
-                    sim, mob_id, 
+                    sim, mob_id, defender.get_mob_rarity()-1,
                     defender.get_x(), defender.get_y(), 
                     defender.get_team(), [](Entity &mob) {
-                    mob.score_reward = MOB_DATA[mob.get_mob_id()].xp;
+                    mob.score_reward = MOB_DATA[mob.get_mob_id()][mob.get_mob_rarity()].xp;
                     BitMath::set(mob.flags, EntityFlags::kHasCulling);
                 });
                 child.set_parent(defender.id);

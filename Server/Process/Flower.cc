@@ -215,7 +215,7 @@ void tick_player_behavior(Simulation *sim, Entity &player) {
                     if (petal_data.attributes.spawns != MobID::kNumMobs &&
                         petal.secondary_reload > sec_reload_ticks) {
                         uint8_t spawn_id = petal_data.attributes.spawns;
-                        Entity &mob = alloc_mob(sim, spawn_id, petal.get_x(), petal.get_y(), petal.get_team(), [&](Entity &mob){
+                        Entity &mob = alloc_mob(sim, spawn_id,petal.get_petal_rarity(), petal.get_x(), petal.get_y(), petal.get_team(), [&](Entity &mob){ //TODO 修改召唤逻辑
                             mob.set_parent(player.id);
                             mob.set_color(player.get_color());
                             mob.base_entity = player.id;

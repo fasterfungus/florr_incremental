@@ -157,7 +157,8 @@ static void tick_hornet_aggro(Simulation *sim, Entity &ent) {
         if (ent.ai_tick >= 1.5 * TPS && dist < 800) {
             ent.ai_tick = 0;
 
-            Entity &missile = alloc_petal(sim, PetalID::kMissile, RarityID::kCommon,ent); //TODO 修改
+            Entity &missile = alloc_petal(sim, PetalID::kMissile, ent.get_mob_rarity(),ent); //TODO 修改
+            missile.set_scale(ent.get_scale());
             missile.damage = 10;
             missile.health = missile.max_health = 10;
             missile.friction = DEFAULT_FRICTION;
@@ -431,9 +432,9 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
                 behind.unit_normal(ent.get_angle() + M_PI);
                 behind *= ent.get_radius();
                 Entity &spawned = alloc_mob(
-                    sim, MobID::kSoldierAnt, ent.get_x() + behind.x, ent.get_y() + behind.y, 
+                    sim, MobID::kSoldierAnt, ent.get_mob_rarity()-1, ent.get_x() + behind.x, ent.get_y() + behind.y,
                     ent.get_team(), [](Entity &mob) {
-                    mob.score_reward = MOB_DATA[mob.get_mob_id()].xp;
+                    mob.score_reward = MOB_DATA[mob.get_mob_id()][mob.get_mob_rarity()].xp;
                     BitMath::set(mob.flags, EntityFlags::kHasCulling);
                 });
                 entity_set_despawn_tick(spawned, 10 * TPS);

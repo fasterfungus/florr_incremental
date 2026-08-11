@@ -8,7 +8,7 @@ class Simulation;
 
 Entity &alloc_drop(Simulation *, PetalID::T ,RarityID::T);
 Entity &alloc_mob(
-    Simulation *, MobID::T, float, float, 
+    Simulation *, MobID::T,RarityID::T, float, float,
     EntityID const, std::function<void(Entity &)> = nullptr
 );
 Entity &alloc_player(Simulation *, EntityID const);

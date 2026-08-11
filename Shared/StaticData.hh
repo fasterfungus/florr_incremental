@@ -1,14 +1,14 @@
 #pragma once
 
 #include <Shared/StaticDefinitions.hh>
-
+#include <algorithm>
 #include <array>
 #include <cstdint>
 
 constexpr std::size_t NUM_PETALS = static_cast<std::size_t>(PetalID::kNumPetals);
 constexpr std::size_t NUM_RARITIES = static_cast<std::size_t>(RarityID::kNumRarities);
-
-
+constexpr std::size_t NUM_MOBS = static_cast<std::size_t>(MobID::kNumMobs);
+static constexpr int MAX_POINTS = 8;
 struct PetalStats;
 extern uint32_t const MAX_LEVEL;
 extern uint32_t const TPS;
@@ -24,7 +24,6 @@ extern float const BASE_PETAL_ROTATION_SPEED;
 extern float const BASE_FOV;
 extern float const BASE_HEALTH;
 extern float const BASE_BODY_DAMAGE;
-extern std::array<struct MobData, MobID::kNumMobs> const MOB_DATA;
 template <typename T>
 struct RarityValue {
     std::array<T, NUM_RARITIES> values;
@@ -42,10 +41,32 @@ struct RarityValue {
 
     constexpr RarityValue() : values{} {}
 };
+constexpr float ScaleMobHealth(float base, int rarity) {
+    constexpr float HEALTH_GROWTH[] = {
+        1.0f,    // 普通
+        3.75f,   // 罕见 / 普通
+        3.6f,    // 稀有 / 罕见
+        4.0f,    // 史诗 / 稀有
+        6.0f,    // 传奇 / 史诗
+        9.75f,   // 神话 / 传奇
+        46.154f, // 究极 / 神话
+        27.942f, // 超级 / 究极
+    };
 
+    float result = base;
+    for (int i = 1; i <= rarity; ++i) {
+        result *= HEALTH_GROWTH[i];
+    }
+    return result;
+}
 constexpr float ScaleBy3(float base, int rarity) {
     float result = base;
     for (int i = 0; i < static_cast<int>(rarity); ++i) result *= 3.0;
+    return result;
+}
+constexpr float ScaleBy14(float base, int rarity) {
+    float result = base;
+    for (int i = 0; i < static_cast<int>(rarity); ++i) result *= 1.4;
     return result;
 }
 
@@ -60,7 +81,414 @@ struct PetalConfig {
     RarityValue<int> count;
     RarityValue<PetalAttributes> attributes;
 };
+struct MobConfig {
+    char const *name;
+    char const *description;
+    RarityValue<float> health;
+    RarityValue<float> damage;
+    RarityValue<float> scale;
+    float radius;
+    float width;
+    float height;
+    float length;
+    StaticArray<std::array<float, 2>, 8> vertics;
+    RarityValue<uint8_t> shape;
+    RarityValue<uint32_t> xp;
+    RarityValue<MobAttributes> attributes;
 
+};
+constexpr std::array<MobConfig, NUM_MOBS> MOB_CONFIGS = {
+    {
+        {
+            .name = "Baby Ant",
+            .description = "Weak and defenseless, but big dreams.",
+            .health = 10.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 14.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 1,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Worker Ant",
+            .description = "It's temperamental, probably from working all the time.",
+            .health = 25.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 14.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 3,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Soldier Ant",
+            .description = "It's got wings and it's ready to use them.",
+            .health = [](int r)
+            {
+                return ScaleMobHealth(40.0,r);
+            },
+            .damage = 10.0,
+            .scale = [](int r)
+            {
+                return ScaleBy14(1,r);
+            },
+            .radius = 14.0,
+            .width = 40.0,
+            .height = 30.0,
+            .shape = CollisionShape::kEllipse,
+            .xp = 5,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Bee",
+            .description = "It stings. Don't touch it.",
+            .health = 15.0,
+            .damage = 50.0,
+            .scale = 3.0,
+            .radius = 20.0,
+            .width = 63.75,
+            .height = 45,
+            .shape = CollisionShape::kEllipse,
+            .xp = 4,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Ladybug",
+            .description = "Cute and harmless.",
+            .health = 25.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 32.5,
+            .shape = CollisionShape::kCircle,
+            .xp = 3,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Beetle",
+            .description = "It's hungry and flowers are its favorite meal.",
+            .health = 40.0,
+            .damage = 35.0,
+            .scale = 3.0,
+            .radius = 32.5,
+            .length = 25.0,
+            .shape = CollisionShape::kCapsule,
+            .xp = 10,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Massive Ladybug",
+            .description = "Much larger, but still cute.",
+            .health = 1000.0,
+            .damage = 10.0,
+            .scale = 7.0,
+            .radius = 32.5,
+            .shape = CollisionShape::kCircle,
+            .xp = 400,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Massive Beetle",
+            .description = "Someone overfed this one, you might be next.",
+            .health = 600.0,
+            .damage = 35.0,
+            .scale = 3.0,
+            .radius = 30.0,
+            .length = 25.0,
+            .shape = CollisionShape::kCapsule,
+            .xp = 50,
+            .attributes = MobAttributes{
+                .aggro_radius = 750
+            }
+        },
+        {
+            .name = "Ladybug",
+            .description = "Cute and harmless... if left unprovoked.",
+            .health = [](int r)
+            {
+                return ScaleMobHealth(35.0,r);
+            },
+            .damage = 10.0,
+            .scale = [](int r)
+            {
+                return ScaleBy14(1,r);
+            },
+            .radius = 30.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 5,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Hornet",
+            .description = "These aren't quite as nice as the little bees.",
+            .health = [](int r)
+            {
+                return ScaleMobHealth(40,r);
+            },
+            .damage = 40.0,
+            .scale = [](int r)
+            {
+                return ScaleBy14(1,r);
+                },
+            .radius = 30.0,
+            .width = 60.0,
+            .height = 40.0,
+            .shape = CollisionShape::kEllipse,
+            .xp = 12,
+            .attributes = MobAttributes{
+                .aggro_radius = 600
+            }
+        },
+        {
+            .name = "Cactus",
+            .description = "This one's prickly, don't touch it either.",
+            .health = 25.0,
+            .damage = 30.0,
+            .scale = 2.0,
+            .radius = 30.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 2,
+            .attributes = MobAttributes{
+                .stationary = 1
+            }
+        },
+        {
+            .name = "Rock",
+            .description = "A rock. It doesn't do much.",
+            .health = 5.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 10.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 1,
+            .attributes = MobAttributes{
+                .stationary = 1
+            }
+        },
+        {
+            .name = "Boulder",
+            .health = 40.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 50.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 10,
+            .attributes = MobAttributes{
+                .stationary = 1
+            }
+        },
+        {
+            .name = "Centipede",
+            .description = "It's just there doing its thing.",
+            .health = 50.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 35.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 2,
+            .attributes = MobAttributes{
+                .segments = 10
+            }
+        },
+        {
+            .name = "Evil Centipede",
+            .description = "This one loves flowers.",
+            .health = 50.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 35.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 3,
+            .attributes = MobAttributes{
+                .segments = 10,
+                .poison_damage = {
+                    .damage = 5.0,
+                    .time = 2.0
+                }
+            }
+        },
+        {
+            .name = "Desert Centipede",
+            .description = "It doesn't like it when you interrupt its run.",
+            .health = 50.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 35.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 4,
+            .attributes = MobAttributes{
+                .segments = 6
+            }
+        },
+        {
+            .name = "Sandstorm",
+            .description = "Quite unpredictable.",
+            .health = 30.0,
+            .damage = 40.0,
+            .scale = 1.0,
+            .radius = 32.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 5,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Scorpion",
+            .description = "This one stings, now with poison.",
+            .health = 35.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 35.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 10,
+            .attributes = MobAttributes{
+                .poison_damage = {
+                    .damage = 10.0,
+                    .time = 1.0
+                }
+            }
+        },
+        {
+            .name = "Spider",
+            .description = "Spooky.",
+            .health = 35.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 15.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 8,
+            .attributes = MobAttributes{
+                .poison_damage = {
+                    .damage = 5.0,
+                    .time = 3.0
+                }
+            }
+        },
+        {
+            .name = "Ant Hole",
+            .description = "Ants go in, and come out. Can't explain that.",
+            .health = 500.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 45.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 25,
+            .attributes = MobAttributes{
+                .stationary = 1
+            }
+        },
+        {
+            .name = "Queen Ant",
+            .description = "You must have done something really bad if she's chasing you.",
+            .health = [](int r)
+            {
+                return ScaleMobHealth(350.0,r);
+            },
+            .damage = 10.0,
+            .scale = [](int r)
+            {
+                return ScaleBy14(1,r);
+            },
+            .radius = 25.0,
+            .vertics = {{-58,0},{-55,14.5},{-37.5,29},{37.5,20},{48,0},{37.5,-20},{-37.5,-29},{-55,-14.5}},
+            .shape = CollisionShape::kPolygon,
+            .xp = 15,
+            .attributes = MobAttributes{
+                .aggro_radius = 750
+            }
+        },
+        {
+            .name = "Ladybug",
+            .description = "This one is shiny... I wonder what it could mean...",
+            .health = 25.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 30.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 30,
+            .attributes = MobAttributes{}
+        },
+        {
+            .name = "Square",
+            .description = "???",
+            .health = 20.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 40.0,
+            .width = 60,
+            .height = 60,
+            .shape = CollisionShape::kRectangle,
+            .xp = 1,
+            .attributes = MobAttributes{
+                .stationary = 1
+            }
+        },
+        {
+            .name = "Ellipse",
+            .description = "???",
+            .health = 20.0,
+            .damage = 10.0,
+            .scale = 1.0,
+            .radius = 20.0,
+            .width = 60.0,
+            .height = 40.0,
+            .shape = CollisionShape::kEllipse,
+            .xp = 1,
+            .attributes = MobAttributes{
+                .stationary = 1
+            }
+        },
+        {
+            .name = "Segment",
+            .description = "???",
+            .health = 20.0,
+            .damage = 1.0,
+            .scale = 1.0,
+            .radius = 40.0,
+            .length = 80,
+            .shape = CollisionShape::kSegment,
+            .xp = 1,
+            .attributes = MobAttributes{
+                .stationary = 1
+            },
+        },
+        {
+            .name = "Digger",
+            .description = "Friend or foe? You'll never know...",
+            .health = 250.0,
+            .damage = 25.0,
+            .scale = 1.0,
+            .radius = 40.0,
+            .shape = CollisionShape::kCircle,
+            .xp = 0,
+            .attributes = MobAttributes{}
+        },
+    }
+};
+constexpr std::array<std::array<MobData, NUM_RARITIES>, NUM_MOBS> BakeMobData() {
+    std::array<std::array<MobData, NUM_RARITIES>, NUM_MOBS> result{};
+
+    for (std::size_t p = 0; p < NUM_MOBS; ++p) {
+        const auto& config = MOB_CONFIGS[p];
+        for (std::size_t r = 0; r < NUM_RARITIES; ++r) {
+            // 直接从提前算好的 RarityValue 的 .values 数组中提取对应的数据
+            result[p][r].name        = config.name;
+            result[p][r].description = config.description;
+            result[p][r].health      = config.health.values[r];
+            result[p][r].damage      = config.damage.values[r];
+            result[p][r].scale      = config.scale.values[r];
+            result[p][r].radius      = config.radius;
+            result[p][r].width      = config.width;
+            result[p][r].height      = config.height;
+            result[p][r].length      = config.length;
+            result[p][r].vertics     = config.vertics;
+            result[p][r].shape   = config.shape.values[r];
+            result[p][r].xp   = config.xp.values[r];
+            result[p][r].attributes  = config.attributes.values[r];
+        }
+    }
+    return result;
+}
+inline constexpr auto MOB_DATA = BakeMobData();
 constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
     // [0] None
     {
@@ -798,12 +1226,6 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {{
             .attributes = PetalAttributes{}
         },
 }};
-
-// ==========================================
-// 6. 最终游戏数据结构 & 二维数组转置烘焙
-// ==========================================
-
-
 constexpr std::array<std::array<PetalData, NUM_RARITIES>, NUM_PETALS> BakePetalData() {
     std::array<std::array<PetalData, NUM_RARITIES>, NUM_PETALS> result{};
 
