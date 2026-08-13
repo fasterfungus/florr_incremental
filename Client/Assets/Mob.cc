@@ -160,7 +160,7 @@ void draw_static_mob(MobID::T mob_id, Renderer& ctx, MobRenderAttributes attr)
         ctx.fill();
         break;
     case MobID::kLadybug:
-    case MobID::kMassiveLadybug:
+    //case MobID::kMassiveLadybug:
     case MobID::kDarkLadybug:
     case MobID::kShinyLadybug:
         ctx.scale(scale);
@@ -230,7 +230,7 @@ void draw_static_mob(MobID::T mob_id, Renderer& ctx, MobRenderAttributes attr)
         ctx.fill(1);
         break;
     case MobID::kBeetle:
-    case MobID::kMassiveBeetle:
+    //case MobID::kMassiveBeetle:
         ctx.scale(scale);
         SET_BASE_COLOR(0xff905db0)
         ctx.begin_path();
@@ -385,7 +385,7 @@ void draw_static_mob(MobID::T mob_id, Renderer& ctx, MobRenderAttributes attr)
             break;
         }
     case MobID::kRock:
-    case MobID::kBoulder:
+    //case MobID::kBoulder:
         {
             ctx.scale(scale);
             SET_BASE_COLOR(0xff777777)
@@ -725,8 +725,8 @@ void draw_static_mob(MobID::T mob_id, Renderer& ctx, MobRenderAttributes attr)
         break;
     case MobID::kDigger:
         {
-            ctx.scale(scale);
-            attr.flower_attrs.radius = 40;
+            attr.flower_attrs.radius = 25;
+            attr.flower_attrs.scale = scale;
             BitMath::set(attr.flower_attrs.equip_flags, EquipmentFlags::kCutter);
             BitMath::set(attr.flower_attrs.face_flags, FaceFlags::kSquareEyes);
             draw_static_flower(ctx, attr.flower_attrs);

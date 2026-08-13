@@ -43,7 +43,7 @@ void DeadFlowerIcon::on_render(Renderer &ctx) {
         RarityID::T rarity = physical_loadout_rarities[i];
         ctx.translate(offset_x, offset_y);
         ctx.rotate(PETAL_DATA[id][rarity].attributes.icon_angle);
-        if (PETAL_DATA[id][rarity].radius > 20) ctx.scale(20 / PETAL_DATA[id][rarity].radius);
+        if (PETAL_DATA[id][rarity].radius*PETAL_DATA[id][rarity].scale > 20) ctx.scale(20 / PETAL_DATA[id][rarity].radius*PETAL_DATA[id][rarity].scale);
         draw_static_petal_single(id, ctx);
     }
     {
@@ -62,7 +62,7 @@ void DeadFlowerIcon::on_render(Renderer &ctx) {
         RarityID::T rarity = physical_loadout_rarities[i];
         ctx.translate(offset_x, offset_y);
         ctx.rotate(PETAL_DATA[id][rarity].attributes.icon_angle);
-        if (PETAL_DATA[id][rarity].radius > 20) ctx.scale(20 / PETAL_DATA[id][rarity].radius);
+        if (PETAL_DATA[id][rarity].radius*PETAL_DATA[id][rarity].scale > 20) ctx.scale(20 / PETAL_DATA[id][rarity].radius*PETAL_DATA[id][rarity].scale);
         draw_static_petal_single(id, ctx);
     }
 }

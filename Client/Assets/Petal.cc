@@ -16,7 +16,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.move_to(0,0);
             ctx.line_to(-1.6 * 10.0, 0);
             ctx.stroke();
-        case PetalID::kUniqueBasic:
+        //case PetalID::kUniqueBasic:
         case PetalID::kBasic:
         ctx.set_fill(0xffffffff);
         ctx.set_stroke(0xffcfcfcf);
@@ -27,8 +27,8 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
         ctx.stroke();
         break;
         case PetalID::kLight:
-        case PetalID::kTwin:
-        case PetalID::kTriplet:
+        //case PetalID::kTwin:
+        //case PetalID::kTriplet:
             ctx.set_fill(0xffffffff);
             ctx.set_stroke(0xffcfcfcf);
             ctx.set_line_width(3);
@@ -47,7 +47,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         case PetalID::kStinger: {
-        case PetalID::kTringer:
+        //case PetalID::kTringer:
             ctx.set_fill(0xff333333);
             ctx.set_stroke(0xff292929);
             ctx.set_line_width(3);
@@ -200,7 +200,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         case PetalID::kWeb:
-        case PetalID::kTriweb:
+        //case PetalID::kTriweb:
             ctx.set_fill(0xffffffff);
             ctx.set_stroke(0xffcfcfcf);
             ctx.round_line_cap();
@@ -295,7 +295,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         case PetalID::kCactus:
-        case PetalID::kTricac:
+        //case PetalID::kTricac:
             ctx.set_fill(0xff38c75f);
             ctx.set_stroke(Renderer::HSV(0xff38c75f, 0.8));
             ctx.set_line_width(3);
@@ -378,6 +378,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.fill();
             ctx.stroke();
             break;
+        /*
         case PetalID::kAzalea: {
             ctx.set_fill(0xffff94c9);
             ctx.set_stroke(0xffcf78a3);
@@ -394,6 +395,7 @@ void draw_static_petal_single(PetalID::T id, Renderer &ctx) {
             ctx.stroke();
             break;
         }
+        */
         case PetalID::kPoisonCactus:
             ctx.set_fill(0xffce76db);
             ctx.set_stroke(0xffa760b1);

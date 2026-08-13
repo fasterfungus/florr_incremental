@@ -86,3 +86,129 @@ float Sqrt(float);
 float Clamp(float, float, float);
 bool Equals(float a, float b);
 bool Sign(float value);
+namespace ConstexprMath {
+
+constexpr double LN2 =
+    0.693147180559945309417232121458176568;
+
+constexpr double log(double x) {
+    if (x <= 0.0)
+        return -1.0e300;
+
+    int exponent = 0;
+
+    while (x >= 2.0) {
+        x *= 0.5;
+        ++exponent;
+    }
+
+    while (x < 0.5) {
+        x *= 2.0;
+        --exponent;
+    }
+
+    const double z =
+        (x - 1.0) / (x + 1.0);
+
+    const double z2 = z * z;
+
+    double term = z;
+    double result = 0.0;
+
+    for (int n = 1; n <= 99; n += 2) {
+        result +=
+            term / static_cast<double>(n);
+
+        term *= z2;
+    }
+
+    return
+        2.0 * result +
+        static_cast<double>(exponent) * LN2;
+}
+
+
+constexpr double log1p(double x) {
+    if (x <= -1.0)
+        return -1.0e300;
+
+    if (x > -0.25 && x < 0.25) {
+        double term = x;
+        double result = 0.0;
+
+        for (int n = 1; n <= 99; ++n) {
+            double value =
+                term / static_cast<double>(n);
+
+            if (n & 1)
+                result += value;
+            else
+                result -= value;
+
+            term *= x;
+        }
+
+        return result;
+    }
+
+    return log(1.0 + x);
+}
+
+
+constexpr double exp(double x) {
+    if (x <= -745.0)
+        return 0.0;
+
+    if (x >= 709.0)
+        return 1.0e300;
+
+    int exponent =
+        static_cast<int>(x / LN2);
+
+    double remainder =
+        x -
+        static_cast<double>(exponent) * LN2;
+
+    double result = 1.0;
+    double term = 1.0;
+
+    for (int i = 1; i <= 50; ++i) {
+        term *=
+            remainder /
+            static_cast<double>(i);
+
+        result += term;
+    }
+
+    if (exponent > 0) {
+        for (int i = 0; i < exponent; ++i)
+            result *= 2.0;
+    }
+    else {
+        for (int i = 0; i > exponent; --i)
+            result *= 0.5;
+    }
+
+    return result;
+}
+
+
+constexpr double expm1(double x) {
+    if (x > -0.25 && x < 0.25) {
+        double term = x;
+        double result = x;
+
+        for (int i = 2; i <= 50; ++i) {
+            term *=
+                x / static_cast<double>(i);
+
+            result += term;
+        }
+
+        return result;
+    }
+
+    return exp(x) - 1.0;
+}
+
+}

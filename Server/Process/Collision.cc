@@ -121,7 +121,10 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
 // normal and kill the velocity component that drives it into the wall.
 void on_wall_collide(Simulation *sim, Entity &entity, Wall const &wall) {
     if (entity.pending_delete) return;
-
+    if (entity.has_component(kPetal) && entity.get_petal_id() == PetalID::kMissile && entity.get_parent() == NULL_ENTITY)
+    {
+        sim->request_delete(entity.id);
+    }
     float dist;
     Vector separation(0, 0);
     Geometry g_ent = Geometry(entity);

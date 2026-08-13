@@ -82,13 +82,13 @@ void tick_petal_behavior(Simulation *sim, Entity &petal) {
                 entity_set_despawn_tick(petal, 2.5 * TPS);
             }
             break;
-        case PetalID::kTriweb:
+        //case PetalID::kTriweb:
         case PetalID::kWeb: {
             if (BitMath::at(player.input, InputFlags::kAttacking)) {
                 Vector delta(petal.get_x() - player.get_x(), petal.get_y() - player.get_y());
                 petal.friction = DEFAULT_FRICTION;
                 float angle = delta.angle();
-                if (petal.get_petal_id() == PetalID::kTriweb) angle += frand() - 0.5;
+                //if (petal.get_petal_id() == PetalID::kTriweb) angle += frand() - 0.5;
                 petal.acceleration.unit_normal(angle).set_magnitude(25 * PLAYER_ACCELERATION);
                 entity_set_despawn_tick(petal, 0.6 * TPS);
             } else if (BitMath::at(player.input, InputFlags::kDefending))

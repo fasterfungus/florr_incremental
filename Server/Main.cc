@@ -16,7 +16,6 @@ int main() {
     std::printf("ALL BVH TESTS PASSED\n");
     std::cout << "Diagnostics: {\n";
     std::cout << "  Simulation Size: " << sizeof(Simulation) << '\n';
-    std::cout << "  BVH Size: " << sizeof(BVHCollisionManager) << '\n';
     std::cout << "  Entity Size: " << sizeof(Entity) << '\n';
     std::cout << "}\n";
     srand(std::time(0));

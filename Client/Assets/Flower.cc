@@ -5,9 +5,9 @@
 #include <Helpers/Bits.hh>
 
 void draw_static_flower(Renderer &ctx, FlowerRenderAttributes attributes) {
+    ctx.scale(attributes.scale);
     if (BitMath::at(attributes.equip_flags, EquipmentFlags::kCutter)) {
         RenderContext context(&ctx);
-        ctx.scale(attributes.scale);
         ctx.rotate(attributes.cutter_angle);
         draw_static_petal_single(PetalID::kCutter, ctx);
     }
@@ -16,7 +16,6 @@ void draw_static_flower(Renderer &ctx, FlowerRenderAttributes attributes) {
         base_color = 0xffce76db;
     else if (BitMath::at(attributes.face_flags, FaceFlags::kDandelioned)) 
         base_color = Renderer::MIX(base_color, 0xffffffff, 0.4);
-    ctx.scale(attributes.scale);
     ctx.set_stroke(Renderer::HSV(base_color, 0.8));
     ctx.set_fill(base_color);
     ctx.set_line_width(3);

@@ -90,17 +90,29 @@ void entity_on_death(Simulation* sim, Entity const& ent)
             struct MobData const& mob_data = MOB_DATA[ent.get_mob_id()][ent.get_mob_rarity()];
             std::vector<PetalID::T> success_drops_id = {};
             std::vector<RarityID::T> success_drops_rarity = {};
-            StaticArray<float, MAX_DROPS_PER_MOB> const& drop_chances = MOB_DROP_CHANCES[ent.get_mob_id()];
-            RarityID::T success_drop_rarity = RarityID::kCommon; //TODO 修改这里的内容
-            /*
-            for (uint32_t i = 0; i < mob_data.drops.size(); ++i)
-                if (frand() < drop_chances[i])
+            StaticArray<PetalDropChance, MAX_DROPS_PER_MOB> drop_chances = MOB_DROP_CHANCES[ent.get_mob_id()][ent.
+                get_mob_rarity()];
+            for (uint32_t i = 0; i < drop_chances.size(); ++i)
+            {
+                PetalID::T petal_id = drop_chances[i].id;
+                float roll = frand();
+                float cumulative = 0.0f;
+
+                for (RarityID::T petal_rarity = 0;
+                     petal_rarity < drop_chances[i].chances.size();
+                     ++petal_rarity)
                 {
-                    success_drops_id.push_back(mob_data.drops[i]);
-                    success_drops_rarity.push_back(success_drop_rarity);
+                    cumulative += drop_chances[i].chances[petal_rarity];
+
+                    if (roll < cumulative)
+                    {
+                        success_drops_id.push_back(petal_id);
+                        success_drops_rarity.push_back(petal_rarity);
+                        break;
+                    }
                 }
-            _alloc_drops(sim, success_drops_id,success_drops_rarity, ent.get_x(), ent.get_y());
-            */
+            }
+            _alloc_drops(sim, success_drops_id, success_drops_rarity, ent.get_x(), ent.get_y());
         }
         if (ent.get_mob_id() == MobID::kAntHole &&
             BitMath::at(ent.flags, EntityFlags::kSpawnedFromZone) &&
@@ -114,7 +126,7 @@ void entity_on_death(Simulation* sim, Entity const& ent)
     }
     else if (ent.has_component(kPetal))
     {
-        if (ent.get_petal_id() == PetalID::kWeb || ent.get_petal_id() == PetalID::kTriweb)
+        if (ent.get_petal_id() == PetalID::kWeb /*|| ent.get_petal_id() == PetalID::kTriweb*/)
             alloc_web(sim, 100, ent);
     }
     else if (ent.has_component(kFlower))

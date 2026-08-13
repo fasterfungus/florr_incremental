@@ -64,7 +64,7 @@ static Entity &__alloc_mob(
     mob.set_y(y);
     Set(mob);
     mob.friction = DEFAULT_FRICTION;
-    mob.mass = (1 + mob.get_radius()*mob.get_scale() / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 10000 : 1);
+    mob.mass = (1 + mob.get_radius()*mob.get_scale()*3 / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 5 : 1);
     if (mob_id == MobID::kAntHole)
         BitMath::set(mob.flags, EntityFlags::kNoFriendlyCollision);
 
@@ -126,8 +126,8 @@ Entity &alloc_mob(
             seg.add_component(kSegmented);
             seg.seg_head = curr->id;
             seg.set_angle(curr->get_angle() + frand() * 0.1 - 0.05);
-            seg.set_x(curr->get_x() - (curr->get_radius() + seg.get_radius()) * cosf(seg.get_angle()));
-            seg.set_y(curr->get_y() - (curr->get_radius() + seg.get_radius()) * sinf(seg.get_angle()));
+            seg.set_x(curr->get_x() - (curr->get_radius()*curr->get_scale() + seg.get_radius()*seg.get_scale()) * cosf(seg.get_angle()));
+            seg.set_y(curr->get_y() - (curr->get_radius()*curr->get_scale() + seg.get_radius()*seg.get_scale()) * sinf(seg.get_angle()));
             curr = &seg;
         }
         return head;

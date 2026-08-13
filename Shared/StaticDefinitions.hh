@@ -44,7 +44,7 @@ namespace PetalID {
         kHeavy,
         kStinger,
         kLeaf,
-        kTwin,
+        //kTwin,
         kRose,
         kIris,
         kMissile,
@@ -59,24 +59,22 @@ namespace PetalID {
         kSand,
         kPincer,
         kDahlia,
-        kTriplet,
+        //kTriplet,
         kAntEgg,
         kBlueIris,
         kPollen,
         kPoisonPeas,
         kBeetleEgg,
-        kAzalea,
+        //kAzalea,
         kStick,
-        kTringer,
-        kTriweb,
         kAntennae,
-        kTricac,
+        //kTricac,
         kHeaviest,
         kThirdEye,
         kObserver,
         kPoisonCactus,
         kSalt,
-        kUniqueBasic,
+        //kUniqueBasic,
         kSquare,
         kEllipse,
         kMoon,
@@ -233,33 +231,31 @@ namespace MapID
 namespace MobID {
     typedef uint8_t T;
     enum : T {
-        kBabyAnt,
-        kWorkerAnt,
-        kSoldierAnt,
-        kBee,
-        kLadybug,
-        kBeetle,
-        kMassiveLadybug,
-        kMassiveBeetle,
-        kDarkLadybug,
-        kHornet,
-        kCactus,
-        kRock,
-        kBoulder,
-        kCentipede,
-        kEvilCentipede,
-        kDesertCentipede,
-        kSandstorm,
-        kScorpion,
-        kSpider,
-        kAntHole,
-        kQueenAnt,
-        kShinyLadybug,
-        kSquare,
+        kBabyAnt, //0
+        kWorkerAnt,//1
+        kSoldierAnt,//2
+        kBee,//3
+        kLadybug,//4
+        kBeetle,//5
+        kDarkLadybug,//6
+        kHornet,//7
+        kCactus,//8
+        kRock,//9
+        //kBoulder,//10
+        kCentipede,//11
+        kEvilCentipede,//12
+        kDesertCentipede,//13
+        kSandstorm,//14
+        kScorpion,//15
+        kSpider,//16
+        kAntHole,//17
+        kQueenAnt,//18
+        kShinyLadybug,//19
+        kSquare,//20
         //kCapsule,
-        kEllipse,
-        kSegment,
-        kDigger,
+        kEllipse,//21
+        kSegment,//22
+        kDigger,//23
         kNumMobs
     };
 };
@@ -390,6 +386,7 @@ struct PetalData {
     float reload;
     int count;
     PetalAttributes attributes;
+    RarityID::T min_drop_rarity;
 };
 struct MobAttributes {
     float aggro_radius = 500;
@@ -411,8 +408,8 @@ struct MobData {
     float length;
     StaticArray<std::array<float,2>,8> vertics;
     uint8_t shape;
-
     uint32_t xp;
+    StaticArray<std::pair<PetalID::T,double>,10> drops;
     MobAttributes attributes;
 };
 
@@ -441,3 +438,8 @@ namespace Map {
         kNumGamemodes
     };
 }
+struct PetalDropChance
+{
+    PetalID::T id;
+    StaticArray<double,RarityID::kNumRarities> chances;
+};
