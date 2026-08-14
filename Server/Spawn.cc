@@ -19,7 +19,7 @@ Entity &alloc_drop(Simulation *sim, PetalID::T drop_id ,RarityID::T drop_rarity)
     drop.set_radius(25);
     drop.set_width(50);
     drop.set_height(50);
-    drop.set_shape(5);
+    drop.set_shape(CollisionShape::kRectangle);
     Set(drop);
     drop.set_angle(frand() * 0.2 - 0.1);
     drop.friction = 0.25;
@@ -64,7 +64,7 @@ static Entity &__alloc_mob(
     mob.set_y(y);
     Set(mob);
     mob.friction = DEFAULT_FRICTION;
-    mob.mass = (1 + mob.get_radius()*mob.get_scale()*3 / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 5 : 1);
+    mob.mass = (1 + mob.get_radius()*mob.get_scale()*4 / BASE_FLOWER_RADIUS) * (data.attributes.stationary ? 10 : 1);
     if (mob_id == MobID::kAntHole)
         BitMath::set(mob.flags, EntityFlags::kNoFriendlyCollision);
 
@@ -141,7 +141,7 @@ Entity &alloc_player(Simulation *sim, EntityID const team) {
     player.set_scale(1.0);
     player.set_radius(BASE_FLOWER_RADIUS);
 
-    player.set_shape(1);
+    player.set_shape(CollisionShape::kCircle);
     Set(player);
     player.friction = DEFAULT_FRICTION;
     player.mass = 1;
@@ -175,7 +175,7 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id,RarityID::T petal_rarit
     petal.set_y(parent.get_y());
     petal.set_scale(petal_data.scale);
     petal.set_radius(petal_data.radius);
-    petal.set_shape(1);
+    petal.set_shape(CollisionShape::kCircle);
     Set(petal);
     if (petal_data.attributes.rotation_style == PetalAttributes::kPassiveRot)
         petal.set_angle(frand() * 2 * M_PI);
@@ -204,15 +204,15 @@ Entity &alloc_petal(Simulation *sim, PetalID::T petal_id,RarityID::T petal_rarit
     return petal;
 }
 
-Entity &alloc_web(Simulation *sim, float radius, Entity const &parent) {
+Entity &alloc_web(Simulation *sim, float scale, Entity const &parent) {
     Entity &web = sim->alloc_ent();
     web.add_component(kPhysics);
     web.set_x(parent.get_x());
     web.set_y(parent.get_y());
     web.set_angle(frand() * 2 * M_PI);
-    web.set_scale(1.0);
-    web.set_radius(radius);
-    web.set_shape(1);
+    web.set_scale(scale);
+    web.set_radius(10);
+    web.set_shape(CollisionShape::kCircle);
     Set(web);
     web.mass = 1.0;
     web.friction = 1.0;

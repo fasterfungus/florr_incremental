@@ -127,7 +127,7 @@ void entity_on_death(Simulation* sim, Entity const& ent)
     else if (ent.has_component(kPetal))
     {
         if (ent.get_petal_id() == PetalID::kWeb /*|| ent.get_petal_id() == PetalID::kTriweb*/)
-            alloc_web(sim, 100, ent);
+            alloc_web(sim, 10, ent);
     }
     else if (ent.has_component(kFlower))
     {

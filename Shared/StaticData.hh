@@ -686,14 +686,20 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {
             .min_drop_rarity = RarityID::kCommon
         },
         {
-            .name = "Fast",
+            .name = "Light",
             .description = "Weaker than most petals, but reloads very quickly",
             .health = 5.0,
             .damage = 8.0,
             .scale = 1.0,
             .radius = 7.0,
             .reload = 1.0,
-            .count = 1,
+            .count = [](int r) {
+                if (r == RarityID::kCommon) return 1;
+                if (r<RarityID::kLegendary) return 2;
+                if (r == RarityID::kLegendary) return 3;
+                if (r >= RarityID::kMythic) return 5;
+                return 1;
+            },
             .attributes = PetalAttributes{},
             .min_drop_rarity = RarityID::kCommon
         },
@@ -717,8 +723,16 @@ constexpr std::array<PetalConfig, NUM_PETALS> PETAL_CONFIGS = {
             .scale = 1.0,
             .radius = 7.0,
             .reload = 3.5,
-            .count = 1,
-            .attributes = PetalAttributes{},
+            .count = [](int r) {
+                if (r == RarityID::kMythic) return 3;
+                if (r > RarityID::kMythic) return 5;
+                return 1;
+            },
+            .attributes = [](int r)
+            {
+                if (r >= RarityID::kMythic) return PetalAttributes{.clump_radius = 10};
+                return PetalAttributes{.clump_radius = 0};
+            },
             .min_drop_rarity = RarityID::kCommon
         },
         {

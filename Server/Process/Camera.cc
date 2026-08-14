@@ -16,6 +16,7 @@ void tick_camera_behavior(Simulation *sim, Entity &ent) {
 
         ent.last_damaged_by = player.last_damaged_by;
         struct ZoneDefinition const &zone = MAP_DATA[Map::get_zone_from_pos(player.get_x(), player.get_y())];
+        /*
         if (zone.difficulty < Map::difficulty_at_level(score_to_level(player.get_score()))) {
             if (player.get_overlevel_timer() < PETAL_DISABLE_DELAY * TPS)
                 player.set_overlevel_timer(player.get_overlevel_timer() + 1);
@@ -25,6 +26,7 @@ void tick_camera_behavior(Simulation *sim, Entity &ent) {
                 player.set_overlevel_timer(player.get_overlevel_timer() - 0.1);
             else player.set_overlevel_timer(0);
         }
+        */
     } else {
         if (BitMath::at(ent.flags, EntityFlags::kCPUControlled)) {
             //temp: cpu cameras die

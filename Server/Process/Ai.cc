@@ -423,7 +423,7 @@ void tick_ai_behavior(Simulation *sim, Entity &ent) {
             break;
         case MobID::kSpider:
             if (ent.lifetime % (TPS) == 0) 
-                alloc_web(sim, 25, ent);
+                alloc_web(sim, 2.5*ent.get_scale(), ent);
             tick_default_aggro(sim, ent, 1.20);
             break;
         case MobID::kQueenAnt:

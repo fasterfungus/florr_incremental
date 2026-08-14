@@ -80,7 +80,7 @@ void on_collide(Simulation *sim, Entity &ent1, Entity &ent2) {
             separation.unit_normal(frand() * 2 * M_PI);
         else
             separation.Normalize();
-        float ratio = ent2.mass*ent2.get_scale() / (ent1.mass*ent1.get_scale() + ent2.mass*ent2.get_scale());
+        float ratio = ent2.mass / (ent1.mass + ent2.mass);
         if (!is_finite(ratio)) ratio = 0.5f;
         if (!(ent1.get_team() == ent2.get_team())) {
             if (ent1.has_component(kFlower) && !ent2.has_component(kPetal))

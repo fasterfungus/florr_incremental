@@ -29,4 +29,5 @@ void draw_web(Renderer &ctx) {
         }
     }
     ctx.stroke();
+
 }

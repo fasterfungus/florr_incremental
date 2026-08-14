@@ -127,9 +127,9 @@ void Game::init() {
     game_ui_window.add_child(
         Ui::make_broadcast_display()
     );
-    game_ui_window.add_child(
-        Ui::make_overlevel_indicator()
-    );
+    //game_ui_window.add_child(
+    //    Ui::make_overlevel_indicator()
+    //);
     game_ui_window.add_child(
         Ui::make_stat_screen()
     );

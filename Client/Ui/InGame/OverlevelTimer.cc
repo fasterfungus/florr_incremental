@@ -6,7 +6,7 @@
 #include <Client/Game.hh>
 
 #include <Shared/Map.hh>
-
+/*
 using namespace Ui;
 
 OverlevelTimer::OverlevelTimer(float w) : Element(w,w,{}) {}
@@ -49,3 +49,4 @@ Element *Ui::make_overlevel_indicator() {
     elt->y = -80;
     return elt;
 }
+*/
