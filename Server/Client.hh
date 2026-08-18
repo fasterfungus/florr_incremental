@@ -39,7 +39,7 @@ public:
     //optionally, the client can also be disconnected
     bool check_invalid(bool);
     static void on_message(WebSocket *, std::string_view, uint64_t);
-    static void command(Client* client, std::string const& text, float mouse_x, float mouse_y);
+    static void command(Client* client, std::string const& text);
     static void on_disconnect(WebSocket *, int, std::string_view);
 };
 

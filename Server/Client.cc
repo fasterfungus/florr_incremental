@@ -101,6 +101,8 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code)
                 return;
             float x = reader.read<float>();
             float y = reader.read<float>();
+            client->mouse_world_x = x;
+            client->mouse_world_y = y;
             // Reject NaN/Inf outright. Comparisons against NaN are always false,
             // so `x == 0` and `|x| > 5e3` alone would let a NaN payload slip
             // straight into player.acceleration and then into velocity/position
@@ -193,7 +195,7 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code)
 
             if (!text.empty() && text[0] == '/')
             {
-                command(client, text.substr(1), client->mouse_world_x, client->mouse_world_y);
+                command(client, text.substr(1));
                 break;
             }
 
@@ -203,18 +205,26 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code)
     }
 }
 
-void Client::command(Client* client, std::string const& text, float mouse_x, float mouse_y)
+void Client::command(Client* client, std::string const& text)
 {
     Simulation* simulation = &client->game->simulation;
     Entity& camera = simulation->get_ent(client->camera);
     Entity& player = simulation->get_ent(camera.get_player());
-    float x = mouse_x;
-    float y = mouse_y;
 
-    std::istringstream iss(text);
+    std::string lower_text = text;
+    std::transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
+
+    std::istringstream iss(lower_text);
     std::string command, arg;
     iss >> command;
-    std::transform(command.begin(), command.end(), command.begin(), ::tolower);
+
+    float x = player.get_x();
+    float y = player.get_y();
+    if (command.ends_with("to")) {
+        command = command.substr(0, command.size() - 2);  // 去掉 "to" 后缀
+        x += client->mouse_world_x;
+        y += client->mouse_world_y;
+    }
 
     if (command == "kill")
     {
@@ -244,7 +254,7 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
 
                 // 调用你现在的 alloc_drop（接收 id 和 rarity）
                 Entity& drop = alloc_drop(simulation, id, rarity);
-                drop.set_x(player.get_x()), drop.set_y(player.get_y());
+                drop.set_x(x), drop.set_y(y);
 
             } catch (const std::invalid_argument&) {
                 // 参数不是数字
@@ -309,13 +319,8 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
     else if (command == "tp")
     {
         try { iss >> arg, x = std::stof(arg), iss >> arg, y = std::stof(arg); }
-        catch (const std::invalid_argument&) { return; }
-        catch (const std::out_of_range&) { return; }
-        if (!is_finite(x) || !is_finite(y)) return;
-        player.set_x(fclamp(x, 0, ARENA_WIDTH)), player.set_y(fclamp(y, 0, ARENA_HEIGHT));
-    }
-    else if (command == "tpto")
-    {
+        catch (const std::invalid_argument&) {}
+        catch (const std::out_of_range&) {}
         if (!is_finite(x) || !is_finite(y)) return;
         player.set_x(fclamp(x, 0, ARENA_WIDTH)), player.set_y(fclamp(y, 0, ARENA_HEIGHT));
     }
@@ -346,7 +351,7 @@ void Client::command(Client* client, std::string const& text, float mouse_x, flo
                 }
                 MobID::T id = static_cast<MobID::T>(id_int);
                 RarityID::T rarity = static_cast<RarityID::T>(rarity_int);
-                alloc_mob(simulation, id, rarity, player.get_x(), player.get_y(),NULL_ENTITY);
+                alloc_mob(simulation, id, rarity, x, y, NULL_ENTITY);
             }
             catch (const std::invalid_argument&) { return; }
             catch (const std::out_of_range&) { return; }

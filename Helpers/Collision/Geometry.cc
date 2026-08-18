@@ -82,6 +82,10 @@ bool Contains(const Geometry& geometry, const Vector& pt){
                 float radius2 = geometry.radius * geometry.radius;
                 return dist2 <= radius2;
             }
+            default:{
+                assert(false && "Unknown CollisionShape");
+                return false;
+            }
         }
 
 }
@@ -207,6 +211,11 @@ Vector GetFarthestProjectionPoint(const Geometry& geometry, const Vector& dir)
             p.x += x;
             return p;
             break;
+        }
+    default:
+        {
+            assert(false && "Unknown CollisionShape");
+            return Vector(0, 0);
         }
     }
 }

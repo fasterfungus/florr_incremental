@@ -229,7 +229,6 @@ void Game::tick(double time) {
     Ui::focused = nullptr;
     double a = Ui::window_width / 1920;
     double b = Ui::window_height / 1080;
-    Ui::scale = std::max(a, b);
     Game::scale = Ui::scale = std::max(a, b);
     if (alive()) {
         on_game_screen = 1;
