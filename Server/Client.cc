@@ -13,7 +13,6 @@
 
 #include <array>
 #include <iostream>
-#define VALIDATE(expr) if (!expr) { client->disconnect(); return; }
 constexpr std::array<uint32_t, RarityID::kNumRarities> RARITY_TO_XP = {2, 10, 50, 200, 1000, 5000, 0};
 
 Client::Client() : game(nullptr)
@@ -101,8 +100,6 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code)
                 return;
             float x = reader.read<float>();
             float y = reader.read<float>();
-            client->mouse_world_x = x;
-            client->mouse_world_y = y;
             // Reject NaN/Inf outright. Comparisons against NaN are always false,
             // so `x == 0` and `|x| > 5e3` alone would let a NaN payload slip
             // straight into player.acceleration and then into velocity/position
@@ -187,15 +184,19 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code)
             Entity& camera = simulation->get_ent(client->camera);
             Entity& player = simulation->get_ent(camera.get_player());
             std::string text;
-            VALIDATE(validator.validate_string(MAX_CHAT_LENGTH));
+            if (client->check_invalid(validator.validate_string(MAX_CHAT_LENGTH))) return;
             reader.read<std::string>(text);
-            VALIDATE(UTF8Parser::is_valid_utf8(text));
+            if (client->check_invalid(UTF8Parser::is_valid_utf8(text))) return;
             text = UTF8Parser::trunc_string(text, MAX_CHAT_LENGTH);
             if (text.empty()) break;
 
-            if (!text.empty() && text[0] == '/')
+            if (client->check_invalid(validator.validate_uint8() && validator.validate_float())) return;
+            float x = reader.read<float>();
+            float y = reader.read<float>();
+
+            if (text[0] == '/')
             {
-                command(client, text.substr(1));
+                command(client, text.substr(1), x, y);
                 break;
             }
 
@@ -205,7 +206,7 @@ void Client::on_message(WebSocket* ws, std::string_view message, uint64_t code)
     }
 }
 
-void Client::command(Client* client, std::string const& text)
+void Client::command(Client* client, std::string const& text, float client_x, float client_y)
 {
     Simulation* simulation = &client->game->simulation;
     Entity& camera = simulation->get_ent(client->camera);
@@ -222,8 +223,8 @@ void Client::command(Client* client, std::string const& text)
     float y = player.get_y();
     if (command.ends_with("to")) {
         command = command.substr(0, command.size() - 2);  // 去掉 "to" 后缀
-        x += client->mouse_world_x;
-        y += client->mouse_world_y;
+        x += client_x;
+        y += client_y;
     }
 
     if (command == "kill")

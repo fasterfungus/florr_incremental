@@ -100,11 +100,13 @@ void Game::swap_all_petals() {
     for (uint32_t i = 0; i < Game::loadout_count; ++i)
         Ui::ui_swap_petals(i, i + Game::loadout_count);
 }
-void Game::send_chat(std::string const& text) {
-    uint8_t packet[100];
-    Writer writer(static_cast<uint8_t*>(packet));
+
+void Game::send_chat(std::string const &text) {
+    Writer writer(static_cast<uint8_t *>(OUTGOING_PACKET));
     if (!Game::alive()) return;
     writer.write<uint8_t>(Serverbound::kChatSend);
     writer.write<std::string>(text);
+    writer.write<float>((Input::mouse_x - renderer.width / 2) / scale / simulation.get_ent(camera_id).get_fov());
+    writer.write<float>((Input::mouse_y - renderer.height / 2) / scale / simulation.get_ent(camera_id).get_fov());
     socket.send(writer.packet, writer.at - writer.packet);
 }
